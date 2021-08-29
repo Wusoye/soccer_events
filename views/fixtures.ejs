@@ -1,0 +1,90 @@
+<%- include('include/header') %>
+
+<form action="" method="POST">
+    <div class="row" style="text-align: center;">
+        <div class="col">
+            <input type="date" name="dateMatch" id="dateMatch" class="input-group date">
+            
+        </div>
+        <div class="col">
+            <button type="submit" class="btn btn-primary btn-sm">Valider</button>
+        </div>
+    </div>
+</form>
+
+<br>
+
+<table class="table table-striped table-bordered border-secondary" data-toggle="table" data-pagination="true">
+    <thead>
+        <tr>
+            <th data-sortable="true" scope="col">Date</th>
+            <th data-sortable="true" scope="col">League</th>
+            <th scope="col">Teams</th>
+            <th scope="col">Score</th>
+            <th scope="col">Prediction</th>
+        </tr>
+    </thead>
+    <tbody>
+
+<% data.forEach(function(event){
+        fixture = event['fixture'],
+        league = event['league'],
+        teams = event['teams'],
+        goals = event['goals'],
+        score = event['score'],
+
+        id_fixture = fixture['id'],
+        date = moment(fixture['date']).format("DD-MM-YYYY HH:mm"), 
+        long_status = fixture['status']['long'], 
+        short_status = fixture['status']['short'],
+        elapsed = fixture['status']['elapsed'],
+
+        id_league = league['id'],
+        name_league = league['name'],
+        country_league = league['country'],
+        img_logo = league['logo'],
+        season_league = league['season'],
+        round_league = league['round'],
+
+        home = teams['home'],
+        away = teams['away'],
+
+        home_id = home['id'],
+        home_name = home['name'],
+        home_logo = home['logo'],
+
+        away_id = away['id'],
+        away_name = away['name'],
+        away_logo = away['logo'],
+
+        home_goal_ft = score['fulltime']['home'],
+        away_goal_ft = score['fulltime']['away']; %>
+
+        <tr>
+            <td>
+                <%= date %>
+            </td>
+            <td>
+                <%= country_league %> - <%= name_league %> - <%= id_league %>
+            </td>
+            <td>
+                <%= home_name %> - <%= away_name %>
+            </td>
+            <td>
+                <% if (elapsed) { %>  
+                    <%= home_goal_ft %> - <%= away_goal_ft %> 
+                <%} else { %> 
+                    <%= short_status %> 
+                <% } %>
+            </td>
+            <td>
+                <a href="/predictions_by_fixture/<%- id_fixture -%>">Press me</a>
+            </td>
+        </tr>
+
+<% }); %> 
+
+    </tbody>
+</table>
+
+<%- include('include/footer') %>

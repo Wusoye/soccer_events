@@ -1,0 +1,59 @@
+data_book.forEach(function(un_book) {
+
+    if (un_book['id'] == 16) {
+        name_book = un_book['name']
+        bets_book = un_book['bets']
+        score_exact_odd = [];
+
+        bets_book.forEach(function(un_bet){
+
+            if (un_bet['id'] == 10) {
+                values = un_bet['values']
+
+                values.forEach(function(une_value){
+                    score_exact_odd.push([une_value['value'], une_value['odd']])
+                })
+            }
+        })
+    }
+});
+
+console.log(score_exact_odd);
+
+//-----
+
+/*app.get('/predictions_by_fixture/:id', function(req, res){
+    my_id = String(req.params.id);
+    var options = {
+      method: 'GET',
+      url: 'https://api-football-v1.p.rapidapi.com/v3/predictions',
+      params: {fixture: my_id},
+      headers: {
+        'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+        'x-rapidapi-key': 'c5b77243e3mshe9ba9a33f164ba5p149e4bjsn1c1fdd2bc8f0'
+      }
+    };
+    
+    axios.request(options).then(function (response_1) {
+  
+      var options = {
+        method: 'GET',
+        url: 'https://api-football-v1.p.rapidapi.com/v3/odds',
+        params: {fixture: my_id},
+        headers: {
+          'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+          'x-rapidapi-key': 'c5b77243e3mshe9ba9a33f164ba5p149e4bjsn1c1fdd2bc8f0'
+        }
+      };
+      
+      axios.request(options).then(function (response_2) {
+        //console.log(response_2.data.response[0].bookmakers);
+        res.render('predictions_by_fixture', {data_pred: response_1.data.response[0], data_book: response_2.data.response[0].bookmakers});
+      }).catch(function (error) {
+        console.error(error);
+      });
+  
+    }).catch(function (error) {
+      console.error(error);
+    });
+  });*/ // with odd

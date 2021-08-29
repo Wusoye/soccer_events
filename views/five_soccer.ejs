@@ -1,0 +1,47 @@
+<%- include('include/header') -%>
+
+ 
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table" data-search="true" data-pagination="true">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th data-sortable="true" scope="col">League</th>
+                    <th scope="col">Teams</th>
+                    <th scope="col">1</th>
+                    <th scope="col">N</th>
+                    <th scope="col">2</th>
+                    <th scope="col">score</th>                    
+                </tr>
+            </thead>
+            <tbody>
+                <% data.forEach(element=> { %>
+                    <% let nbDay = 30; if ( moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days')){ %>
+                    <tr>
+                        <td>
+                            <%= moment(element.date).format("DD-MM-YYYY") %>
+                        </td>
+                        <td>
+                            <%= (element.league).substring(0, 30) %>
+                        </td>
+                        <td>
+                            <%= element.team1 %> - <%= element.team2 %>
+                        </td>
+                        <td>
+                            <%= (element.prob1 * 100).toFixed(2) %>
+                        </td>
+                        <td>
+                            <%= (element.probtie * 100).toFixed(2) %>
+                        </td>
+                        <td>
+                            <%= (element.prob2 * 100).toFixed(2) %>
+                        </td>
+                        <td>
+                            <%= element.score1 %> - <%= element.score2 %>
+                        </td>
+                    </tr>
+                    <% }; %>
+                <% }); %>
+            </tbody>
+        </table>
+
+<%- include('include/footer') -%>

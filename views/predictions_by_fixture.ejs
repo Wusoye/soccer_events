@@ -1,0 +1,218 @@
+<%- include('include/header_predictions') %>
+
+<% 
+
+//---- catégories
+predictions = data_pred['predictions']
+league = data_pred['league']
+teams = data_pred['teams']
+comparison = data_pred['comparison']
+h2h = data_pred['h2h']
+
+//----  league
+
+id_league = league['id']
+name_league = league['name']
+country_league = league['country']
+logo_league = league['logo']
+flag_league = league['flag']
+season_league = league['season']
+
+//----  teams
+
+home_info = teams['home']
+away_info = teams['away']
+
+id_home = home_info['id']
+name_home = home_info['name']
+logo_home = home_info['logo']
+
+
+id_away = away_info['id']
+name_away = away_info['name']
+logo_away = away_info['logo']
+
+//----  comparison
+
+form_comparison = comparison['form']
+home_form = form_comparison['home']
+away_form = form_comparison['away']
+
+att_comparison = comparison['att']
+home_att = att_comparison['home']
+away_att = att_comparison['away']
+
+def_comparison = comparison['def']
+home_def = def_comparison['home']
+away_def = def_comparison['away']
+
+poissond_comparison = comparison['poisson_distribution']
+home_poissond = poissond_comparison['home']
+away_poissond = poissond_comparison['away']
+
+poissond_comparison = comparison['poisson_distribution']
+home_poissond = poissond_comparison['home']
+away_poissond = poissond_comparison['away']
+
+h2h_comparison = comparison['h2h']
+home_h2h = h2h_comparison['home']
+away_h2h = h2h_comparison['away']
+
+goals_comparison = comparison['goals']
+home_goals = goals_comparison['home']
+away_goals = goals_comparison['away']
+
+total_comparison = comparison['total']
+home_total = total_comparison['home']
+away_total = total_comparison['away']
+
+//---- predictions
+
+winner_predictions = predictions['winner']
+id_winner = winner_predictions['id']
+name_winner = winner_predictions['name']
+comment_winner = winner_predictions['comment']
+
+bool_win_or_draw = predictions['win_or_draw']
+under_over = predictions['under_over']
+
+goals_predictions = predictions['goals']
+home_goals_pred = goals_predictions['home']
+away_goals_pred = goals_predictions['away']
+
+advice = predictions['advice']
+
+percent_predictions = predictions['percent']
+home_percent = percent_predictions['home']
+draw_percent = percent_predictions['draw']
+away_percent = percent_predictions['away']
+
+
+
+%> 
+
+<div class="row justify-content-md-left" id="img_country_league">
+    <div class="col col-1">
+        <img src = <%= logo_league %> />
+    </div>
+    <div class="col-md-auto">
+        <h4><%= country_league %> - <%= name_league %> - <%= season_league %></h4>
+    </div>
+</div>
+
+<br>
+<br>
+
+<div class="row justify-content-md-center" id="img_both_team">
+    <div class="col col-1">
+        <img src = <%= logo_home %> />
+    </div>
+    <div class="col-md-auto">
+        <h4><%= name_home %> - <%= name_away %></h4>
+    </div>
+    <div class="col col-1">
+        <img src = <%= logo_away %> />
+    </div>
+</div>
+
+<br>
+
+<div class="row">
+    <div class="col-6">
+
+        <div class="table-responsive-md">
+            <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+                <thead>
+                    <tr>
+                      <th scope="col">Predictions</th>
+                      <th scope="col">Tips</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <th scope="row">Winner</th>
+                        <td><%= name_winner %></td>
+                    </tr>
+                    <% if(bool_win_or_draw){ %>
+                    <tr>
+                        <th scope="row">Winner or draw</th>
+                        <td><%= comment_winner %></td>
+                    </tr>
+                    <% }; %> 
+                    <tr>
+                        <th scope="row">Under / Over</th>
+                        <td><%= under_over %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Home goals / Away goals</th>
+                        <td><%= home_goals_pred %> / <%= away_goals_pred %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Percent winning</th>
+                        <td><%= home_percent %> / <%= draw_percent %> / <%= away_percent %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Advice</th>
+                        <td><%= advice %></td>
+                    </tr>
+                  </tbody>
+            </table>
+        </div>
+
+    </div>
+    <div class="col-6">
+
+        <div class="table-responsive-md">
+            <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+                <thead>
+                    <tr>
+                      <th scope="col">Compare</th>
+                      <th scope="col">Home</th>
+                      <th scope="col">Away</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <th scope="row">Form</th>
+                        <td><%= home_form %></td>
+                        <td><%= away_form %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Attack</th>
+                        <td><%= home_att %></td>
+                        <td><%= away_att %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Defense</th>
+                        <td><%= home_def %></td>
+                        <td><%= away_def %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Poisson distribution</th>
+                        <td><%= home_poissond %></td>
+                        <td><%= away_poissond %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Head 2 head</th>
+                        <td><%= home_h2h %></td>
+                        <td><%= away_h2h %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Goal</th>
+                        <td><%= home_goals %></td>
+                        <td><%= away_goals %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Total</th>
+                        <td><%= home_total %></td>
+                        <td><%= away_total %></td>
+                    </tr>
+                  </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+<%- include('include/footer') %>
