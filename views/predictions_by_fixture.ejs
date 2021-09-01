@@ -88,8 +88,7 @@ draw_percent = percent_predictions['draw']
 away_percent = percent_predictions['away']
 
 
-
-%> 
+%>
 
 <div class="row justify-content-md-left" id="img_country_league">
     <div class="col col-1">
@@ -139,10 +138,12 @@ away_percent = percent_predictions['away']
                         <td><%= comment_winner %></td>
                     </tr>
                     <% }; %> 
+                    <% if(under_over){ %>
                     <tr>
                         <th scope="row">Under / Over</th>
                         <td><%= under_over %></td>
                     </tr>
+                    <% }; %> 
                     <tr>
                         <th scope="row">Home goals / Away goals</th>
                         <td><%= home_goals_pred %> / <%= away_goals_pred %></td>
@@ -214,5 +215,14 @@ away_percent = percent_predictions['away']
     </div>
 </div>
 
+<br>
+<br>
+<!--
+<div class="row justify-content-md-center">
+    <div class="col col-6 col-md-1">
+        <a href="/predictions_by_fixture/show_score_odds/<%- id_fixture %>" class="btn btn-primary btn-sm">Show odd</a>
+    </div>
+</div>
+-->
 
 <%- include('include/footer') %>

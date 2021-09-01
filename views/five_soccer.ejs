@@ -10,6 +10,7 @@
                     <th scope="col">1</th>
                     <th scope="col">N</th>
                     <th scope="col">2</th>
+                    <th scope="col">Importance</th>
                     <th scope="col">score</th>                    
                 </tr>
             </thead>
@@ -27,13 +28,16 @@
                             <%= element.team1 %> - <%= element.team2 %>
                         </td>
                         <td>
-                            <%= (element.prob1 * 100).toFixed(2) %>
+                            <%= (element.prob1 * 100).toFixed(0) %>
                         </td>
                         <td>
-                            <%= (element.probtie * 100).toFixed(2) %>
+                            <%= (element.probtie * 100).toFixed(0) %>
                         </td>
                         <td>
-                            <%= (element.prob2 * 100).toFixed(2) %>
+                            <%= (element.prob2 * 100).toFixed(0) %>
+                        </td>
+                        <td>
+                            <%= element.importance1 %> - <%= element.importance2 %>
                         </td>
                         <td>
                             <%= element.score1 %> - <%= element.score2 %>

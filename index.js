@@ -63,7 +63,7 @@ app.post('/fixtures', function(req, res){
 });
 
 app.get('/predictions_by_fixture/:id', function(req, res){
-  my_id = String(req.params.id);
+  my_id = req.params.id;
   var options = {
     method: 'GET',
     url: 'https://api-football-v1.p.rapidapi.com/v3/predictions',
@@ -75,10 +75,30 @@ app.get('/predictions_by_fixture/:id', function(req, res){
   };
   
   axios.request(options).then(function (response_1) {   
-    res.render('predictions_by_fixture', {data_pred: response_1.data.response[0], header: 'Prédiction'});
+    res.render('predictions_by_fixture', {id_fixture: my_id, data_pred: response_1.data.response[0], header: 'Prédiction'});
   }).catch(function (error) {
     console.error(error);
   });
+});
+
+app.get('/predictions_by_fixture/show_score_odds/:id', function(req, res){
+    my_id = String(req.params.id);
+    var options = {
+      method: 'GET',
+      url: 'https://api-football-v1.p.rapidapi.com/v3/odds',
+      params: {fixture: my_id},
+      headers: {
+        'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+        'x-rapidapi-key': 'c5b77243e3mshe9ba9a33f164ba5p149e4bjsn1c1fdd2bc8f0'
+      }
+    };
+      
+    axios.request(options).then(function (response_2) {
+      //console.log(response_2.data.response[0].bookmakers);
+      res.render('show_score_odds', {data_book: response_2.data.response[0].bookmakers});
+    }).catch(function (error) {
+      console.error(error);
+    });
 });
 
 app.get('/math_odds_events', function(req, res){
@@ -150,6 +170,33 @@ app.get('/five_soccer', (req, res) => {
           //console.log(jsonObj);
           res.render('five_soccer', { data: jsonObj, header: 'Five Soccer 8'});
       })
+});
+
+app.get('/five_soccer_ranking', (req, res) => {
+  const csvFilePath_1 = './models/spi_global_rankings.csv';
+  const csvFilePath_2 = './models/spi_global_rankings_intl.csv'
+  csv()
+      .fromFile(csvFilePath_1)
+      .then((jsonObj_1) => {
+
+        csv()
+          .fromFile(csvFilePath_2)
+          .then((jsonObj_2) => {
+              res.render('five_soccer_ranking', { data_club: jsonObj_1, data_intl: jsonObj_2, header: 'FS8 Ranking'});
+          })
+      })
+});
+
+app.get('/calculator_drop', (req, res) => {
+  cote_arr = [];
+  cote_dep = [];
+  res.render('calculator_drop', {header: 'Calc. Drop'})
+});
+
+app.post('/calculator_drop', (req, res) => {
+  cote_arr = [req.body.cote_arr_1, req.body.cote_arr_X, req.body.cote_arr_2];
+  cote_dep = [req.body.cote_dep_1, req.body.cote_dep_X, req.body.cote_dep_2];
+  res.render('calculator_drop', {cote_arr: cote_arr, cote_dep: cote_dep, header: 'Calc. Drop'})
 });
 
 

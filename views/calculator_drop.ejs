@@ -1,0 +1,111 @@
+<%- include('include/header') -%>
+
+<% 
+
+function percent_to_odd(percent){
+    return 1 / percent * 100
+}
+
+function dropping_me(odd_arrive, odd_depart){
+    return ((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2)
+}
+
+bool_aff_diff = false;
+
+if(cote_arr.length == 3 && cote_dep.length == 3){
+    my_odd_arr_1 = percent_to_odd(cote_arr[0])
+    my_odd_arr_X = percent_to_odd(cote_arr[1])
+    my_odd_arr_2 = percent_to_odd(cote_arr[2])
+
+    my_odd_dep_1 = percent_to_odd(cote_dep[0])
+    my_odd_dep_X = percent_to_odd(cote_dep[1])
+    my_odd_dep_2 = percent_to_odd(cote_dep[2])
+    bool_aff_diff = true;
+}
+
+%> 
+
+<form action="/calculator_drop" method="POST">
+    <h5 style="text-align: center">Dropping percent</h5>
+    <br>
+    <div class="row" style="text-align: center">
+
+        <div class="col">
+            <label for="cote1">1</label>
+            <input type="text" class="form-control" id="cote_arr_1" name="cote_arr_1" value=<% if(cote_arr[0]){ %>"<%= cote_arr[0]
+                %>"<%}%>>
+        </div>
+        <div class="col">
+            <label for="coteX">X</label>
+            <input type="text" class="form-control" id="cote_arr_X" name="cote_arr_X" value=<% if(cote_arr[1]){ %>"<%= cote_arr[1]
+                %>"<%}%>>
+        </div>
+        <div class="col">
+            <label for="cote1">2</label>
+            <input type="text" class="form-control" id="cote_arr_2" name="cote_arr_2" value=<% if(cote_arr[2]){ %>"<%= cote_arr[2]
+                %>"<%}%>>
+        </div>
+
+    </div>
+    <br>
+    <div class="row" style="text-align: center">
+
+        <div class="col">
+            <label for="cote1">1</label>
+            <input type="text" class="form-control" id="cote_dep_1" name="cote_dep_1" value=<% if(cote_dep[0]){ %>"<%= cote_dep[0]
+                %>"<%}%>>
+        </div>
+        <div class="col">
+            <label for="coteX">X</label>
+            <input type="text" class="form-control" id="cote_dep_X" name="cote_dep_X" value=<% if(cote_dep[1]){ %>"<%= cote_dep[1]
+                %>"<%}%>>
+        </div>
+        <div class="col">
+            <label for="cote1">2</label>
+            <input type="text" class="form-control" id="cote_dep_2" name="cote_dep_2" value=<% if(cote_dep[2]){ %>"<%= cote_dep[2]
+                %>"<%}%>>
+        </div>
+        
+    </div>
+    <br>
+    <div class="row justify-content-md-center">
+        <div class="col col-6 col-md-1">
+            <button type="submit" class="btn btn-primary btn-sm">valider</button>
+        </div>
+    </div>
+</form>
+
+<% if(bool_aff_diff){ %>
+    <br>
+    
+    <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+        <thead>
+            <tr>
+                <th scope="col" data-sortable="true">Your</th>
+                <th scope="col" data-sortable="true">1</th>
+                <th scope="col" data-sortable="true">X</th>
+                <th scope="col" data-sortable="true">2</th>
+            </tr>
+        </thead>
+    
+        <tbody>
+            <td>
+                Drop is.
+            </td>
+            <td>
+                <%= dropping_me(my_odd_arr_1, my_odd_dep_1) %>
+            </td>
+            <td>
+                <%= dropping_me(my_odd_arr_X, my_odd_dep_X) %>
+            </td>
+            <td>
+                <%= dropping_me(my_odd_arr_2, my_odd_dep_2) %>
+            </td>
+            </tr>
+        </tbody>
+    </table>
+    <% 
+        }; 
+    %>
+
+<%- include('include/footer') -%>
