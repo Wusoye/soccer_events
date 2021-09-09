@@ -1,0 +1,386 @@
+<%- include('include/header_detail') -%>
+
+                <% 
+                
+                function numAverage(a) {
+                    var b = a.length,
+                        c = 0, i;
+                    for (i = 0; i < b; i++){
+                      c += Number(a[i]);
+                    }
+                    return parseFloat((c/b).toFixed(2));
+                  } 
+                  
+                function one_to_many_tab(tab){
+                    all1 = []
+                    allX = []
+                    all2 = []
+                    tab.forEach(un_tab => {
+                        all1.push(un_tab[un_tab.length-3]),
+                        allX.push(un_tab[un_tab.length-2]),
+                        all2.push(un_tab[un_tab.length-1])
+                    });
+                    
+                    return [all1, allX, all2];
+                  }
+
+                function dropping_me(odd_arrive, odd_depart){
+                    return ((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2)
+                }
+
+                function percent_to_odd(percent){
+                    return 1 / percent * 100
+                }
+
+                function my_change(){
+                    console.log('bonkr');
+                }
+
+                function double_chance(first_odd, second_odd){
+                    return (first_odd*second_odd)/(first_odd+second_odd)
+                }
+
+                %> 
+
+                <% 
+                history_book = []
+                all_opening_1 = []
+                all_opening_X = []
+                all_opening_2 = []
+                all_drop_1 = []
+                all_drop_X = []
+                all_drop_2 = []
+                nd_all_opening_1 = []
+                nd_all_opening_X = []
+                nd_all_opening_2 = []
+                fi_all_opening_1 = []
+                fi_all_opening_X = []
+                fi_all_opening_2 = []
+                history_amount = []
+                opening_of_each_book = []
+                live_of_each_book = []
+                five_to_end_each_book = []
+                five_to_end_each_book_val = false
+                change_mode = false
+                bool_aff_diff = false;
+
+                if(coteFte.length == 3 && coteBe.length == 3){
+                    my_odd_1 = percent_to_odd(coteFte[0])
+                    my_odd_X = percent_to_odd(coteFte[1])
+                    my_odd_2 = percent_to_odd(coteFte[2])
+
+                    my_odd_sats_1 = percent_to_odd(coteBe[0])
+                    my_odd_sats_X = percent_to_odd(coteBe[1])
+                    my_odd_sats_2 = percent_to_odd(coteBe[2])
+                    bool_aff_diff = true;
+                }
+
+                Object.keys(items).forEach(function(book){ 
+
+                    if (book == 'Betfair') {
+                        history_exchange_back = items[book]['history_exchange_back'];
+
+                        history_exchange_back.forEach(un_history => {
+                            amount_1 = un_history['amount_1']
+                            amount_X = un_history['amount_X']
+                            amount_2 = un_history['amount_2']
+                            date_time = moment(un_history['updated']).format('lll')
+                            history_amount.push([date_time, amount_1, amount_X, amount_2])
+                        });
+                    }
+                    
+                    if(book != 'Betfair' ){ 
+
+                        live = items[book].live
+                        all_drop_1.push(live['1'])
+                        all_drop_X.push(live['X'])
+                        all_drop_2.push(live['2'])
+
+                        history = items[book].history,
+                        all_opening_1.push(history[history.length -1]['1'])
+                        all_opening_X.push(history[history.length -1]['X'])
+                        all_opening_2.push(history[history.length -1]['2']);
+
+                        if (history.length > 2){
+                            nd_all_opening_1.push(history[history.length -2]['1'])
+                            nd_all_opening_X.push(history[history.length -2]['X'])
+                            nd_all_opening_2.push(history[history.length -2]['2'])
+                        }
+
+                        if (history.length > 5){
+                            fi_all_opening_1.push(history[5]['1'])
+                            fi_all_opening_X.push(history[5]['X'])
+                            fi_all_opening_2.push(history[5]['2'])
+
+                            fi_nb_opening_1 = history[5]['1']
+                            fi_nb_opening_X = history[5]['X']
+                            fi_nb_opening_2 = history[5]['2']
+
+                            five_to_end_each_book.push([book, fi_nb_opening_1, fi_nb_opening_X, fi_nb_opening_2])
+                            five_to_end_each_book_val = true
+                        }
+                        
+                        history_odd_1 = [],
+                        history_odd_X = [],
+                        history_odd_2 = [],
+                        
+
+                        history.forEach(un_history => {
+                            history_odd_1.push(un_history['1'])
+                            history_odd_X.push(un_history['X'])
+                            history_odd_2.push(un_history['2'])
+                        });
+
+                        history_book.push([book, numAverage(history_odd_1), numAverage(history_odd_X), numAverage(history_odd_2)])
+
+                        opening_of_each_book.push([book, history[history.length -1]['1'], history[history.length -1]['X'], history[history.length -1]['2']])
+                        live_of_each_book.push([book, live['1'], live['X'], live['2'], live['updated']])
+                        
+                        //console.log(opening_of_each_book.length, live_of_each_book.length);
+                    }; 
+                    
+                }); 
+                        
+                        tab_of_all_history_book = one_to_many_tab(history_book),
+
+                        history_book_1 = tab_of_all_history_book[0],
+                        history_book_X = tab_of_all_history_book[1],
+                        history_book_2 = tab_of_all_history_book[2],
+
+                        average_odd_1 = numAverage(history_book_1), 
+                        average_odd_X = numAverage(history_book_X), 
+                        average_odd_2 = numAverage(history_book_2),
+
+                        average_opening_1 = numAverage(all_opening_1),
+                        average_opening_X = numAverage(all_opening_X),
+                        average_opening_2 = numAverage(all_opening_2),
+
+                        nd_average_opening_1 = numAverage(nd_all_opening_1),
+                        nd_average_opening_X = numAverage(nd_all_opening_X),
+                        nd_average_opening_2 = numAverage(nd_all_opening_2),
+
+                        fi_average_opening_1 = numAverage(fi_all_opening_1),
+                        fi_average_opening_X = numAverage(fi_all_opening_X),
+                        fi_average_opening_2 = numAverage(fi_all_opening_2),
+                        
+                        average_drop_1 = numAverage(all_drop_1),
+                        average_drop_X = numAverage(all_drop_X),
+                        average_drop_2 = numAverage(all_drop_2),
+                         
+                        //percent_drop_1 = ((average_drop_1 - average_opening_1)/(average_opening_1 - 1)*100).toFixed(2)
+                        percent_drop_1 = dropping_me(average_drop_1, average_opening_1)
+                        percent_drop_X = dropping_me(average_drop_X, average_opening_X)
+                        percent_drop_2 = dropping_me(average_drop_2, average_opening_2)
+
+                        first_percent_drop_1 = dropping_me(nd_average_opening_1, average_opening_1)
+                        first_percent_drop_X = dropping_me(nd_average_opening_X, average_opening_X)
+                        first_percent_drop_2 = dropping_me(nd_average_opening_2, average_opening_2)
+                                            
+                        %>
+            
+        <br>
+        
+        <h3 style="text-align: center;">Odd average</h3>
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>1 </th>
+                    <th>X </th>
+                    <th>2 </th>
+                    <th>Margin </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Oppening  odds</td>
+                    <td><%= average_opening_1 %></td>
+                    <td><%= average_opening_X %></td>
+                    <td><%= average_opening_2 %></td>
+                    <td><%= ((1/average_opening_1 + 1/average_opening_X + 1/average_opening_2)*100-100).toFixed(2) %></td>
+                </tr>
+                <tr>
+                    <td>Live odds</td>
+                    <td><%= average_drop_1 %></td>
+                    <td><%= average_drop_X %></td>
+                    <td><%= average_drop_2 %></td>
+                    <td><%= ((1/average_drop_1 + 1/average_drop_X + 1/average_drop_2)*100-100).toFixed(2) %></td>
+                </tr>
+                <tr>
+                    <td>Dropping odds</td>
+                    <td><%= percent_drop_1 %>% </td>
+                    <td><%= percent_drop_X %>% </td>
+                    <td><%= percent_drop_2 %>% </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+
+        
+
+        <form action="" method="POST">
+            <h5 style="text-align: center">Prediction odds</h5>
+            <div class="row" style="text-align: center">
+
+                <div class="col">
+                    <label for="cote1">1</label>
+                    <input type="text" class="form-control" id="cote1" name="cote1" value=<% if(coteFte[0]){ %>"<%=
+                    coteFte[0] %>"<%}%>>
+                </div>
+                <div class="col">
+                    <label for="coteX">X</label>
+                    <input type="text" class="form-control" id="coteX" name="coteX" value=<% if(coteFte[1]){ %>"<%=
+                    coteFte[1] %>"<%}%>> 
+                </div>
+                <div class="col">
+                    <label for="cote1">2</label>
+                    <input type="text" class="form-control" id="cote2" name="cote2" value=<% if(coteFte[2]){ %>"<%=
+                    coteFte[2] %>"<%}%>>
+                </div>
+
+            </div>
+            <br>
+            <div class="row" style="text-align: center">
+
+                <div class="col">
+                    <label for="cote1">1</label>
+                    <input type="text" class="form-control" id="Acote1" name="Acote1" value=<% if(coteBe[0]){ %>"<%=
+                    coteBe[0] %>"<%}%>>
+                </div>
+                <div class="col">
+                    <label for="coteX">X</label>
+                    <input type="text" class="form-control" id="AcoteX" name="AcoteX" value=<% if(coteBe[1]){ %>"<%=
+                    coteBe[1] %>"<%}%>> 
+                </div>
+                <div class="col">
+                    <label for="cote1">2</label>
+                    <input type="text" class="form-control" id="Acote2" name="Acote2" value=<% if(coteBe[2]){ %>"<%=
+                    coteBe[2] %>"<%}%>>
+                </div>
+                
+            </div>
+            <br>
+            <div class="row justify-content-md-center">
+                <div class="col col-6 col-md-1">
+                    <button type="submit" class="btn btn-primary btn-sm">valider</button>
+                </div>
+            </div>
+        </form>
+        <br>
+
+        <% if(bool_aff_diff){ %>
+        <br>
+        <h5 style="text-align: center">Oppening odds / prediction odds</h5>
+        
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+            <thead>
+                <tr>
+                    <th scope="col" data-sortable="true">Odd use</th>
+                    <th scope="col" data-sortable="true">1</th>
+                    <th scope="col" data-sortable="true">X</th>
+                    <th scope="col" data-sortable="true">2</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>
+                        Average of FTE
+                    </td>
+                    <td>
+                        <%= dropping_me(average_opening_1, my_odd_1) %>
+                    </td>
+                    <td>
+                        <%= dropping_me(average_opening_X, my_odd_X) %>
+                    </td>
+                    <td>
+                        <%= dropping_me(average_opening_2, my_odd_2) %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Average of BeSoccer
+                    </td>
+                    <td>
+                        <%= dropping_me(average_opening_1, my_odd_sats_1) %>
+                    </td>
+                    <td>
+                        <%= dropping_me(average_opening_X, my_odd_sats_X) %>
+                    </td>
+                    <td>
+                        <%= dropping_me(average_opening_2, my_odd_sats_2) %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Sum
+                    </td>
+                    <td>
+                        <%= (dropping_me(average_opening_1, my_odd_1) - dropping_me(average_opening_1, my_odd_sats_1)).toFixed(2) %>
+                    </td>
+                    <td>
+                        <%= (dropping_me(average_opening_X, my_odd_X) - dropping_me(average_opening_X, my_odd_sats_X)).toFixed(2) %>
+                    </td>
+                    <td>
+                        <%= (dropping_me(average_opening_2, my_odd_2) - dropping_me(average_opening_2, my_odd_sats_2)).toFixed(2) %>
+                    </td>
+                </tr>
+                
+            </tbody>
+        </table>
+        <br>
+        <% 
+            }; 
+        %>
+        <br>
+
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+            <thead>
+                <tr>
+                    <th scope="col" data-sortable="true">Bookmaker</th> <!-- Average of Bookmaker -->
+                    <th scope="col" data-sortable="true">1</th>
+                    <th scope="col" data-sortable="true">X</th>
+                    <th scope="col" data-sortable="true">2</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <% 
+                    Object.keys(opening_of_each_book).forEach(function(book){ 
+                            
+                        opening_1 = opening_of_each_book[book][1], 
+                        opening_X = opening_of_each_book[book][2], 
+                        opening_2 = opening_of_each_book[book][3],
+                        live_1 = live_of_each_book[book][1], 
+                        live_X = live_of_each_book[book][2], 
+                        live_2 = live_of_each_book[book][3],
+                        date_live = moment(live_of_each_book[book][4]).add(2,'h').format('lll'),
+                        un_book = opening_of_each_book[book][0];
+
+                    %>
+                <tr>
+                    <td>
+                        <%= date_live %> / <%= un_book %>
+                    </td>
+                        
+                    <td>
+                        <%= dropping_me(live_1, opening_1) %> 
+                    </td>
+                    <td>
+                        <%= dropping_me(live_X, opening_X) %> 
+                    </td>
+                    <td>
+                        <%= dropping_me(live_2, opening_2) %> 
+                    </td>
+
+                </tr>
+
+                <% 
+                    }); 
+                %>
+            </tbody>
+        </table>
+
+        
+               
+        <%- include('include/footer') -%>

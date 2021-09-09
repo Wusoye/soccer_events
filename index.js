@@ -133,6 +133,7 @@ app.post('/math_odds_events', function(req, res){
 app.get('/event_detail/:id', function(req, res){
   id = req.params.id;
   coteFte = [];
+  coteBe = [];
   var options = {
     method: 'GET',
     url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
@@ -140,7 +141,7 @@ app.get('/event_detail/:id', function(req, res){
   
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', {items: response.data.data, infos: response.data.event, coteFte: coteFte, header: 'Event Detail'});
+    res.render('event_detail', {items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
   }).catch(function (error) {
     console.error(error);
   });
@@ -148,7 +149,8 @@ app.get('/event_detail/:id', function(req, res){
 
 app.post('/event_detail/:id', function(req, res){
   id = req.params.id;
-  coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
+  coteFte = [req.body.cote1, req.body.cote2];
+  coteBe = [];
   var options = {
     method: 'GET',
     url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
@@ -156,7 +158,7 @@ app.post('/event_detail/:id', function(req, res){
   
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', {items: response.data.data, infos: response.data.event, coteFte: coteFte, header: 'Event Detail'});
+    res.render('event_detail', {items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
   }).catch(function (error) {
     console.error(error);
   });

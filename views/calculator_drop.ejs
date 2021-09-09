@@ -78,13 +78,14 @@ if(cote_arr.length == 3 && cote_dep.length == 3){
 <% if(bool_aff_diff){ %>
     <br>
     
-    <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+    <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
         <thead>
             <tr>
-                <th scope="col" data-sortable="true">Your</th>
-                <th scope="col" data-sortable="true">1</th>
-                <th scope="col" data-sortable="true">X</th>
-                <th scope="col" data-sortable="true">2</th>
+                <th scope="col">Your</th>
+                <th scope="col">1</th>
+                <th scope="col">X</th>
+                <th scope="col">2</th>
+                <th scope="col">Mouvement</th>
             </tr>
         </thead>
     
@@ -93,13 +94,16 @@ if(cote_arr.length == 3 && cote_dep.length == 3){
                 Drop is.
             </td>
             <td>
-                <%= dropping_me(my_odd_arr_1, my_odd_dep_1) %>
+                <%= dropping_me(my_odd_arr_1, my_odd_dep_1) %>%
             </td>
             <td>
-                <%= dropping_me(my_odd_arr_X, my_odd_dep_X) %>
+                <%= dropping_me(my_odd_arr_X, my_odd_dep_X) %>%
             </td>
             <td>
-                <%= dropping_me(my_odd_arr_2, my_odd_dep_2) %>
+                <%= dropping_me(my_odd_arr_2, my_odd_dep_2) %>%
+            </td>
+            <td>
+                <%= (Math.abs(dropping_me(my_odd_arr_1, my_odd_dep_1)) + Math.abs(dropping_me(my_odd_arr_X, my_odd_dep_X)) + Math.abs(dropping_me(my_odd_arr_2, my_odd_dep_2))).toFixed(2) %>%
             </td>
             </tr>
         </tbody>

@@ -10,13 +10,17 @@
                     <th scope="col">1</th>
                     <th scope="col">N</th>
                     <th scope="col">2</th>
-                    <th scope="col">Importance</th>
-                    <th scope="col">score</th>                    
+                    <th scope="col">Quality</th>  
+                    <th scope="col">Rating</th>                    
                 </tr>
             </thead>
             <tbody>
                 <% data.forEach(element=> { %>
-                    <% let nbDay = 30; if ( moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days')){ %>
+                    <% 
+                        var nbDay = 30; 
+                        var quality = (2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))).toFixed(2);
+                        if ( quality > 25 && moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days')){ 
+                    %>
                     <tr>
                         <td>
                             <%= moment(element.date).format("DD-MM-YYYY") %>
@@ -28,19 +32,19 @@
                             <%= element.team1 %> - <%= element.team2 %>
                         </td>
                         <td>
-                            <%= (element.prob1 * 100).toFixed(0) %>
+                            <%= (element.prob1 * 100).toFixed(1) %>
                         </td>
                         <td>
-                            <%= (element.probtie * 100).toFixed(0) %>
+                            <%= (element.probtie * 100).toFixed(1) %>
                         </td>
                         <td>
-                            <%= (element.prob2 * 100).toFixed(0) %>
+                            <%= (element.prob2 * 100).toFixed(1) %>
                         </td>
                         <td>
-                            <%= element.importance1 %> - <%= element.importance2 %>
+                            <%= quality %>
                         </td>
                         <td>
-                            <%= element.score1 %> - <%= element.score2 %>
+                            <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>
                         </td>
                     </tr>
                     <% }; %>

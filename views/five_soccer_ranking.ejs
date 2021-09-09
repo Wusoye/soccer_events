@@ -7,7 +7,7 @@
             aria-controls="nav-profile" aria-selected="false">INTERNATIONAL</a>
     </div>
 </nav>
-<div class="tab-content" id="nav-tabContent">
+<div style="text-align: center;" class="tab-content" id="nav-tabContent">
     <div class="tab-pane fade show active" id="nav_club" role="tabpanel" aria-labelledby="nav-home-tab">
 
         <table class="table table-striped table-bordered border-secondary" data-toggle="table" data-search="true" data-pagination="true">
@@ -16,7 +16,8 @@
                     <th scope="col">Rank</th>
                     <th scope="col">League</th>
                     <th scope="col">Teams</th>
-                    <th scope="col">Goals Avg.</th>                 
+                    <th scope="col">Goals Avg.</th>    
+                    <th scope="col">Note SPI</th>             
                 </tr>
             </thead>
             <tbody>
@@ -34,6 +35,9 @@
                         <td>
                             <%= (element.off / element.def).toFixed(2) %>
                         </td>
+                        <td>
+                            <%= element.spi %>
+                        </td>
                     </tr>
                 <% }); %>
             </tbody>
@@ -47,7 +51,8 @@
                 <tr>
                     <th scope="col">Rank</th>
                     <th scope="col">Teams</th>
-                    <th scope="col">Goals Avg.</th>                 
+                    <th scope="col">Goals Avg.</th>    
+                    <th scope="col">Note SPI</th>              
                 </tr>
             </thead>
             <tbody>
@@ -61,6 +66,9 @@
                         </td>
                         <td>
                             <%= (element.off / element.def).toFixed(2) %>
+                        </td>
+                        <td>
+                            <%= element.spi %>
                         </td>
                     </tr>
                 <% }); %>
