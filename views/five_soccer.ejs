@@ -10,16 +10,19 @@
                     <th scope="col">1</th>
                     <th scope="col">N</th>
                     <th scope="col">2</th>
-                    <th scope="col">Quality</th>  
+                    <th scope="col">Score</th>  
                     <th scope="col">Rating</th>                    
                 </tr>
             </thead>
             <tbody>
                 <% data.forEach(element=> { %>
                     <% 
-                        var nbDay = 30; 
-                        var quality = (2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))).toFixed(2);
-                        if ( quality > 25 && moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days')){ 
+                        var id_element = element.league_id
+                        var nbDay = 30;
+                        var min_quality = 10; 
+                        var quality = (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2);
+                        
+                        if ( quality > min_quality && moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days') && (id_element != 7921 && id_element != 1983 && id_element != 2413 && id_element != 2414 && id_element != 2160 && id_element != 4582)){ 
                     %>
                     <tr>
                         <td>
@@ -41,7 +44,7 @@
                             <%= (element.prob2 * 100).toFixed(1) %>
                         </td>
                         <td>
-                            <%= quality %>
+                            <%= element.score1 %> - <%= element.score2 %>
                         </td>
                         <td>
                             <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>

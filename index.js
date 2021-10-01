@@ -149,8 +149,8 @@ app.get('/event_detail/:id', function(req, res){
 
 app.post('/event_detail/:id', function(req, res){
   id = req.params.id;
-  coteFte = [req.body.cote1, req.body.cote2];
-  coteBe = [];
+  coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
+  coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
   var options = {
     method: 'GET',
     url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
