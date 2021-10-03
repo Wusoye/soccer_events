@@ -19,7 +19,7 @@
                     <% 
                         var id_element = element.league_id
                         var nbDay = 30;
-                        var min_quality = 10; 
+                        var min_quality = 35; 
                         var quality = (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2);
                         
                         if ( quality > min_quality && moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days') && (id_element != 7921 && id_element != 1983 && id_element != 2413 && id_element != 2414 && id_element != 2160 && id_element != 4582)){ 
