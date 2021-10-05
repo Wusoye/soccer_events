@@ -295,65 +295,6 @@
                         first_percent_drop_X = dropping_me(nd_average_opening_X, average_opening_X)
                         first_percent_drop_2 = dropping_me(nd_average_opening_2, average_opening_2)
 
-            var number_of_verity = 
-            (dropping_me_modif(average_opening_1, my_oddBe_1) + dropping_me_modif(average_opening_1, my_odd_1)) +
-            (dropping_me_modif(average_opening_X, my_oddBe_X) + dropping_me_modif(average_opening_X, my_odd_X)) +
-            (dropping_me_modif(average_opening_2, my_oddBe_2) + dropping_me_modif(average_opening_2, my_odd_2)) +
-            (dropping_me_modif(max_opening_1, my_oddBe_1) + dropping_me_modif(max_opening_1, my_odd_1)) +
-            (dropping_me_modif(max_opening_X, my_oddBe_X) + dropping_me_modif(max_opening_X, my_odd_X)) +
-            (dropping_me_modif(max_opening_2, my_oddBe_2) + dropping_me_modif(max_opening_2, my_odd_2)) +
-            (dropping_me_modif(min_opening_1, my_oddBe_1) + dropping_me_modif(min_opening_1, my_odd_1)) +
-            (dropping_me_modif(min_opening_X, my_oddBe_X) + dropping_me_modif(min_opening_X, my_odd_X)) +
-            (dropping_me_modif(min_opening_2, my_oddBe_2) + dropping_me_modif(min_opening_2, my_odd_2));
-
-            var av1 =
-            parseFloat(dropping_me_modif(average_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_1, my_odd_1) + 
-            dropping_me_modif(average_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_1, my_odd_1) +
-            dropping_me_modif(average_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_1, my_odd_1));
-
-            var avN = 
-            parseFloat(dropping_me_modif(average_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_X, my_odd_X) +
-            dropping_me_modif(average_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_X, my_odd_X) +
-            dropping_me_modif(average_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_X, my_odd_X));
-
-            var av2 = 
-            parseFloat(dropping_me_modif(average_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_2, my_odd_2) +
-            dropping_me_modif(average_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_2, my_odd_2) +
-            dropping_me_modif(average_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_2, my_odd_2));
-
-            var ma1 =
-            parseFloat(dropping_me_modif(max_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_1, my_odd_1) + 
-            dropping_me_modif(max_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_1, my_odd_1) +
-            dropping_me_modif(max_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_1, my_odd_1));
-
-            var maN =
-            parseFloat(dropping_me_modif(max_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_X, my_odd_X) + 
-            dropping_me_modif(max_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_X, my_odd_X) +
-            dropping_me_modif(max_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_X, my_odd_X));
-
-            var ma2 =
-            parseFloat(dropping_me_modif(max_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_2, my_odd_2) + 
-            dropping_me_modif(max_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_2, my_odd_2) +
-            dropping_me_modif(max_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_2, my_odd_2));
-
-            var mi1 =
-            parseFloat(dropping_me_modif(min_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_1, my_odd_1) + 
-            dropping_me_modif(min_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_1, my_odd_1) +
-            dropping_me_modif(min_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_1, my_odd_1));
-
-            var miN =
-            parseFloat(dropping_me_modif(min_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_X, my_odd_X) + 
-            dropping_me_modif(min_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_X, my_odd_X) +
-            dropping_me_modif(min_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_X, my_odd_X));
-
-            var mi2 =
-            parseFloat(dropping_me_modif(min_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_2, my_odd_2) + 
-            dropping_me_modif(min_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_2, my_odd_2) +
-            dropping_me_modif(min_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_2, my_odd_2));
-
-            console.log(infos.hometeam.name +"-"+ infos.awayteam.name +":\n"+ av1+", "+avN+", "+av2 + "\n" + ma1+", "+maN+", "+ma2 + "\n"+ mi1+", "+miN+", "+mi2 + "\n" + (av1+avN+av2+ma1+maN+ma2+mi1+miN+mi2));
-
-
             //console.log(infos.hometeam.name +"-"+ infos.awayteam.name +":"+ number_of_verity);
             %> 
             
@@ -610,6 +551,52 @@
                 </tbody>
             </table>            
         </div>
+        <% 
+            var av1 =
+            parseFloat(dropping_me_modif(average_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_1, my_odd_1) + 
+            dropping_me_modif(average_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_1, my_odd_1) +
+            dropping_me_modif(average_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_1, my_odd_1));
+
+            var avN = 
+            parseFloat(dropping_me_modif(average_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_X, my_odd_X) +
+            dropping_me_modif(average_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_X, my_odd_X) +
+            dropping_me_modif(average_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_X, my_odd_X));
+
+            var av2 = 
+            parseFloat(dropping_me_modif(average_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_2, my_odd_2) +
+            dropping_me_modif(average_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_2, my_odd_2) +
+            dropping_me_modif(average_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_2, my_odd_2));
+
+            var ma1 =
+            parseFloat(dropping_me_modif(max_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_1, my_odd_1) + 
+            dropping_me_modif(max_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_1, my_odd_1) +
+            dropping_me_modif(max_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_1, my_odd_1));
+
+            var maN =
+            parseFloat(dropping_me_modif(max_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_X, my_odd_X) + 
+            dropping_me_modif(max_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_X, my_odd_X) +
+            dropping_me_modif(max_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_X, my_odd_X));
+
+            var ma2 =
+            parseFloat(dropping_me_modif(max_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_2, my_odd_2) + 
+            dropping_me_modif(max_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_2, my_odd_2) +
+            dropping_me_modif(max_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_2, my_odd_2));
+
+            var mi1 =
+            parseFloat(dropping_me_modif(min_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_1, my_odd_1) + 
+            dropping_me_modif(min_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_1, my_odd_1) +
+            dropping_me_modif(min_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_1, my_odd_1));
+
+            var miN =
+            parseFloat(dropping_me_modif(min_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_X, my_odd_X) + 
+            dropping_me_modif(min_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_X, my_odd_X) +
+            dropping_me_modif(min_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_X, my_odd_X));
+
+            var mi2 =
+            parseFloat(dropping_me_modif(min_opening_1, my_oddBe_1) * dropping_me_modif(average_opening_2, my_odd_2) + 
+            dropping_me_modif(min_opening_X, my_oddBe_X) * dropping_me_modif(max_opening_2, my_odd_2) +
+            dropping_me_modif(min_opening_2, my_oddBe_2) * dropping_me_modif(min_opening_2, my_odd_2));
+        %> 
         <div class="col-6">
             <h6>[BeSoccer] * [Five Soccer 8]</h6>
             <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">

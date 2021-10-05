@@ -1,0 +1,129 @@
+<%- include('../include/header') -%>
+
+    <form action="" method="POST">
+        <div class="row">
+            <div class="col-3">
+                <input type="date" name="dateMatch" id="dateMatch" class="input-group date">
+
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary btn-sm">Valider</button>
+            </div>
+        </div>
+    </form>
+    <br>
+
+
+    <% 
+    Object.keys(categoryList).forEach(idCat => {
+
+        nameCountry = categoryList[idCat].name
+
+        Object.keys(leagueList).forEach(idLeague => {
+
+            if (leagueList[idLeague].category_id == idCat) {
+
+                nameLeague = leagueList[idLeague].name
+                roundLeague = null
+                if (leagueList[idLeague].round_name) {
+                    roundLeague = leagueList[idLeague].round_name
+                }
+                %>
+
+                
+                <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Home</th>
+                                    <th scope="col">Away</th>
+                                    <th scope="col">Status</th>
+                                    <th data-sortable="true" scope="col">Date</th>
+                                    <th scope="col">Detail 1N2</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                <h5>
+                    <%= nameCountry %> - <%= nameLeague %> <% if (roundLeague) { %> / <%= roundLeague %> <% } %>
+                </h5>
+
+                <%
+
+                matchList.forEach(function(unMatch) {
+
+                    if (unMatch.league_id == idLeague) {
+
+                        idMatch = unMatch.id
+                        homeTeam = unMatch.ht
+                        awayTeam = unMatch.at
+                        dateMatch = moment(unMatch.md).format('lll')
+                        uri = unMatch.uri.split("-")
+                        idMatch_detail = uri[uri.length -1]
+
+                        if (unMatch.matchstatus == 1) {
+                            hscore = ""
+                            ascore = ""
+                            score = ""
+                            status = "Not started"
+                        }
+                        else if (unMatch.matchstatus == 2) {
+                            if (unMatch.hscore != null && unMatch.ascore != null) {
+                                hscore = unMatch.hscore
+                                ascore = unMatch.ascore
+                                score = hscore + ' - ' + ascore
+                            }
+                            if (unMatch.current_time != null) {
+                                status = unMatch.current_time + "'" + ' / '
+                            }
+                        }
+                        else if (unMatch.matchstatus == 4) { //cancel
+                            hscore = ""
+                            ascore = ""
+                            score = ""
+                            status = unMatch.special_status + ' / '
+                        }
+                        else if (unMatch.matchstatus == 8) {
+                            if (unMatch.hscore != null && unMatch.ascore != null) {
+                                hscore = unMatch.hscore
+                                ascore = unMatch.ascore
+                                score = hscore + ' - ' + ascore
+                            }
+                            if (unMatch.inplay_status != null) {
+                                status = unMatch.inplay_status + ' / '
+                            }
+                        }
+                        %>
+                        <tr>
+                            <td>
+                                <%= homeTeam %>
+                            </td>
+                            <td>
+                                <%= awayTeam %>
+                            </td>
+                            <td>
+                                <%= status %> <%= score %>
+                            </td>
+                            <td>
+                                <%= dateMatch %>
+                            </td>
+                            <td>
+                                <a href="/oddspedia_soccer_detail/<%- idMatch -%>"><i>Détail 1N2</i></a>
+                            </td>
+                        </tr>
+                        <%                        
+                    }
+                });
+
+                %>
+
+                    </tbody>
+                </table>
+                <br>
+
+                <%
+            }
+        });
+    }); 
+    %> 
+
+<%- include('../include/footer') -%>

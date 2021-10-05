@@ -41,9 +41,9 @@ rank,name,confed,off,def,spi
 40,Saudi Arabia,AFC,1.9,0.93,66.37
 41,Ivory Coast,CAF,1.68,0.77,65.99
 42,Scotland,UEFA,1.58,0.75,64.62
-43,Venezuela,CONMEBOL,1.66,0.88,62.96
-44,South Korea,AFC,1.48,0.74,62.76
-45,Egypt,CAF,1.57,0.82,62.58
+43,Egypt,CAF,1.57,0.8,63.08
+44,Venezuela,CONMEBOL,1.66,0.88,62.96
+45,South Korea,AFC,1.48,0.74,62.76
 46,Turkey,UEFA,1.88,1.09,62.52
 47,Bosnia and Herzegovina,UEFA,1.64,0.91,61.78
 48,Nigeria,CAF,1.72,1.01,61.12
@@ -120,7 +120,7 @@ rank,name,confed,off,def,spi
 119,Sudan,CAF,1.02,1.45,35.27
 120,Vietnam,AFC,0.87,1.27,35.02
 121,Sierra Leone,CAF,1.01,1.48,34.65
-122,Liberia,CAF,0.91,1.38,33.85
+122,Liberia,CAF,0.89,1.38,33.33
 123,Nicaragua,CONCACAF,1.01,1.57,32.86
 124,Burundi,CAF,0.85,1.37,32.57
 125,Kuwait,AFC,0.85,1.37,32.42
