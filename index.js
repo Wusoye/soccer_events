@@ -201,6 +201,8 @@ app.post('/calculator_drop', (req, res) => {
   res.render('calculator_drop', {cote_arr: cote_arr, cote_dep: cote_dep, header: 'Calc. Drop'})
 });
 
+//-> OddsPedia
+
 app.get('/oddspedia_soccer_events', (req, res) => {
   var dateFin = moment().format('YYYY-MM-DD')
   var dateDebut = moment().subtract(1, 'day').format('YYYY-MM-DD')
@@ -224,13 +226,30 @@ app.get('/oddspedia_soccer_events', (req, res) => {
 })
 
 app.post('/oddspedia_soccer_events', (req, res) => {
+  dateFin = req.body.dateMatch;
+  dateDebut = moment(dateFin).subtract(1, 'day').format('YYYY-MM-DD')
+  var options = {
+    method: 'GET',
+    url: 'https://oddspedia.com/api/v1/getMatchList?excludeSpecialStatus=0&sortBy=default&perPageDefault=50&startDate='+dateDebut+'T22%3A00%3A00Z&endDate='+dateFin+'T21%3A59%3A59Z&geoCode=FR&status=all&sport=football&popularLeaguesOnly=0&page=1&perPage=50&language=en'
+  };
+  
+  axios.request(options).then(function (response) {
 
+    var matchList = response.data.data.matchList;
+    var categoryList = response.data.data.categoryList;
+    var leagueList = response.data.data.leagueList;
+
+    //console.log(response.data.data.matchList);
+    res.render('oddspedia_soccer/oddspedia_soccer_events', {matchList: matchList, categoryList: categoryList, leagueList: leagueList, header: 'OddsPedia Events'});
+  }).catch(function (error) {
+    console.error(error);
+  });
 })
 
-
-// Récupérer les infos sur le match aussi ...
-app.get('/oddspedia_soccer_detail/:id', (req, res) => {
+// Récupérer les infos sur le match aussi (nom des équipes date heure...)
+app.get('/oddspedia_soccer_detail/:id/:idInfo', (req, res) => {
   idMatch = req.params.id
+  idInfo = req.params.idInfo
   var options = {
     method: 'GET',
     url: 'https://oddspedia.com/api/v1/getOddsMovements?ot=100&matchId='+idMatch+'&inplay=0&wettsteuer=0&geoCode=FR&geoState=&language=en'
@@ -241,8 +260,12 @@ app.get('/oddspedia_soccer_detail/:id', (req, res) => {
     moov_odds_1 = response.data.data[1];
     moov_odds_N = response.data.data[2];
     moov_odds_2 = response.data.data[3];
+
     moov_odds = [moov_odds_1, moov_odds_N, moov_odds_2]
+    console.log(response + idInfo);
     //res.render('oddspedia_soccer_events', {matchList: matchList, categoryList: categoryList, leagueList: leagueList, header: 'OddsPedia Events'});
+  
+  
   }).catch(function (error) {
     console.error(error);
   });
