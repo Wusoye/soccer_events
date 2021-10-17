@@ -212,10 +212,37 @@ away_percent = percent_predictions['away']
             </table>
         </div>
 
+        
+
     </div>
+
+
 </div>
 
 <br>
+<form action="" method="post">
+
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="winner">Winner</label>
+                </div>
+                <select class="custom-select" name="winner" id="winner">
+                  <option selected>Choose...</option>
+                  <option value="0">Home</option>
+                  <option value="1">Draw</option>
+                  <option value="2">Away</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-3">
+            <button type="submit" class="btn btn-outline-primary">Ecrire</button>
+        </div>
+    </div>
+
+</form>
+
 <br>
 <!--
 <div class="row justify-content-md-center">

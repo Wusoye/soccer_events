@@ -208,3 +208,39 @@ console.log(score_exact_odd);
                 </tr>
             </tbody>
         </table>
+
+
+
+
+        var options = {
+            method: 'GET',
+            url: ''
+          };
+          
+          axios.request(options).then(function (response) {
+        
+            //console.log(response.data.data.matchList);
+            //res.render('', );
+          }).catch(function (error) {
+            console.error(error);
+          });
+
+///////////////////
+
+          book_offer_id.forEach(offer_id => {
+
+            console.log(offer_id);
+            var options = {
+              method: 'GET',
+              url: 'https://oddspedia.com/api/v1/getOddsMovements?ot=100&matchId='+idMatch+'&inplay=0&wettsteuer=0&geoCode=&geoState=&'+offer_id+'=128709958&language=en'
+            };
+            
+            axios.request(options).then(function (response) {
+          
+              console.log(response);
+              //res.render('', );
+            }).catch(function (error) {
+              console.error(error);
+            });
+      
+          });

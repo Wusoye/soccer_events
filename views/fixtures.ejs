@@ -34,7 +34,8 @@
         score = event['score'],
 
         id_fixture = fixture['id'],
-        date = moment(fixture['date']).format("DD-MM-YYYY HH:mm"), 
+        date = moment(fixture['date']).format("DD-MM-YYYY HH:mm"),
+        dateISO = moment(fixture['date']).format(), 
         long_status = fixture['status']['long'], 
         short_status = fixture['status']['short'],
         elapsed = fixture['status']['elapsed'],
@@ -78,7 +79,7 @@
                 <% } %>
             </td>
             <td>
-                <a href="/predictions_by_fixture/<%- id_fixture -%>">Press me</a>
+                <a href="/predictions_by_fixture/<%- id_fixture -%>/<%- dateISO %>">Press me</a>
             </td>
         </tr>
 

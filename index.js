@@ -4,6 +4,7 @@ var app = express();
 var axios = require("axios").default;
 var bodyParser = require('body-parser');
 var csv = require("csvtojson");
+const request=require('request')
 var moment = require('./config/moment');
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
@@ -14,12 +15,22 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 app.set('view engine', 'ejs');
 app.locals.moment = require('./config/moment');
 
+
+var client = require('./config/bd');
+const { ObjectId } = require('bson');
+
+const spawn  = require('child_process').spawn;
+
+var XMLHttpRequest = require('xhr2');
+var xhr = new XMLHttpRequest();
+const Papa = require("papaparse"), fs = require("fs");
+
 header = false;
 
 //--- 
 
 app.get('/', function (req, res) {
-  console.log('Hello');
+  console.log('Hello world !');
 });
 
 app.get('/fixtures', function(req, res){
@@ -62,8 +73,9 @@ app.post('/fixtures', function(req, res){
   });
 });
 
-app.get('/predictions_by_fixture/:id', function(req, res){
+app.get('/predictions_by_fixture/:id/:dateISO', function(req, res){
   my_id = req.params.id;
+  dateISO = req.params.dateISO;
   var options = {
     method: 'GET',
     url: 'https://api-football-v1.p.rapidapi.com/v3/predictions',
@@ -75,11 +87,181 @@ app.get('/predictions_by_fixture/:id', function(req, res){
   };
   
   axios.request(options).then(function (response_1) {   
-    res.render('predictions_by_fixture', {id_fixture: my_id, data_pred: response_1.data.response[0], header: 'Prédiction'});
+    res.render('predictions_by_fixture', {id_fixture: my_id, dateISO: dateISO, data_pred: response_1.data.response[0], header: 'Prédiction'});
   }).catch(function (error) {
     console.error(error);
   });
 });
+
+app.post('/predictions_by_fixture/:id/:dateISO', function(req, res){ // add in BDD Mongo
+  my_id = parseFloat(req.params.id);
+  //console.log(my_id);
+  var options = {
+    method: 'GET',
+    url: 'https://api-football-v1.p.rapidapi.com/v3/predictions',
+    params: {fixture: my_id},
+    headers: {
+      'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+      'x-rapidapi-key': 'c5b77243e3mshe9ba9a33f164ba5p149e4bjsn1c1fdd2bc8f0'
+    }
+  };
+  
+  axios.request(options).then(function (response) {   
+    data_pred = response.data.response[0]
+    dateISO = req.params.dateISO;
+    winner = parseFloat(req.body.winner);
+
+    //---- catégories
+    predictions = data_pred['predictions']
+    league = data_pred['league']
+    teams = data_pred['teams']
+    comparison = data_pred['comparison']
+    h2h = data_pred['h2h']
+
+    //----  league
+
+    id_league = league['id']
+    name_league = league['name']
+    country_league = league['country']
+    logo_league = league['logo']
+    flag_league = league['flag']
+    season_league = league['season']
+
+    //----  teams
+
+    home_info = teams['home']
+    away_info = teams['away']
+
+    id_home = home_info['id']
+    name_home = home_info['name']
+    logo_home = home_info['logo']
+
+
+    id_away = away_info['id']
+    name_away = away_info['name']
+    logo_away = away_info['logo']
+
+    //----  comparison
+
+    form_comparison = comparison['form']
+    home_form = parseFloat(form_comparison['home'])
+    away_form = parseFloat(form_comparison['away'])
+
+    att_comparison = comparison['att']
+    home_att = parseFloat(att_comparison['home'])
+    away_att = parseFloat(att_comparison['away'])
+
+    def_comparison = comparison['def']
+    home_def = parseFloat(def_comparison['home'])
+    away_def = parseFloat(def_comparison['away'])
+
+    poissond_comparison = comparison['poisson_distribution']
+    home_poissond = parseFloat(poissond_comparison['home'])
+    away_poissond = parseFloat(poissond_comparison['away'])
+
+    poissond_comparison = comparison['poisson_distribution']
+    home_poissond = parseFloat(poissond_comparison['home'])
+    away_poissond = parseFloat(poissond_comparison['away'])
+
+    h2h_comparison = comparison['h2h']
+    home_h2h = parseFloat(h2h_comparison['home'])
+    away_h2h = parseFloat(h2h_comparison['away'])
+
+    goals_comparison = comparison['goals']
+    home_goals = parseFloat(goals_comparison['home'])
+    away_goals = parseFloat(goals_comparison['away'])
+
+    total_comparison = comparison['total']
+    home_total = parseFloat(total_comparison['home'])
+    away_total = parseFloat(total_comparison['away'])
+
+    //---- predictions
+
+    winner_predictions = predictions['winner']
+    id_winner = winner_predictions['id']
+    name_winner = winner_predictions['name']
+    comment_winner = winner_predictions['comment']
+
+    bool_win_or_draw = predictions['win_or_draw']
+    under_over = predictions['under_over']
+
+    goals_predictions = predictions['goals']
+    home_goals_pred = goals_predictions['home']
+    away_goals_pred = goals_predictions['away']
+
+    advice = predictions['advice']
+
+    percent_predictions = predictions['percent']
+    home_percent = parseFloat(percent_predictions['home'])
+    draw_percent = parseFloat(percent_predictions['draw'])
+    away_percent = parseFloat(percent_predictions['away'])
+
+
+    client.connect(function (err) {
+      const db = client.db("soccer_event");
+      if (err) throw err;
+    
+      db.collection('fixtures').updateOne({ _id: ObjectId("6169bbf063242a35a44d18d4") },
+        {
+          $push:{
+          "data":
+              {
+                "id_fixtures": my_id,
+                "match": name_home+" - "+name_away,
+                "comparaison": {"Home": {
+                    
+                    
+                        "Form": home_form,
+                        "Attack": home_att,
+                        "Defense": home_def,
+                        "Poisson distribution": home_poissond,
+                        "Head 2 head": home_h2h,
+                        "Goal": home_goals,
+                        "Total": home_total
+                    
+                    
+                    },
+                    "Away":{
+                     
+                        "Form": away_form,
+                        "Attack": away_att,
+                        "Defense": away_def,
+                        "Poisson distribution": away_poissond,
+                        "Head 2 head": away_h2h,
+                        "Goal": away_goals,
+                        "Total": away_total
+                      
+                     
+                    },
+                    
+                        "Percent winning": [home_percent,draw_percent,away_percent]
+                    },
+                    "Infos": {
+                  
+                      "League": name_league,
+                      "Country": country_league,
+                      "Season league": season_league
+    
+                    },
+                "date": new Date(dateISO),
+                "winner": winner
+              }
+                
+            }
+            
+        }
+      
+      , function (err, data) {
+        if (err) throw err;
+        console.log(name_home+" - "+name_away+": Ajouté");
+        res.redirect('/predictions_by_fixture/'+my_id+'/'+dateISO);
+      })
+    });
+    
+  }).catch(function (error) {
+    console.error(error);
+  });
+})
 
 app.get('/predictions_by_fixture/show_score_odds/:id', function(req, res){
     my_id = String(req.params.id);
@@ -134,6 +316,7 @@ app.get('/event_detail/:id', function(req, res){
   id = req.params.id;
   coteFte = [];
   coteBe = [];
+  model_prob = null;
   var options = {
     method: 'GET',
     url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
@@ -141,7 +324,7 @@ app.get('/event_detail/:id', function(req, res){
   
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', {items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
+    res.render('event_detail', {idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
   }).catch(function (error) {
     console.error(error);
   });
@@ -149,8 +332,11 @@ app.get('/event_detail/:id', function(req, res){
 
 app.post('/event_detail/:id', function(req, res){
   id = req.params.id;
+  whoWin = parseInt(req.body.whoWin);
   coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
   coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
+  model_prob = null;
+
   var options = {
     method: 'GET',
     url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
@@ -158,11 +344,147 @@ app.post('/event_detail/:id', function(req, res){
   
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', {items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
+    res.render('event_detail', {idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
   }).catch(function (error) {
     console.error(error);
   });
 });
+
+app.get('/event_detail_dc/:id', function(req, res){
+  id = req.params.id;
+  coteFte = [];
+  coteBe = [];
+  model_prob = null;
+  var options = {
+    method: 'GET',
+    url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=1&include_exchanges=1&language=en&country_code=FR'
+  };
+  
+  axios.request(options).then(function (response) {
+    //console.log(response.data),
+    res.render('event_detail_dc', {idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
+  }).catch(function (error) {
+    console.error(error);
+  });
+});
+
+app.post('/event_detail_dc/:id', function(req, res){
+  id = req.params.id;
+  whoWin = parseInt(req.body.whoWin);
+  coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
+  coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
+  model_prob = null;
+
+  var options = {
+    method: 'GET',
+    url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=1&include_exchanges=1&language=en&country_code=FR'
+  };
+  
+  axios.request(options).then(function (response) {
+    //console.log(response.data),
+    res.render('event_detail_dc', {idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
+  }).catch(function (error) {
+    console.error(error);
+  });
+});
+
+app.post('/event_detail/addMe/:id/:ht/:at/:dateTime/:av1/:avN/:av2/:ma1/:maN/:ma2/:mi1/:miN/:mi2', function(req, res){
+  whoWin = req.body.whoWin
+
+  ht = req.params.ht
+  at = req.params.at
+  team_match = "" + ht + " - " + at
+  dateTime = req.params.dateTime
+
+  av1 = parseFloat(req.params.av1)
+  avN = parseFloat(req.params.avN)
+  av2 = parseFloat(req.params.av2)
+
+  ma1 = parseFloat(req.params.ma1)
+  maN = parseFloat(req.params.maN)
+  ma2 = parseFloat(req.params.ma2)
+
+  mi1 = parseFloat(req.params.mi1)
+  miN = parseFloat(req.params.miN)
+  mi2 = parseFloat(req.params.mi2)
+
+  array_matrice = [[av1,avN,av2],[ma1,maN,ma2],[mi1,miN,mi2]]
+  
+  if (whoWin == 0 || whoWin == 1 || whoWin == 2) {
+
+    client.connect(function (err) {
+      const db = client.db("soccer_event");
+      if (err) throw err;
+    
+      db.collection('matrice_detail').updateOne({ _id: ObjectId("6160c05590577726bcfeeb49") },
+        {
+          $push:{
+          "data":
+              {
+                  "match": team_match,
+                  "matrice": array_matrice,
+                  "date": new Date(moment(dateTime).format()),
+                  "winner": parseFloat(whoWin)
+              }
+                
+            }
+            
+        }
+      
+      , function (err, data) {
+        if (err) throw err;
+        res.redirect('/event_detail/'+id);
+      })
+    });
+  }
+  else{
+    res.redirect('/event_detail/'+id);
+  }
+
+})
+
+app.get('/event_detail/sayMe/:id/:av1/:avN/:av2/:ma1/:maN/:ma2/:mi1/:miN/:mi2/:fte1/:fteN/:fte2/:be1/:beN/:be2', (req, res) => {
+  id = req.params.id;
+  coteFte = [req.params.fte1, req.params.fteN, req.params.fte2];
+  coteBe = [req.params.be1, req.params.beN, req.params.be2];
+
+  av1 = req.params.av1.toString()
+  avN = req.params.avN.toString()
+  av2 = req.params.av2.toString()
+
+  ma1 = req.params.ma1.toString()
+  maN = req.params.maN.toString()
+  ma2 = req.params.ma2.toString()
+
+  mi1 = req.params.mi1.toString()
+  miN = req.params.miN.toString()
+  mi2 = req.params.mi2.toString()
+
+  console.log(av1);
+
+  const child = spawn('python', ["models/model_matrice.py", av1, avN, av2, ma1, maN, ma2, mi1, miN, mi2]);
+
+  child.stdout.on('data', function(data){
+    prob1 = parseFloat(data.toString().split(' ')[0])
+    probX = parseFloat(data.toString().split(' ')[1])
+    prob2 = parseFloat(data.toString().split(' ')[2])
+    model_prob = [prob1,probX,prob2]
+    
+    var options = {
+      method: 'GET',
+      url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
+    };
+    
+    axios.request(options).then(function (response) {
+      //console.log(response.data),
+      res.render('event_detail', {model_prob: model_prob, idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
+    }).catch(function (error) {
+      console.error(error);
+    });
+
+  });
+
+})
 
 app.get('/five_soccer', (req, res) => {
   const csvFilePath = './models/spi_matches_latest.csv'
@@ -172,6 +494,19 @@ app.get('/five_soccer', (req, res) => {
           //console.log(jsonObj);
           res.render('five_soccer', { data: jsonObj, header: 'Five Soccer 8'});
       })
+});
+
+app.get('/five_soccer_2', (req, res) => {
+  var jsonObj = []
+  csv()
+    .fromStream(request.get('https://projects.fivethirtyeight.com/soccer-api/club/spi_matches_latest.csv'))
+    .subscribe((json) => {
+      return new Promise((resolve, reject) => {
+        console.log(json)
+        //res.render('five_soccer', { data: jsonObj, header: 'Five Soccer 8'});
+      })
+      
+    });
 });
 
 app.get('/five_soccer_ranking', (req, res) => {
@@ -246,30 +581,192 @@ app.post('/oddspedia_soccer_events', (req, res) => {
   });
 })
 
-// Récupérer les infos sur le match aussi (nom des équipes date heure...)
 app.get('/oddspedia_soccer_detail/:id/:idInfo', (req, res) => {
   idMatch = req.params.id
   idInfo = req.params.idInfo
+
+  coteFte = [];
+  coteBe = [];
+
   var options = {
     method: 'GET',
-    url: 'https://oddspedia.com/api/v1/getOddsMovements?ot=100&matchId='+idMatch+'&inplay=0&wettsteuer=0&geoCode=FR&geoState=&language=en'
+    url: 'https://oddspedia.com/api/v1/getMatchOdds?wettsteuer=0&geoCode=&geoState=&matchKey='+idInfo+'&oddGroupId=1&inplay=0&language=en'
   };
   
   axios.request(options).then(function (response) {
 
-    moov_odds_1 = response.data.data[1];
-    moov_odds_N = response.data.data[2];
-    moov_odds_2 = response.data.data[3];
+    book_offer_id = [];
 
-    moov_odds = [moov_odds_1, moov_odds_N, moov_odds_2]
-    console.log(response + idInfo);
+    //console.log(response);
+
+    nb_book = 0;
+
+    data_prematch = response.data.data.prematch;
+    data_prematch.forEach(element => {
+
+      if (element.id == 1){ 
+        
+        periods = element.periods;
+        periods.forEach(element_2 => {
+          if (element_2.ot_id == 100) {
+            all_book = element_2.odds;
+            all_book.forEach(each_book => {
+              book_offer_id.push([each_book.bookie_name, each_book.offer_id])
+            });
+          }
+        });
+      }
+    });
+
+    nb_book = book_offer_id.length;
+
+    moves_by_book = []
+
+    book_offer_id.forEach(offer_id => {
+
+      var options = {
+        method: 'GET',
+        
+        url: 'https://oddspedia.com/api/v1/getOddsMovements?ot=100&matchId='+idMatch+'&inplay=0&wettsteuer=0&geoCode=&geoState=&offerId='+offer_id[1]+'&language=en'
+      };
+      
+      axios.request(options).then(function (response_2) {
+    
+        moves_odds_1 = response_2.data.data['1'].moves;
+        moves_odds_N = response_2.data.data['2'].moves;
+        moves_odds_2 = response_2.data.data['3'].moves;
+        moves_by_book.push([offer_id[0], moves_odds_1, moves_odds_N, moves_odds_2])
+
+        if (nb_book == moves_by_book.length) {
+
+          var options = {
+            method: 'GET',
+            url: 'https://oddspedia.com/api/v1/getMatchInfo?geoCode=FR&wettsteuer=0&matchKey='+idInfo+'&language=en'
+          };
+          
+          axios.request(options).then(function (response_3) {
+            game_infos = response_3.data.data
+            //console.log(game_infos);
+            res.render('oddspedia_soccer/oddspedia_soccer_detail', {moves_by_book: moves_by_book, game_infos: game_infos, coteFte: coteFte, coteBe: coteBe, header: 'OddsPedia Detail'});
+          }).catch(function (error) {
+            console.error(error);
+          });
+          
+        }// fin if()
+
+        //res.render('', );
+      }).catch(function (error) {
+        console.error(error);
+      });
+
+    });
+
     //res.render('oddspedia_soccer_events', {matchList: matchList, categoryList: categoryList, leagueList: leagueList, header: 'OddsPedia Events'});
-  
   
   }).catch(function (error) {
     console.error(error);
   });
 })
+
+app.post('/oddspedia_soccer_detail/:id/:idInfo', (req, res) => {
+  idMatch = req.params.id
+  idInfo = req.params.idInfo
+  
+  coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
+  coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
+
+  var options = {
+    method: 'GET',
+    url: 'https://oddspedia.com/api/v1/getMatchOdds?wettsteuer=0&geoCode=&geoState=&matchKey='+idInfo+'&oddGroupId=1&inplay=0&language=en'
+  };
+  
+  axios.request(options).then(function (response) {
+
+    book_offer_id = [];
+
+    //console.log(response);
+
+    nb_book = 0;
+
+    data_prematch = response.data.data.prematch;
+    data_prematch.forEach(element => {
+
+      if (element.id == 1){ 
+        
+        periods = element.periods;
+        periods.forEach(element_2 => {
+          if (element_2.ot_id == 100) {
+            all_book = element_2.odds;
+            all_book.forEach(each_book => {
+              book_offer_id.push([each_book.bookie_name, each_book.offer_id])
+            });
+          }
+        });
+      }
+    });
+
+    nb_book = book_offer_id.length;
+
+    moves_by_book = []
+
+    book_offer_id.forEach(offer_id => {
+
+      var options = {
+        method: 'GET',
+        
+        url: 'https://oddspedia.com/api/v1/getOddsMovements?ot=100&matchId='+idMatch+'&inplay=0&wettsteuer=0&geoCode=&geoState=&offerId='+offer_id[1]+'&language=en'
+      };
+      
+      axios.request(options).then(function (response_2) {
+    
+        moves_odds_1 = response_2.data.data['1'].moves;
+        moves_odds_N = response_2.data.data['2'].moves;
+        moves_odds_2 = response_2.data.data['3'].moves;
+        moves_by_book.push([offer_id[0], moves_odds_1, moves_odds_N, moves_odds_2])
+
+        if (nb_book == moves_by_book.length) {
+
+          var options = {
+            method: 'GET',
+            url: 'https://oddspedia.com/api/v1/getMatchInfo?geoCode=FR&wettsteuer=0&matchKey='+idInfo+'&language=en'
+          };
+          
+          axios.request(options).then(function (response_3) {
+            game_infos = response_3.data.data
+            //console.log(game_infos);
+            res.render('oddspedia_soccer/oddspedia_soccer_detail', {moves_by_book: moves_by_book, game_infos: game_infos, coteFte: coteFte, coteBe: coteBe, header: 'OddsPedia Detail'});
+          }).catch(function (error) {
+            console.error(error);
+          });
+          
+        }// fin if()
+
+        //res.render('', );
+      }).catch(function (error) {
+        console.error(error);
+      });
+
+    });
+
+    //res.render('oddspedia_soccer_events', {matchList: matchList, categoryList: categoryList, leagueList: leagueList, header: 'OddsPedia Events'});
+  
+  }).catch(function (error) {
+    console.error(error);
+  });
+})
+
+/*client.connect(function (err) {
+  const db = client.db("soccer_event");
+  if (err) throw err;
+
+  db.collection('matrice_detail').findOne({ _id: ObjectId("6160c05590577726bcfeeb49") }, function (err, data) {
+    if (err) throw err;
+    console.log(data.data);
+
+    
+})
+
+});*/
 
 
 app.listen(40);

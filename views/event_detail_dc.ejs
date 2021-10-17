@@ -170,15 +170,17 @@
 
                         nb_book += 1;
 
+                        
+
                         live = items[book].live
-                        all_drop_1.push(live['1'])
-                        all_drop_X.push(live['X'])
-                        all_drop_2.push(live['2'])
+                        all_drop_1.push(live['1X'])
+                        all_drop_X.push(live['12'])
+                        all_drop_2.push(live['X2'])
 
                         history = items[book].history,
-                        all_opening_1.push(parseFloat(history[history.length -1]['1']))
-                        all_opening_X.push(history[history.length -1]['X'])
-                        all_opening_2.push(history[history.length -1]['2']);
+                        all_opening_1.push(parseFloat(history[history.length -1]['1X']))
+                        all_opening_X.push(history[history.length -1]['12'])
+                        all_opening_2.push(history[history.length -1]['X2']);
 
                         if (history.length > 2){
                             nd_all_opening_1.push(history[history.length -2]['1'])
@@ -205,15 +207,15 @@
                         
 
                         history.forEach(un_history => {
-                            history_odd_1.push(un_history['1'])
-                            history_odd_X.push(un_history['X'])
-                            history_odd_2.push(un_history['2'])
+                            history_odd_1.push(un_history['1X'])
+                            history_odd_X.push(un_history['12'])
+                            history_odd_2.push(un_history['X2'])
                         });
 
                         history_book.push([book, numAverage(history_odd_1), numAverage(history_odd_X), numAverage(history_odd_2)])
 
-                        opening_of_each_book.push([book, history[history.length -1]['1'], history[history.length -1]['X'], history[history.length -1]['2']])
-                        live_of_each_book.push([book, live['1'], live['X'], live['2'], live['updated']])
+                        opening_of_each_book.push([book, history[history.length -1]['1X'], history[history.length -1]['12'], history[history.length -1]['X2']])
+                        live_of_each_book.push([book, live['1X'], live['12'], live['X2'], live['updated']])
                         
                         //console.log(opening_of_each_book.length, live_of_each_book.length);
                     }; 
@@ -306,9 +308,9 @@
             <thead>
                 <tr style="text-align: center;">
                     <th>Type</th>
-                    <th>1 </th>
-                    <th>N </th>
-                    <th>2 </th>
+                    <th>1N </th>
+                    <th>12 </th>
+                    <th>N2 </th>
                     <th>Margin </th>
                 </tr>
             </thead>
@@ -346,15 +348,15 @@
             <h6>BeSoccer</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
-                    <input placeholder="Percent 1" type="text" class="form-control" id="coteBe1" name="coteBe1" value=<% if(coteBe[0]){ %>"<%=
+                    <input placeholder="Percent 1N" type="text" class="form-control" id="coteBe1" name="coteBe1" value=<% if(coteBe[0]){ %>"<%=
                     coteBe[0] %>"<%}%>>
                 </div>
                 <div class="col">
-                    <input placeholder="Percent N" type="text" class="form-control" id="coteBeX" name="coteBeX" value=<% if(coteBe[1]){ %>"<%=
+                    <input placeholder="Percent 12" type="text" class="form-control" id="coteBeX" name="coteBeX" value=<% if(coteBe[1]){ %>"<%=
                     coteBe[1] %>"<%}%>> 
                 </div>
                 <div class="col">
-                    <input placeholder="Percent 2" type="text" class="form-control" id="coteBe2" name="coteBe2" value=<% if(coteBe[2]){ %>"<%=
+                    <input placeholder="Percent N2" type="text" class="form-control" id="coteBe2" name="coteBe2" value=<% if(coteBe[2]){ %>"<%=
                     coteBe[2] %>"<%}%>>
                 </div>
             </div>
@@ -362,15 +364,15 @@
             <h6>Five Soccer 8</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
-                    <input placeholder="Percent 1" type="text" class="form-control" id="cote1" name="cote1" value=<% if(coteFte[0]){ %>"<%=
+                    <input placeholder="Percent 1N" type="text" class="form-control" id="cote1" name="cote1" value=<% if(coteFte[0]){ %>"<%=
                     coteFte[0] %>"<%}%>>
                 </div>
                 <div class="col">
-                    <input placeholder="Percent N" type="text" class="form-control" id="coteX" name="coteX" value=<% if(coteFte[1]){ %>"<%=
+                    <input placeholder="Percent 12" type="text" class="form-control" id="coteX" name="coteX" value=<% if(coteFte[1]){ %>"<%=
                     coteFte[1] %>"<%}%>> 
                 </div>
                 <div class="col">
-                    <input placeholder="Percent 2" type="text" class="form-control" id="cote2" name="cote2" value=<% if(coteFte[2]){ %>"<%=
+                    <input placeholder="Percent N2" type="text" class="form-control" id="cote2" name="cote2" value=<% if(coteFte[2]){ %>"<%=
                     coteFte[2] %>"<%}%>>
                 </div>
             </div>
@@ -395,9 +397,9 @@
                     <thead>
                         <tr style="text-align: center;">
                             <th scope="col">Type</th>
-                            <th scope="col">1</th>
-                            <th scope="col">N</th>
-                            <th scope="col">2</th>
+                            <th scope="col">1N</th>
+                            <th scope="col">12</th>
+                            <th scope="col">N2</th>
                         </tr>
                     </thead>
         
@@ -448,9 +450,9 @@
                     <thead>
                         <tr style="text-align: center;">
                             <th scope="col">Type</th>
-                            <th scope="col">1</th>
-                            <th scope="col">N</th>
-                            <th scope="col">2</th>
+                            <th scope="col">1N</th>
+                            <th scope="col">12</th>
+                            <th scope="col">N2</th>
                         </tr>
                     </thead>
         
@@ -506,9 +508,9 @@
                 <thead>
                     <tr style="text-align: center;">
                         <th scope="col">Type</th>
-                        <th scope="col">1</th>
-                        <th scope="col">N</th>
-                        <th scope="col">2</th>
+                        <th scope="col">1N</th>
+                        <th scope="col">12</th>
+                        <th scope="col">N2</th>
                     </tr>
                 </thead>
     
@@ -607,9 +609,9 @@
                 <thead>
                     <tr style="text-align: center;">
                         <th scope="col">Type</th>
-                        <th scope="col">1</th>
-                        <th scope="col">N</th>
-                        <th scope="col">2</th>
+                        <th scope="col">1N</th>
+                        <th scope="col">12</th>
+                        <th scope="col">N2</th>
                     </tr>
                 </thead>
     
@@ -714,9 +716,9 @@
             <thead>
                 <tr style="text-align: center;">
                     <th scope="col" data-sortable="true">Bookmaker</th> <!-- Average of Bookmaker -->
-                    <th scope="col" data-sortable="true">1</th>
-                    <th scope="col" data-sortable="true">N</th>
-                    <th scope="col" data-sortable="true">2</th>
+                    <th scope="col" data-sortable="true">1N</th>
+                    <th scope="col" data-sortable="true">12</th>
+                    <th scope="col" data-sortable="true">N2</th>
                 </tr>
             </thead>
 
