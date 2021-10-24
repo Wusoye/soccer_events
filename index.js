@@ -389,7 +389,61 @@ app.post('/event_detail_dc/:id', function(req, res){
   });
 });
 
+app.post('/event_detail/KaForm/:id/:ht/:at/:dateTime/:av1/:avN/:av2/:ma1/:maN/:ma2/:mi1/:miN/:mi2', function(req, res){
+  whoWin = req.body.whoWin
+  id = req.params.id
 
+  ht = req.params.ht
+  at = req.params.at
+  team_match = "" + ht + " - " + at
+  dateTime = req.params.dateTime
+
+  av1 = parseFloat(req.params.av1)
+  avN = parseFloat(req.params.avN)
+  av2 = parseFloat(req.params.av2)
+
+  ma1 = parseFloat(req.params.ma1)
+  maN = parseFloat(req.params.maN)
+  ma2 = parseFloat(req.params.ma2)
+
+  mi1 = parseFloat(req.params.mi1)
+  miN = parseFloat(req.params.miN)
+  mi2 = parseFloat(req.params.mi2)
+
+  array_drop = [[av1,avN,av2],[ma1,maN,ma2],[mi1,miN,mi2]]
+  
+  if (whoWin == 0 || whoWin == 1 || whoWin == 2) {
+
+    client.connect(function (err) {
+      const db = client.db("soccer_event");
+      if (err) throw err;
+    
+      db.collection('Odds_to_BeSoccer').updateOne({ _id: ObjectId("61753aab787fca2b90bfedc3") },
+        {
+          $push:{
+          "data":
+              {
+                  "match": team_match,
+                  "Drop": array_drop,
+                  "date": new Date(moment(dateTime).format()),
+                  "winner": parseFloat(whoWin)
+              }
+                
+            }
+            
+        }
+      
+      , function (err, data) {
+        if (err) throw err;
+        res.redirect('/event_detail/'+id);
+      })
+    });
+  }
+  else{
+    res.redirect('/event_detail/'+id);
+  }
+
+})
 
 app.post('/event_detail/addMe/:id/:ht/:at/:dateTime/:av1/:avN/:av2/:ma1/:maN/:ma2/:mi1/:miN/:mi2', function(req, res){
   whoWin = req.body.whoWin
