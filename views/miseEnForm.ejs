@@ -1,0 +1,31 @@
+<p>
+
+    <% rows.forEach(row => { %> 
+        'p_<%= row.score %>', 
+    <% }); %> 
+
+</p>
+
+<p>
+
+    <% rows.forEach(row => { %> 
+        p_<%= row.score_ %>, 
+    <% }); %> 
+
+</p>
+
+R4_0_p = mt.loc[i, '4_0_p']
+
+<% rows.forEach(row => { %> 
+<p>
+        p_<%= row.score_ %> = mt.loc[i, 'p_<%= row.score %>']
+</p>
+<% }); %> 
+
+<p>
+
+    <% rows.forEach(row => { %> 
+        'a_<%= row.score %>', 
+    <% }); %> 
+
+</p>

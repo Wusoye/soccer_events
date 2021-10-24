@@ -23,7 +23,8 @@ const spawn  = require('child_process').spawn;
 
 var XMLHttpRequest = require('xhr2');
 var xhr = new XMLHttpRequest();
-const Papa = require("papaparse"), fs = require("fs");
+const Papa = require("papaparse");
+fs = require("fs");
 
 header = false;
 
@@ -387,6 +388,8 @@ app.post('/event_detail_dc/:id', function(req, res){
     console.error(error);
   });
 });
+
+
 
 app.post('/event_detail/addMe/:id/:ht/:at/:dateTime/:av1/:avN/:av2/:ma1/:maN/:ma2/:mi1/:miN/:mi2', function(req, res){
   whoWin = req.body.whoWin
@@ -753,6 +756,14 @@ app.post('/oddspedia_soccer_detail/:id/:idInfo', (req, res) => {
   }).catch(function (error) {
     console.error(error);
   });
+})
+
+app.get('/miseEnForm', (req, res) => {
+  fs.readFile('./models/Exemple_row_scores.json', function(erreur, fichier) {
+    let rows = JSON.parse(fichier)
+    console.log(rows.length);
+    res.render('miseEnForm', {rows: rows})
+ })
 })
 
 /*client.connect(function (err) {

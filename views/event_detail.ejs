@@ -299,7 +299,6 @@
             %> 
             
         <br>
-        
         <h3 style="text-align: center;">AVERAGE ODDS</h3>
         <br>
         <table class="table table-striped table-bordered border-secondary" data-toggle="table">
@@ -320,6 +319,7 @@
                     <td><%= average_opening_2 %></td>
                     <td><%= ((1/average_opening_1 + 1/average_opening_X + 1/average_opening_2)*100-100).toFixed(2) %></td>
                 </tr>
+               
                 <tr>
                     <td>Live odds</td>
                     <td><%= average_drop_1 %></td>
@@ -659,7 +659,7 @@
 
         <br>
 
-        <form action="/event_detail/addMe/<%- idMatch -%>/<%- infos.hometeam.name -%>/<%- infos.awayteam.name -%>/<%- infos.time -%>/<%- av1 -%>/<%- avN -%>/<%- av2 -%>/<%- ma1 -%>/<%- maN -%>/<%- ma2 -%>/<%- mi1 -%>/<%- miN -%>/<%- mi2 -%>" method="POST">
+        <form action="/event_detail/KaForm/<%- idMatch -%>/<%- infos.hometeam.name -%>/<%- infos.awayteam.name -%>/<%- infos.time -%>/<%- av1 -%>/<%- avN -%>/<%- av2 -%>/<%- ma1 -%>/<%- maN -%>/<%- ma2 -%>/<%- mi1 -%>/<%- miN -%>/<%- mi2 -%>" method="POST">-->
 
             <div class="row">
                 <div class="col-md-4 offset-md-4">
