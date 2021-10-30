@@ -7,6 +7,8 @@ var csv = require("csvtojson");
 const request=require('request')
 var moment = require('./config/moment');
 
+distrib_poisson = require('./config/distrib_poisson')
+
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
@@ -317,6 +319,8 @@ app.get('/event_detail/:id', function(req, res){
   id = req.params.id;
   coteFte = [];
   coteBe = [];
+  goals_predictions = [];
+  elo_inc = [];
   model_prob = null;
   var options = {
     method: 'GET',
@@ -325,7 +329,7 @@ app.get('/event_detail/:id', function(req, res){
   
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', {idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
+    res.render('event_detail', {idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, goals_predictions: goals_predictions, elo_inc: elo_inc, header: 'Event Detail'});
   }).catch(function (error) {
     console.error(error);
   });
@@ -334,8 +338,32 @@ app.get('/event_detail/:id', function(req, res){
 app.post('/event_detail/:id', function(req, res){
   id = req.params.id;
   whoWin = parseInt(req.body.whoWin);
-  coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
-  coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
+
+  //coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
+  //coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
+
+
+  goals_predictions = [req.body.local_goal, req.body.visitor_goal];
+  elo_inc = [req.body.local_inc, req.body.visitor_inc];
+
+  local_goals = goals_predictions[0]
+  visitor_goals = goals_predictions[1]
+
+  local_goals_inc = goals_predictions[0] * (1 + elo_inc[0] / 100)
+  visitor_goals_inc = goals_predictions[1]* (1 + elo_inc[1] / 100)
+
+  normal_distrib = new distrib_poisson(local_goals, visitor_goals, 10)
+  normal_proba = normal_distrib.predict_proba(false);
+
+  inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 10)
+  inc_proba = inc_distrib.predict_proba(false);
+
+  console.log(normal_proba, inc_proba);
+
+  coteBe = [normal_proba[0], normal_proba[1], normal_proba[2]];
+  coteFte = [inc_proba[0], inc_proba[1], inc_proba[2]];
+  
+
   model_prob = null;
 
   var options = {
@@ -345,7 +373,7 @@ app.post('/event_detail/:id', function(req, res){
   
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', {idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, header: 'Event Detail'});
+    res.render('event_detail', {idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, goals_predictions: goals_predictions, elo_inc: elo_inc, header: 'Event Detail'});
   }).catch(function (error) {
     console.error(error);
   });
@@ -500,9 +528,9 @@ app.post('/event_detail/addMe/:id/:ht/:at/:dateTime/:av1/:avN/:av2/:ma1/:maN/:ma
 
 })
 
-app.get('/event_detail/sayMe/:id/:av1/:avN/:av2/:ma1/:maN/:ma2/:mi1/:miN/:mi2/:fte1/:fteN/:fte2/:be1/:beN/:be2', (req, res) => {
+app.get('/event_detail/sayMe/:id/:av1/:avN/:av2/:ma1/:maN/:ma2/:mi1/:miN/:mi2/:be1/:beN/:be2', (req, res) => {
   id = req.params.id;
-  coteFte = [req.params.fte1, req.params.fteN, req.params.fte2];
+  coteFte = [];
   coteBe = [req.params.be1, req.params.beN, req.params.be2];
 
   av1 = req.params.av1.toString()
@@ -818,20 +846,11 @@ app.get('/miseEnForm', (req, res) => {
     console.log(rows.length);
     res.render('miseEnForm', {rows: rows})
  })
+ my_distrib = new distrib_poisson(1, 1.32, 10)
+ console.log(my_distrib.predict_proba());
 })
 
-/*client.connect(function (err) {
-  const db = client.db("soccer_event");
-  if (err) throw err;
 
-  db.collection('matrice_detail').findOne({ _id: ObjectId("6160c05590577726bcfeeb49") }, function (err, data) {
-    if (err) throw err;
-    console.log(data.data);
-
-    
-})
-
-});*/
 
 
 app.listen(40);

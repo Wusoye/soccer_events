@@ -15,9 +15,9 @@ import sys
 
 myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
 mydb = myclient["soccer_event"]
-mycol = mydb["matrice_detail"]
+mycol = mydb["Odds_to_BeSoccer"]
 
-myquery = { "_id" : "6160c05590577726bcfeeb49" }
+myquery = { "_id" : "61753aab787fca2b90bfedc3" }
 
 def parse_json(data):
     return json.loads(json_util.dumps(data))
@@ -31,15 +31,15 @@ md_to_w = pd.DataFrame()
 for x in range(len(data)):
     winner.loc[x, 'winner'] = data[x]['winner']
     
-    matrice_detail.loc[x, 'av1'] = data[x]['matrice'][0][0]
-    matrice_detail.loc[x, 'avN'] = data[x]['matrice'][0][1]
-    matrice_detail.loc[x, 'av2'] = data[x]['matrice'][0][2]
-    matrice_detail.loc[x, 'ma1'] = data[x]['matrice'][1][0]
-    matrice_detail.loc[x, 'maN'] = data[x]['matrice'][1][1]
-    matrice_detail.loc[x, 'ma2'] = data[x]['matrice'][1][2]
-    matrice_detail.loc[x, 'mi1'] = data[x]['matrice'][2][0]
-    matrice_detail.loc[x, 'miN'] = data[x]['matrice'][2][1]
-    matrice_detail.loc[x, 'mi2'] = data[x]['matrice'][2][2]
+    matrice_detail.loc[x, 'av1'] = data[x]['Drop'][0][0]
+    matrice_detail.loc[x, 'avN'] = data[x]['Drop'][0][1]
+    matrice_detail.loc[x, 'av2'] = data[x]['Drop'][0][2]
+    matrice_detail.loc[x, 'ma1'] = data[x]['Drop'][1][0]
+    matrice_detail.loc[x, 'maN'] = data[x]['Drop'][1][1]
+    matrice_detail.loc[x, 'ma2'] = data[x]['Drop'][1][2]
+    matrice_detail.loc[x, 'mi1'] = data[x]['Drop'][2][0]
+    matrice_detail.loc[x, 'miN'] = data[x]['Drop'][2][1]
+    matrice_detail.loc[x, 'mi2'] = data[x]['Drop'][2][2]
 
 X = matrice_detail
 y = winner

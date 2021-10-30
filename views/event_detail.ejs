@@ -342,7 +342,7 @@
 
         <form action="" method="POST">
             <h5 style="text-align: center">PREDICTION PERCENT</h5>
-            <br>
+            <!--<br>
             <h6>BeSoccer</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
@@ -372,6 +372,32 @@
                 <div class="col">
                     <input placeholder="Percent 2" type="text" class="form-control" id="cote2" name="cote2" value=<% if(coteFte[2]){ %>"<%=
                     coteFte[2] %>"<%}%>>
+                </div>
+            </div>-->
+
+            <br>
+            <h6>Goals prédiction</h6>
+            <div class="row justify-content-md-center" style="text-align: center">
+                <div class="col">
+                    <input placeholder="Local goals" type="text" class="form-control" id="local_goal" name="local_goal" value=<% if(goals_predictions[0]){ %>"<%=
+                    goals_predictions[0] %>"<%}%>>
+                </div>
+                <div class="col">
+                    <input placeholder="Visitor goals" type="text" class="form-control" id="visitor_goal" name="visitor_goal" value=<% if(goals_predictions[1]){ %>"<%=
+                    goals_predictions[1] %>"<%}%>>
+                </div>
+            </div>
+
+            <br>
+            <h6>Elo inclinaison (tilt)</h6>
+            <div class="row justify-content-md-center" style="text-align: center">
+                <div class="col">
+                    <input placeholder="Local inclinaison" type="text" class="form-control" id="local_inc" name="local_inc" value=<% if(elo_inc[0]){ %>"<%=
+                    elo_inc[0] %>"<%}%>>
+                </div>
+                <div class="col">
+                    <input placeholder="Visitor inclinaison" type="text" class="form-control" id="visitor_inc" name="visitor_inc" value=<% if(elo_inc[1]){ %>"<%=
+                    elo_inc[1] %>"<%}%>>
                 </div>
             </div>
 
@@ -558,7 +584,7 @@
         
         </div>
 
-        <br>
+        <!--<br>
 
         <form action="/event_detail/KaForm/<%- idMatch -%>/<%- infos.hometeam.name -%>/<%- infos.awayteam.name -%>/<%- infos.time -%>/<%- av1 -%>/<%- avN -%>/<%- av2 -%>/<%- ma1 -%>/<%- maN -%>/<%- ma2 -%>/<%- mi1 -%>/<%- miN -%>/<%- mi2 -%>" method="POST">
 
@@ -581,9 +607,9 @@
                 </div>
             </div>
         </form>
-        <!---<br>
+        <br>-->
 
-        <div class="row">
+        <!--<div class="row">
             
             <div class="col-md-4 offset-md-4">
                 <% if (model_prob) { %> 
@@ -594,10 +620,10 @@
                 <a class="btn btn-outline-primary" 
                 href="/event_detail/sayMe/
                 <%- idMatch -%>/<%- av1 -%>/<%- avN -%>/<%- av2 -%>/<%- ma1 -%>/<%- maN -%>/<%- ma2 -%>/<%- mi1 -%>/<%- miN -%>/<%- mi2 -%>/
-                <%- coteFte[0] -%>/<%- coteFte[1] -%>/<%- coteFte[2] -%>/<%- coteBe[0] -%>/<%- coteFte[1] -%>/<%- coteFte[2] -%>">Say me who will win</a>
+                <%- coteBe[0] -%>/<%- coteFte[1] -%>/<%- coteFte[2] -%>">Say me who will win</a>
                 <% } %> 
             </div>
-        </div>--->
+        </div>-->
         
         <br>
 
