@@ -1,0 +1,141 @@
+<%- include('include/header') -%>
+
+<% 
+
+function percent_to_odd(percent){
+    return 1 / percent * 100
+}
+
+function dropping_me(odd_arrive, odd_depart){
+    return ((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2)
+}
+
+bool_aff_diff = false;
+
+if(cote_arr.length == 3 && cote_dep.length == 3){
+    my_odd_arr_1 = percent_to_odd(cote_arr[0])
+    my_odd_arr_X = percent_to_odd(cote_arr[1])
+    my_odd_arr_2 = percent_to_odd(cote_arr[2])
+
+    my_odd_dep_1 = percent_to_odd(cote_dep[0])
+    my_odd_dep_X = percent_to_odd(cote_dep[1])
+    my_odd_dep_2 = percent_to_odd(cote_dep[2])
+    bool_aff_diff = true;
+}
+
+%> 
+
+<form action="/calculator_drop_xG" method="POST">
+    <br>
+    <h5 style="text-align: center">Expected goals</h5>
+    <div class="row" style="text-align: center">
+
+        <div class="col">
+            <label for="cote1">1</label>
+            <input type="text" class="form-control" id="xG_1" name="xG_1" value=<% if(xG[0]){ %>"<%= xG[0]
+                %>"<%}%>>
+        </div>
+        <div class="col">
+            <label for="coteX">X</label>
+            <input type="text" class="form-control" id="xG_2" name="xG_2" value=<% if(xG[1]){ %>"<%= xG[1]
+                %>"<%}%>>
+        </div>
+
+    </div>
+    <br>
+    <h5 style="text-align: center">Tilt</h5>
+    <div class="row" style="text-align: center">
+
+        <div class="col">
+            <label for="cote1">1</label>
+            <input type="text" class="form-control" id="tilt_1" name="tilt_1" value=<% if(tilt[0]){ %>"<%= tilt[0]
+                %>"<%}%>>
+        </div>
+        <div class="col">
+            <label for="coteX">X</label>
+            <input type="text" class="form-control" id="tilt_2" name="tilt_2" value=<% if(tilt[1]){ %>"<%= tilt[1]
+                %>"<%}%>>
+        </div>
+        
+    </div>
+    <br>
+    <div class="row justify-content-md-center">
+        <div class="col col-6 col-md-1">
+            <button type="submit" class="btn btn-primary btn-sm">valider</button>
+        </div>
+    </div>
+</form>
+
+<% if(bool_aff_diff){ %>
+    <br>
+    
+    <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
+        <thead>
+            <tr>
+                <th scope="col">Your</th>
+                <th scope="col">1</th>
+                <th scope="col">X</th>
+                <th scope="col">2</th>
+                <th scope="col">Mouvement</th>
+            </tr>
+        </thead>
+    
+        <tbody>
+            <tr>
+                <td>
+                    No tilt
+                </td>
+                <td>
+                    <%= cote_dep[0].toFixed(2) %>%
+                </td>
+                <td>
+                    <%= cote_dep[1].toFixed(2) %>%
+                </td>
+                <td>
+                    <%= cote_dep[2].toFixed(2) %>%
+                </td>
+                <td>
+                    <%=  %>%
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    With tilt
+                </td>
+                <td>
+                    <%= cote_arr[0].toFixed(2) %>%
+                </td>
+                <td>
+                    <%= cote_arr[1].toFixed(2) %>%
+                </td>
+                <td>
+                    <%= cote_arr[2].toFixed(2) %>%
+                </td>
+                <td>
+                    <%=  %>%
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Drop is.
+                </td>
+                <td>
+                    <%= dropping_me(my_odd_dep_1, my_odd_arr_1) %>%
+                </td>
+                <td>
+                    <%= dropping_me(my_odd_dep_X, my_odd_arr_X) %>%
+                </td>
+                <td>
+                    <%= dropping_me(my_odd_dep_2, my_odd_arr_2) %>%
+                </td>
+                <td>
+                    <%= (Math.abs(dropping_me(my_odd_arr_1, my_odd_dep_1)) + Math.abs(dropping_me(my_odd_arr_X, my_odd_dep_X)) + Math.abs(dropping_me(my_odd_arr_2, my_odd_dep_2))).toFixed(2) %>%
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <% 
+        }; 
+    %>
+
+<%- include('include/footer') -%>

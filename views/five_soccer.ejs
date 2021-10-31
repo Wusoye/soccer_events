@@ -8,6 +8,8 @@
                     <th data-sortable="true" scope="col">League</th>
                     <th scope="col">Teams</th>
                     <th scope="col">1</th>
+                    <th scope="col">2</th>
+                    <th scope="col">1</th>
                     <th scope="col">N</th>
                     <th scope="col">2</th>
                     <th scope="col">Score</th>  
@@ -33,6 +35,12 @@
                         </td>
                         <td>
                             <%= element.team1 %> - <%= element.team2 %>
+                        </td>
+                        <td>
+                            <%= element.proj_score1 %>
+                        </td>
+                        <td>
+                            <%= element.proj_score2 %>
                         </td>
                         <td>
                             <%= (element.prob1 * 100).toFixed(1) %>
