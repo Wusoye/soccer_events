@@ -12,6 +12,7 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
 
     local_distrib = []
     visitor_distrib = []
+    matrice_goals = {}
     local_lambda = local_predict
     visitor_lambda = visitor_predict
 
@@ -28,7 +29,21 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
 
     }
 
-    this.predict_proba = function (prob_percent) {
+    console.log(local_distrib[0] * visitor_distrib[0]);
+
+    this.predict_goals = function(prob_percent) {
+        if (prob_percent) {
+            return [local_distrib, visitor_distrib]
+        } else {
+            for (let k = 0; k < max_goal; k++) {
+                local_distrib[k] = local_distrib[k] * 100
+                visitor_distrib[k] = visitor_distrib[k] * 100
+            }
+            return [local_distrib, visitor_distrib]
+        }
+    }
+
+    this.predict_proba = function () {
 
         home_prob = 0
         draw_prob = 0
@@ -39,6 +54,7 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
 
                 local_prob_score = local_distrib[local_i]
                 visitor_prob_score = visitor_distrib[visitor_i]
+                
 
                 if (local_i > visitor_i) {
                     home_prob = local_prob_score * visitor_prob_score + home_prob
@@ -50,15 +66,18 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
                     away_prob = local_prob_score * visitor_prob_score + away_prob
                 }
 
+                if (local_i <= 5 && visitor_i <= 5) {
+                    score = String(local_i + '-' + visitor_i)
+                    matrice_goals[score] = local_prob_score * visitor_prob_score
+                }
+
             }
         }
 
-        if (prob_percent) {
-            return [home_prob, draw_prob, away_prob]
-        }
-        else {
-            return [home_prob * 100, draw_prob * 100, away_prob * 100]
-        }
+        matrice_goals['proba'] = [home_prob, draw_prob, away_prob]
+        matrice_goals['percent'] = [home_prob * 100, draw_prob * 100, away_prob * 100]
+        //console.log(matrice_goals);
+        return matrice_goals
 
     }
 

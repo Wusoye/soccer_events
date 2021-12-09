@@ -1,0 +1,144 @@
+<%- include('include/header') -%>
+<%
+function im_positive(my_number){
+    var res;
+    if(parseFloat(my_number) > 0){
+        res = "table-success";
+    }
+    else if(parseFloat(my_number) < 0){
+        res = "table-danger";
+    }
+    else if(parseFloat(my_number) < -1 || parseFloat(my_number) > 1){
+        res = "table-warning";
+    }
+    else{
+        res = "table-default";
+    }
+    return res;
+}
+%>
+
+<div class="row">
+    <div class="col-10 offset-1" style="text-align: center;">
+        <h2><%= select_event.team1 %> - <%= select_event.team2 %></h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-10 offset-1" style="text-align: center;">
+        <h5><%= select_event.league %> - <%= moment(select_event.date).format('lll') %></h5>
+    </div>
+</div>
+
+<% if(select_event.score1 != '' && select_event.score2 != '') { %> 
+<div class="row">
+    <div class="col-10 offset-1" style="text-align: center;">
+        <h5><%= select_event.proj_score1 %> | <%= select_event.score1 %> - <%= select_event.score2 %> | <%= select_event.proj_score2 %></h5>
+    </div>
+</div>
+<% } else { %>
+    <div class="row">
+        <div class="col-10 offset-1" style="text-align: center;">
+            <h5><%= select_event.proj_score1 %> - <%= select_event.proj_score2 %></h5>
+        </div>
+    </div>
+<% } %> 
+    
+<br>
+ 
+<div class="row">
+    <div class="col-6">
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+            <thead>
+                <tr>
+                    <th data-sortable="true" scope="col">DATE</th>
+                    <th data-sortable="true" scope="col">LEAGUE</th>
+                    <th scope="col">TEAMS</th>
+                    <th scope="col">SCORE</th>    
+                    <th scope="col">xG</th> 
+                    <th scope="col">FORM</th>                      
+                </tr>
+            </thead>
+            <tbody>
+                <% var i = 0; last_event[0].forEach(element=> { 
+                    detail_home = last_detail[0]
+                    var score1 = parseFloat(detail_home[i].score1)
+                    var xg1 = parseFloat(detail_home[i].xg1)
+                %>
+                    <tr>
+                        <td>
+                            <%= moment(element.date).format("YYYY-MM-DD") %>
+                        </td>
+                        <td>
+                            <%= (element.league).substring(0, 30) %>
+                        </td>
+                        <td>
+                            <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= element.team1 %> - <%= element.team2 %></a> 
+                        </td>
+                        </td>
+                        <td>
+                            <%= element.score1 %> - <%= element.score2 %>
+                        </td>
+                        <td>
+                            <%= element.xg1 %> - <%= element.xg2 %>
+                        </td>
+                        <!--<td>
+                            <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>
+                        </td>-->
+                        <td class="<%= im_positive((score1 - xg1)) %>">
+                            <%= (score1 - xg1).toFixed(2) %>
+                        </td>
+                    </tr>
+                <% i+=1 }); %>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-6">
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+            <thead>
+                <tr>
+                    <th data-sortable="true" scope="col">DATE</th>
+                    <th data-sortable="true" scope="col">LEAGUE</th>
+                    <th scope="col">TEAMS</th>
+                    <th scope="col">SCORE</th>    
+                    <th scope="col">xG</th> 
+                    <th scope="col">FORM</th>                    
+                </tr>
+            </thead>
+            <tbody>
+                <% var k = 0; last_event[1].forEach(element=> { 
+                    detail_home = last_detail[1]
+                    var score2 = parseFloat(detail_home[k].score2)
+                    var xg2 = parseFloat(detail_home[k].xg2)
+                 %>
+                    <tr>
+                        <td>
+                            <%= moment(element.date).format("YYYY-MM-DD") %>
+                        </td>
+                        <td>
+                            <%= (element.league).substring(0, 30) %>
+                        </td>
+                        <td>
+                            <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= element.team1 %> - <%= element.team2 %></a> 
+                        </td>
+                        </td>
+                        <td>
+                            <%= element.score1 %> - <%= element.score2 %>
+                        </td>
+                        <td>
+                            <%= element.xg1 %> - <%= element.xg2 %>
+                        </td>
+                        <!--<td>
+                            <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>
+                        </td>-->
+                        <td class="<%= im_positive(score2 - xg2) %>">
+                            <%= (score2 - xg2).toFixed(2) %>
+                        </td>
+                    </tr>
+                <% k+=1 }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+        
+
+<%- include('include/footer') -%>

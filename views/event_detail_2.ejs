@@ -113,9 +113,34 @@
                     return res;
                 }
 
+                function minus(a, b){
+                    if (a < b) {
+                        return true
+                    } else if (a > b) {
+                        return false
+                    } else {
+                        return false
+                    }
+                }
+
+                function maximus(a, b){
+                    if (a < b) {
+                        return false
+                    } else if (a > b) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+
+                function drop_xG(a, b) {
+                    return ((a-b)/b*100).toFixed(2)
+                }
+
                 %> 
 
                 <% 
+                k = 0
                 history_book = []
                 all_opening_1 = []
                 all_opening_X = []
@@ -137,22 +162,40 @@
                 change_mode = false
                 bool_aff_diff = false;
                 nb_book = 0
+                fo_odds_1 = 0
+                fo_odds_N = 0
+                fo_odds_2 = 0
+                lo_odds_1 = 0
+                lo_odds_N = 0
+                lo_odds_2 = 0
 
-                if(coteFte.length == 3){
-                    my_odd_1 = percent_to_odd(coteFte[0])
-                    my_odd_X = percent_to_odd(coteFte[1])
-                    my_odd_2 = percent_to_odd(coteFte[2])
+
+                fo_date = moment()
+                lo_date = moment("12-25-1995", "MM-DD-YYYY")
+
+
+                if(c_normal.length == 3){
+                    norm_odd_1 = percent_to_odd(c_normal[0])
+                    norm_odd_X = percent_to_odd(c_normal[1])
+                    norm_odd_2 = percent_to_odd(c_normal[2])
                     bool_aff_diff = true;
                 }
 
-                if(coteBe.length == 3){
-                    my_oddBe_1 = percent_to_odd(coteBe[0])
-                    my_oddBe_X = percent_to_odd(coteBe[1])
-                    my_oddBe_2 = percent_to_odd(coteBe[2])
+                if(c_no_tilt.length == 3){
+                    nT_odd_1 = percent_to_odd(c_no_tilt[0])
+                    nT_odd_X = percent_to_odd(c_no_tilt[1])
+                    nT_odd_2 = percent_to_odd(c_no_tilt[2])
                     bool_aff_diff = true;
                 }
 
-                Object.keys(items).forEach(function(book){ 
+                if(c_inc.length == 3){
+                    inc_odd_1 = percent_to_odd(c_inc[0])
+                    inc_odd_X = percent_to_odd(c_inc[1])
+                    inc_odd_2 = percent_to_odd(c_inc[2])
+                    bool_aff_diff = true;
+                }
+
+                Object.keys(items).forEach(function(book){
 
                     if (book == 'Betfair') {
                         history_exchange_back = items[book]['history_exchange_back'];
@@ -177,8 +220,8 @@
 
                         history = items[book].history,
                         all_opening_1.push(parseFloat(history[history.length -1]['1']))
-                        all_opening_X.push(history[history.length -1]['X'])
-                        all_opening_2.push(history[history.length -1]['2']);
+                        all_opening_X.push(parseFloat(history[history.length -1]['X']))
+                        all_opening_2.push(parseFloat(history[history.length -1]['2']))
 
                         if (history.length > 2){
                             nd_all_opening_1.push(history[history.length -2]['1'])
@@ -198,6 +241,23 @@
                             five_to_end_each_book.push([book, fi_nb_opening_1, fi_nb_opening_X, fi_nb_opening_2])
                             five_to_end_each_book_val = true
                         }
+
+                        
+                        
+                        if (minus(moment(history[history.length -1]['updated']), fo_date) ) {
+                            fo_date = moment(history[history.length -1]['updated'])
+                            fo_odds_1 = parseFloat(history[history.length -1]['1'])
+                            fo_odds_N = parseFloat(history[history.length -1]['X'])
+                            fo_odds_2 = parseFloat(history[history.length -1]['2'])
+                        }
+                        if (maximus(moment(history[history.length -1]['updated']), lo_date) ) {
+                            lo_date = moment(history[history.length -1]['updated'])
+                            lo_odds_1 = parseFloat(history[history.length -1]['1'])
+                            lo_odds_N = parseFloat(history[history.length -1]['X'])
+                            lo_odds_2 = parseFloat(history[history.length -1]['2'])
+                        }
+                        
+                        
                         
                         history_odd_1 = [],
                         history_odd_X = [],
@@ -212,7 +272,7 @@
 
                         history_book.push([book, numAverage(history_odd_1), numAverage(history_odd_X), numAverage(history_odd_2)])
 
-                        opening_of_each_book.push([book, history[history.length -1]['1'], history[history.length -1]['X'], history[history.length -1]['2']])
+                        opening_of_each_book.push([book, history[history.length -1]['1'], history[history.length -1]['X'], history[history.length -1]['2'], history[history.length -1]['updated']])
                         live_of_each_book.push([book, live['1'], live['X'], live['2'], live['updated']])
                         
                         //console.log(opening_of_each_book.length, live_of_each_book.length);
@@ -337,43 +397,10 @@
             </tbody>
         </table>
         <br>
-
-        
+                
 
         <form action="" method="POST">
             <h5 style="text-align: center">PREDICTION PERCENT</h5>
-            <!--<br>
-            <h6>BeSoccer</h6>
-            <div class="row justify-content-md-center" style="text-align: center">
-                <div class="col">
-                    <input placeholder="Percent 1" type="text" class="form-control" id="coteBe1" name="coteBe1" value=<% if(coteBe[0]){ %>"<%=
-                    coteBe[0] %>"<%}%>>
-                </div>
-                <div class="col">
-                    <input placeholder="Percent N" type="text" class="form-control" id="coteBeX" name="coteBeX" value=<% if(coteBe[1]){ %>"<%=
-                    coteBe[1] %>"<%}%>> 
-                </div>
-                <div class="col">
-                    <input placeholder="Percent 2" type="text" class="form-control" id="coteBe2" name="coteBe2" value=<% if(coteBe[2]){ %>"<%=
-                    coteBe[2] %>"<%}%>>
-                </div>
-            </div>
-            <br>
-            <h6>Five Soccer 8</h6>
-            <div class="row justify-content-md-center" style="text-align: center">
-                <div class="col">
-                    <input placeholder="Percent 1" type="text" class="form-control" id="cote1" name="cote1" value=<% if(coteFte[0]){ %>"<%=
-                    coteFte[0] %>"<%}%>>
-                </div>
-                <div class="col">
-                    <input placeholder="Percent N" type="text" class="form-control" id="coteX" name="coteX" value=<% if(coteFte[1]){ %>"<%=
-                    coteFte[1] %>"<%}%>> 
-                </div>
-                <div class="col">
-                    <input placeholder="Percent 2" type="text" class="form-control" id="cote2" name="cote2" value=<% if(coteFte[2]){ %>"<%=
-                    coteFte[2] %>"<%}%>>
-                </div>
-            </div>-->
 
             <br>
             <h6>Goals prédiction</h6>
@@ -389,7 +416,20 @@
             </div>
 
             <br>
-            <h6>Elo inclinaison</h6>
+            <h6>Tilt</h6> <!--Diminution du xG par le tilt-->
+            <div class="row justify-content-md-center" style="text-align: center">
+                <div class="col">
+                    <input placeholder="Local tilt" type="text" class="form-control" id="local_inc" name="local_tilt" value=<% if(tilt[0]){ %>"<%=
+                    tilt[0] %>"<%}%>>
+                </div>
+                <div class="col">
+                    <input placeholder="Visitor tilt" type="text" class="form-control" id="visitor_inc" name="visitor_tilt" value=<% if(tilt[1]){ %>"<%=
+                    tilt[1] %>"<%}%>>
+                </div>
+            </div>
+
+            <!--<br>
+            <h6>Elo inclinaison</h6> Augmentation du xG par l'inclinaison
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
                     <input placeholder="Local inclinaison" type="text" class="form-control" id="local_inc" name="local_inc" value=<% if(elo_inc[0]){ %>"<%=
@@ -399,7 +439,7 @@
                     <input placeholder="Visitor inclinaison" type="text" class="form-control" id="visitor_inc" name="visitor_inc" value=<% if(elo_inc[1]){ %>"<%=
                     elo_inc[1] %>"<%}%>>
                 </div>
-            </div>
+            </div>-->
 
             <br>
             <div class="row justify-content-md-center">
@@ -415,8 +455,9 @@
         <h5 style="text-align: center">OPPENING / PREDICTION</h5>
         <br>
         <div class="row">
-            <div class="col-6">
-                <h6>NoTilt</h6>
+            
+            <div class="col-12">
+                <h6>AVERAGE / NORMAL</h6>
                 <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
                     <thead>
                         <tr style="text-align: center;">
@@ -430,92 +471,64 @@
                     <tbody>
                         <tr>
                             <td>Average</td>
-                            <td class="<%= im_positive(dropping_me(average_opening_1, my_odd_1)) %>" > 
-                                <%= dropping_me(average_opening_1, my_odd_1) %> %
+                            <td class="<%= im_positive(dropping_me(average_opening_1, norm_odd_1)) %>" > 
+                                <%= dropping_me(average_opening_1, norm_odd_1) %> % 
                             </td>
-                            <td class="<%= im_positive(dropping_me(average_opening_X, my_odd_X)) %>" >
-                                <%= dropping_me(average_opening_X, my_odd_X) %> %
+                            <td class="<%= im_positive(dropping_me(average_opening_X, norm_odd_X)) %>" >
+                                <%= dropping_me(average_opening_X, norm_odd_X) %> % 
                             </td>
-                            <td class="<%= im_positive(dropping_me(average_opening_2, my_odd_2)) %>" >
-                                <%= dropping_me(average_opening_2, my_odd_2) %> %
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Max</td>
-                            <td class="<%= im_positive(dropping_me(max_opening_1, my_odd_1)) %>" >
-                                <%= dropping_me(max_opening_1, my_odd_1) %> %
-                            </td>
-                            <td class="<%= im_positive(dropping_me(max_opening_X, my_odd_X)) %>">
-                                <%= dropping_me(max_opening_X, my_odd_X) %> %
-                            </td>
-                            <td class="<%= im_positive(dropping_me(max_opening_2, my_odd_2)) %>" >
-                                <%= dropping_me(max_opening_2, my_odd_2) %> %
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Min</td>
-                            <td class="<%= im_positive(dropping_me(min_opening_1, my_odd_1)) %>" >
-                                <%= dropping_me(min_opening_1, my_odd_1) %> %
-                            </td>
-                            <td class="<%= im_positive(dropping_me(min_opening_X, my_odd_X)) %>" >
-                                <%= dropping_me(min_opening_X, my_odd_X) %> %
-                            </td>
-                            <td class="<%= im_positive(dropping_me(min_opening_2, my_odd_2)) %>" >
-                                <%= dropping_me(min_opening_2, my_odd_2) %> %
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-6">
-                <h6>WithTilt</h6>
-                <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
-                    <thead>
-                        <tr style="text-align: center;">
-                            <th scope="col">Type</th>
-                            <th scope="col">1</th>
-                            <th scope="col">N</th>
-                            <th scope="col">2</th>
-                        </tr>
-                    </thead>
-        
-                    <tbody>
-                        <tr>
-                            <td>Average</td>
-                            <td class="<%= im_positive(dropping_me(average_opening_1, my_oddBe_1)) %>" > 
-                                <%= dropping_me(average_opening_1, my_oddBe_1) %> % <% av1 = dropping_me(average_opening_1, my_oddBe_1) %>
-                            </td>
-                            <td class="<%= im_positive(dropping_me(average_opening_X, my_oddBe_X)) %>" >
-                                <%= dropping_me(average_opening_X, my_oddBe_X) %> % <% avN = dropping_me(average_opening_X, my_oddBe_X) %>
-                            </td>
-                            <td class="<%= im_positive(dropping_me(average_opening_2, my_oddBe_2)) %>" >
-                                <%= dropping_me(average_opening_2, my_oddBe_2) %> % <% av2 = dropping_me(average_opening_2, my_oddBe_2) %>
+                            <td class="<%= im_positive(dropping_me(average_opening_2, norm_odd_2)) %>" >
+                                <%= dropping_me(average_opening_2, norm_odd_2) %> % 
                             </td>
                         </tr>
                         <tr>
                             <td>Max</td>
-                            <td class="<%= im_positive(dropping_me(max_opening_1, my_oddBe_1)) %>" >
-                                <%= dropping_me(max_opening_1, my_oddBe_1) %> % <% ma1 = dropping_me(max_opening_1, my_oddBe_1) %>
+                            <td class="<%= im_positive(dropping_me(max_opening_1, norm_odd_1)) %>" >
+                                <%= dropping_me(max_opening_1, norm_odd_1) %> % 
                             </td>
-                            <td class="<%= im_positive(dropping_me(max_opening_X, my_oddBe_X)) %>">
-                                <%= dropping_me(max_opening_X, my_oddBe_X) %> % <% maN = dropping_me(max_opening_X, my_oddBe_X) %>
+                            <td class="<%= im_positive(dropping_me(max_opening_X, norm_odd_X)) %>">
+                                <%= dropping_me(max_opening_X, norm_odd_X) %> % 
                             </td>
-                            <td class="<%= im_positive(dropping_me(max_opening_2, my_oddBe_2)) %>" >
-                                <%= dropping_me(max_opening_2, my_oddBe_2) %> % <% ma2 = dropping_me(max_opening_2, my_oddBe_2) %>
+                            <td class="<%= im_positive(dropping_me(max_opening_2, norm_odd_2)) %>" >
+                                <%= dropping_me(max_opening_2, norm_odd_2) %> % 
                             </td>
                         </tr>
                         <tr>
                             <td>Min</td>
-                            <td class="<%= im_positive(dropping_me(min_opening_1, my_oddBe_1)) %>" >
-                                <%= dropping_me(min_opening_1, my_oddBe_1) %> % <% mi1 = dropping_me(min_opening_1, my_oddBe_1) %>
+                            <td class="<%= im_positive(dropping_me(min_opening_1, norm_odd_1)) %>" >
+                                <%= dropping_me(min_opening_1, norm_odd_1) %> % 
                             </td>
-                            <td class="<%= im_positive(dropping_me(min_opening_X, my_oddBe_X)) %>" >
-                                <%= dropping_me(min_opening_X, my_oddBe_X) %> % <% miN = dropping_me(min_opening_X, my_oddBe_X) %>
+                            <td class="<%= im_positive(dropping_me(min_opening_X, norm_odd_X)) %>" >
+                                <%= dropping_me(min_opening_X, norm_odd_X) %> % 
                             </td>
-                            <td class="<%= im_positive(dropping_me(min_opening_2, my_oddBe_2)) %>" >
-                                <%= dropping_me(min_opening_2, my_oddBe_2) %> % <% mi2 = dropping_me(min_opening_2, my_oddBe_2) %>
+                            <td class="<%= im_positive(dropping_me(min_opening_2, norm_odd_2)) %>" >
+                                <%= dropping_me(min_opening_2, norm_odd_2) %> % 
                             </td>
                         </tr>
+                        <!--<tr>
+                            <td>Last opening</td>
+                            <td class="<%= im_positive(dropping_me(lo_odds_1, norm_odd_1)) %>" >
+                                <%= dropping_me(lo_odds_1, norm_odd_1) %> % 
+                            </td>
+                            <td class="<%= im_positive(dropping_me(lo_odds_N, norm_odd_X)) %>" >
+                                <%= dropping_me(lo_odds_N, norm_odd_X) %> % 
+                            </td>
+                            <td class="<%= im_positive(dropping_me(lo_odds_2, norm_odd_2)) %>" >
+                                <%= dropping_me(lo_odds_2, norm_odd_2) %> % 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>First opening</td>
+                            <td class="<%= im_positive(dropping_me(fo_odds_1, norm_odd_1)) %>" >
+                                <%= dropping_me(fo_odds_1, norm_odd_1) %> % 
+                            </td>
+                            <td class="<%= im_positive(dropping_me(fo_odds_N, norm_odd_X)) %>" >
+                                <%= dropping_me(fo_odds_N, norm_odd_X) %> % 
+                            </td>
+                            <td class="<%= im_positive(dropping_me(fo_odds_2, norm_odd_2)) %>" >
+                                <%= dropping_me(fo_odds_2, norm_odd_2) %> % 
+                            </td>
+                        </tr>-->
                         
                     </tbody>
                 </table>
@@ -527,7 +540,7 @@
         <div class="row">
             <div class="col-12">
         
-                <h6>NoTilt - WithTilt</h6>
+                <h6>PROBABILITY</h6>
                 <table style="text-align: center;" class="table table-striped table-bordered border-secondary"
                     data-toggle="table">
                     <thead>
@@ -541,136 +554,89 @@
         
                     <tbody>
                         <tr>
-                            <td>Drop</td>
-                            <td
-                                class="<%= im_positive((dropping_me(my_odd_1, my_oddBe_1)).toFixed(2)) %>">
-                                <%= dropping_me(my_odd_1, my_oddBe_1).toFixed(2) %> %
+                            <td>NORMAL</td>
+                            <td>
+                                <%= c_normal[0].toFixed(2) %> %
                             </td>
-                            <td
-                                class="<%= im_positive((dropping_me(my_odd_X, my_oddBe_X)).toFixed(2)) %>">
-                                <%= dropping_me(my_odd_X, my_oddBe_X).toFixed(2) %> %
+                            <td>
+                                <%= c_normal[1].toFixed(2) %> %
                             </td>
-                            <td
-                                class="<%= im_positive((dropping_me(my_odd_2, my_oddBe_2)).toFixed(2)) %>">
-                                <%= dropping_me(my_odd_2, my_oddBe_2).toFixed(2) %> %
+                            <td>
+                                <%= c_normal[2].toFixed(2) %> %
                             </td>
                         </tr>
+                        <tr>
+                            <td>NO TILT</td>
+                            <td>
+                                <%= c_no_tilt[0].toFixed(2) %> %
+                            </td>
+                            <td>
+                                <%= c_no_tilt[1].toFixed(2) %> %
+                            </td>
+                            <td>
+                                <%= c_no_tilt[2].toFixed(2) %> %
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>NO TILT / NORMAL</td>
+                            <td
+                                class="<%= im_positive((dropping_me(nT_odd_1, norm_odd_1)).toFixed(2)) %>">
+                                <%= dropping_me(nT_odd_1, norm_odd_1).toFixed(2) %> 
+                            </td>
+                            <td
+                                class="<%= im_positive((dropping_me(nT_odd_X, norm_odd_X)).toFixed(2)) %>">
+                                <%= dropping_me(nT_odd_X, norm_odd_X).toFixed(2) %> 
+                            </td>
+                            <td
+                                class="<%= im_positive((dropping_me(nT_odd_2, norm_odd_2)).toFixed(2)) %>">
+                                <%= dropping_me(nT_odd_2, norm_odd_2).toFixed(2) %> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>NO TILT / NORMAL (XG)</td>
+                            <td
+                                class="<%= im_positive((drop_xG(goals_predictions[0], tilt[0]))) %>">
+                                <%= drop_xG(goals_predictions[0], tilt[0]) %> 
+                            </td>
+                            <td>
+                            
+                            </td>
+                            <td
+                                class="<%= im_positive((drop_xG(goals_predictions[1], tilt[1]))) %>">
+                                <%= drop_xG(goals_predictions[1], tilt[1]) %> 
+                            </td>
+                        </tr>
+                        
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <br>
-
-        <div class="row">
-            <div class="col-12">
-
-            <h6>[NoTilt] - [WithTilt]</h6>
-            <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
-                <thead>
-                    <tr style="text-align: center;">
-                        <th scope="col">Type</th>
-                        <th scope="col">1</th>
-                        <th scope="col">N</th>
-                        <th scope="col">2</th>
-                    </tr>
-                </thead>
-    
-                <tbody>
-                    <tr>
-                        <td>Average</td>
-                        <td class="<%= im_positive((dropping_me(average_opening_1, my_oddBe_1) - dropping_me(average_opening_1, my_odd_1)).toFixed(2)) %>">
-                            <%= (dropping_me(average_opening_1, my_oddBe_1) - dropping_me(average_opening_1, my_odd_1)).toFixed(2) %> %
-                        </td>
-                        <td class="<%= im_positive((dropping_me(average_opening_X, my_oddBe_X) - dropping_me(average_opening_X, my_odd_X)).toFixed(2)) %>">
-                            <%= (dropping_me(average_opening_X, my_oddBe_X) - dropping_me(average_opening_X, my_odd_X)).toFixed(2) %> %
-                        </td>
-                        <td class="<%= im_positive((dropping_me(average_opening_2, my_oddBe_2) - dropping_me(average_opening_2, my_odd_2)).toFixed(2)) %>">
-                            <%= (dropping_me(average_opening_2, my_oddBe_2) - dropping_me(average_opening_2, my_odd_2)).toFixed(2) %> %
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Max</td>
-                        <td class="<%= im_positive((dropping_me(max_opening_1, my_oddBe_1) - dropping_me(max_opening_1, my_odd_1)).toFixed(2)) %>">
-                            <%= (dropping_me(max_opening_1, my_oddBe_1) - dropping_me(max_opening_1, my_odd_1)).toFixed(2) %> %
-                        </td>
-                        <td class="<%= im_positive((dropping_me(max_opening_X, my_oddBe_X) - dropping_me(max_opening_X, my_odd_X)).toFixed(2)) %>">
-                            <%= (dropping_me(max_opening_X, my_oddBe_X) - dropping_me(max_opening_X, my_odd_X)).toFixed(2) %> %
-                        </td>
-                        <td class="<%= im_positive((dropping_me(max_opening_2, my_oddBe_2) - dropping_me(max_opening_2, my_odd_2)).toFixed(2)) %>">
-                            <%= (dropping_me(max_opening_2, my_oddBe_2) - dropping_me(max_opening_2, my_odd_2)).toFixed(2) %> %
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Min</td>
-                        <td class="<%= im_positive((dropping_me(min_opening_1, my_oddBe_1) - dropping_me(min_opening_1, my_odd_1)).toFixed(2)) %>">
-                            <%= (dropping_me(min_opening_1, my_oddBe_1) - dropping_me(min_opening_1, my_odd_1)).toFixed(2) %> %
-                        </td>
-                        <td class="<%= im_positive((dropping_me(min_opening_X, my_oddBe_X) - dropping_me(min_opening_X, my_odd_X)).toFixed(2)) %>">
-                            <%= (dropping_me(min_opening_X, my_oddBe_X) - dropping_me(min_opening_X, my_odd_X)).toFixed(2) %> %
-                        </td>
-                        <td class="<%= im_positive((dropping_me(min_opening_2, my_oddBe_2) - dropping_me(min_opening_2, my_odd_2)).toFixed(2)) %>">
-                            <%= (dropping_me(min_opening_2, my_oddBe_2) - dropping_me(min_opening_2, my_odd_2)).toFixed(2) %> %
-                        </td>
-                    </tr>
-                </tbody>
-            </table>  
-            </div>          
-        </div>
-
-        
-        
-        
-
-        
-        
-
-        <!--<br>
-
-        <form action="/event_detail/KaForm/<%- idMatch -%>/<%- infos.hometeam.name -%>/<%- infos.awayteam.name -%>/<%- infos.time -%>/<%- av1 -%>/<%- avN -%>/<%- av2 -%>/<%- ma1 -%>/<%- maN -%>/<%- ma2 -%>/<%- mi1 -%>/<%- miN -%>/<%- mi2 -%>" method="POST">
-
-            <div class="row">
-                <div class="col-md-4 offset-md-4">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                          <label class="input-group-text" for="whoWin">Winner</label>
-                        </div>
-                        <select class="custom-select" name="whoWin" id="whoWin">
-                          <option selected>Choose...</option>
-                          <option value="0">Home</option>
-                          <option value="1">Draw</option>
-                          <option value="2">Away</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-outline-primary">Ecrire</button>
-                </div>
-            </div>
-        </form>
-        <br>-->
-
-        <!--<div class="row">
-            
-            <div class="col-md-4 offset-md-4">
-                <% if (model_prob) { %> 
-                    <div class="alert alert-primary" role="alert">
-                        Home: <%= model_prob[0] %> Draw: <%= model_prob[1] %> Away: <%= model_prob[2] %> 
-                    </div>
-                <%} else { %> 
-                <a class="btn btn-outline-primary" 
-                href="/event_detail/sayMe/
-                <%- idMatch -%>/<%- av1 -%>/<%- avN -%>/<%- av2 -%>/<%- ma1 -%>/<%- maN -%>/<%- ma2 -%>/<%- mi1 -%>/<%- miN -%>/<%- mi2 -%>/
-                <%- coteBe[0] -%>/<%- coteFte[1] -%>/<%- coteFte[2] -%>">Say me who will win</a>
-                <% } %> 
-            </div>
-        </div>-->
         
         <br>
 
         <% 
             }; 
         %>
+
+        <!--<table class="table table-striped table-bordered border-secondary" data-toggle="table">
+            <thead>
+                <tr style="text-align: center;">
+                    <th>Type</th>
+                    <th>1 </th>
+                    <th>N </th>
+                    <th>2 </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Oppening  drop</td>
+                    <td><%= dropping_me(lo_odds_1, fo_odds_1) %></td>
+                    <td><%= dropping_me(lo_odds_N, fo_odds_N) %></td>
+                    <td><%= dropping_me(lo_odds_2, fo_odds_2) %></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>-->
 
         <button class="btn btn-light btn-md btn-block" type="button" data-toggle="collapse" data-target="#detail_drop_by_book" aria-expanded="false" aria-controls="detail_drop_by_book">
         DETAIL DROP BY BOOK
@@ -685,6 +651,7 @@
                     <th scope="col" data-sortable="true">1</th>
                     <th scope="col" data-sortable="true">N</th>
                     <th scope="col" data-sortable="true">2</th>
+                    <th scope="col" data-sortable="true">Opening date</th>
                 </tr>
             </thead>
 
@@ -695,6 +662,7 @@
                         opening_1 = opening_of_each_book[book][1], 
                         opening_X = opening_of_each_book[book][2], 
                         opening_2 = opening_of_each_book[book][3],
+                        opening_date = opening_of_each_book[book][4],
                         live_1 = live_of_each_book[book][1], 
                         live_X = live_of_each_book[book][2], 
                         live_2 = live_of_each_book[book][3],
@@ -716,6 +684,9 @@
                     <td>
                         <%= dropping_me(live_2, opening_2) %> %
                     </td>
+                    <td>
+                        <%= moment(opening_date).from(infos.time) %> <!--/ <%= moment(opening_date).format('lll') %>-->
+                    </td>
                 
                 </tr>
 
@@ -726,6 +697,6 @@
         </table>
     </div>
 
-        <p><%= infos.hometeam.name %>_<%= infos.awayteam.name %>_<%= moment(infos.time).add(2,'h').format('lll') %></p>
+    <p><%= infos.hometeam.name %>_<%= infos.awayteam.name %>_<%= moment(infos.time).add(1,'h').format('lll') %></p>
                
-        <%- include('include/footer') -%>
+    <%- include('include/footer') -%>

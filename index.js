@@ -8,6 +8,7 @@ const request = require('request')
 var moment = require('./config/moment');
 
 distrib_poisson = require('./config/distrib_poisson')
+inde_tilt = require('./config/inde_tilt')
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -70,6 +71,7 @@ app.get('/event_detail/:id', function (req, res) {
   coteFte = [];
   coteBe = [];
   goals_predictions = [];
+  tilt = [];
   elo_inc = [];
   model_prob = null;
   var options = {
@@ -94,28 +96,35 @@ app.post('/event_detail/:id', function (req, res) {
 
 
   goals_predictions = [req.body.local_goal, req.body.visitor_goal];
+  tilt = [req.body.local_tilt, req.body.visitor_tilt];
   elo_inc = [req.body.local_inc, req.body.visitor_inc];
 
   local_goals = goals_predictions[0]
   visitor_goals = goals_predictions[1]
 
-  //local_goals_inc = elo_inc[0]
-  //visitor_goals_inc = elo_inc[1]
+  local_goals_nT = goals_predictions[0] * (1 + elo_inc[0] / 100)
+  visitor_goals_nT = goals_predictions[1] * (1 + elo_inc[1] / 100)
 
-  local_goals_inc = goals_predictions[0] / (1 + elo_inc[0] / 100)
-  visitor_goals_inc = goals_predictions[1] / (1 + elo_inc[1] / 100)
+  console.log(local_goals_nT, visitor_goals_nT);
+
+  //local_goals_no_tilt = goals_predictions[0] / (1 + tilt[0] / 100)
+  //visitor_goals_no_tilt = goals_predictions[1] / (1 + tilt[1] / 100)
+
+  //local_goals_inc = local_goals_no_tilt * (1 + elo_inc[0] / 100)
+  //visitor_goals_inc = visitor_goals_no_tilt * (1 + elo_inc[1] / 100)
 
   normal_distrib = new distrib_poisson(local_goals, visitor_goals, 15)
   normal_proba = normal_distrib.predict_proba(false);
   //normal_distrib.show_distrib()
 
-  inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 15)
+  inc_distrib = new distrib_poisson(local_goals_nT, visitor_goals_nT, 15)
   inc_proba = inc_distrib.predict_proba(false);
 
   //console.log(normal_proba, inc_proba);
 
   coteBe = [normal_proba[0], normal_proba[1], normal_proba[2]];
   coteFte = [inc_proba[0], inc_proba[1], inc_proba[2]];
+
 
 
   model_prob = null;
@@ -128,6 +137,161 @@ app.post('/event_detail/:id', function (req, res) {
   axios.request(options).then(function (response) {
     //console.log(response.data),
     res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, goals_predictions: goals_predictions, elo_inc: elo_inc, header: 'Event Detail' });
+  }).catch(function (error) {
+    console.error(error);
+  });
+});
+
+app.get('/event_detail_2/:id', function (req, res) {
+  id = req.params.id;
+  c_normal = []; //be
+  c_no_tilt = []; //fte
+  c_inc = [];
+  goals_predictions = [];
+  tilt = [];
+  elo_inc = [];
+  model_prob = null;
+  var options = {
+    method: 'GET',
+    url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
+  };
+
+  axios.request(options).then(function (response) {
+    //console.log(response.data),
+    res.render('event_detail_2', { idMatch: id, items: response.data.data, infos: response.data.event, c_normal: c_normal, c_no_tilt: c_no_tilt, c_inc: c_inc, goals_predictions: goals_predictions, tilt: tilt, elo_inc: elo_inc, header: 'Event Detail' });
+  }).catch(function (error) {
+    console.error(error);
+  });
+});
+
+app.post('/event_detail_2/:id', function (req, res) {
+  id = req.params.id;
+  whoWin = parseInt(req.body.whoWin);
+  
+  goals_predictions = [req.body.local_goal, req.body.visitor_goal];
+  tilt = [req.body.local_tilt, req.body.visitor_tilt];
+  elo_inc = [req.body.local_inc, req.body.visitor_inc];
+
+  local_goals = goals_predictions[0]
+  visitor_goals = goals_predictions[1]
+
+  //local_goals_nT = goals_predictions[0] / (1 + tilt[0] / 100)
+  //visitor_goals_nT = goals_predictions[1] / (1 + tilt[1] / 100)
+
+  local_goals_nT = tilt[0]
+  visitor_goals_nT = tilt[1]
+
+  local_goals_inc = goals_predictions[0] * (1 + elo_inc[0] / 100)
+  visitor_goals_inc = goals_predictions[1] * (1 + elo_inc[1] / 100)
+
+  console.log('----------')
+
+  normal_distrib = new distrib_poisson(local_goals, visitor_goals, 25)
+  normal_proba = normal_distrib.predict_proba(false);
+  console.log(normal_proba);
+
+  no_tilt_distrib = new distrib_poisson(local_goals_nT, visitor_goals_nT, 25)
+  no_tilt_proba = no_tilt_distrib.predict_proba(false);
+  console.log(no_tilt_proba); 
+
+  inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 15)
+  inc_proba = inc_distrib.predict_proba(false);
+
+  c_normal = [normal_proba[0], normal_proba[1], normal_proba[2]];
+  c_no_tilt = [no_tilt_proba[0], no_tilt_proba[1], no_tilt_proba[2]];
+  c_inc = [inc_proba[0], inc_proba[1], inc_proba[2]];
+
+  model_prob = null;
+
+  var options = {
+    method: 'GET',
+    url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
+  };
+
+  axios.request(options).then(function (response) {
+    //console.log(response.data),
+    res.render('event_detail_2', { idMatch: id, items: response.data.data, infos: response.data.event, c_normal: c_normal, c_no_tilt: c_no_tilt, c_inc: c_inc, goals_predictions: goals_predictions, tilt: tilt, elo_inc: elo_inc, header: 'Event Detail' });
+  }).catch(function (error) {
+    console.error(error);
+  });
+});
+
+app.get('/event_detail_3/:id', function (req, res) {
+  id = req.params.id;
+  c_normal = []; //be
+  c_no_tilt = []; //fte
+  c_inc = [];
+  goals_predictions = [];
+  tilt = [];
+  elo_inc = [];
+  model_prob = null;
+  var options = {
+    method: 'GET',
+    url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
+  };
+
+  axios.request(options).then(function (response) {
+    //console.log(response.data),
+    res.render('event_detail_3', { idMatch: id, items: response.data.data, infos: response.data.event, c_normal: c_normal, c_no_tilt: c_no_tilt, c_inc: c_inc, goals_predictions: goals_predictions, tilt: tilt, elo_inc: elo_inc, header: 'Event Detail' });
+  }).catch(function (error) {
+    console.error(error);
+  });
+});
+
+app.post('/event_detail_3/:id', function (req, res) {
+  id = req.params.id;
+  whoWin = parseInt(req.body.whoWin);
+  
+  goals_predictions = [req.body.local_goal, req.body.visitor_goal];
+  tilt = [req.body.local_tilt, req.body.visitor_tilt];
+  elo_inc = [req.body.local_inc, req.body.visitor_inc];
+
+  local_goals = goals_predictions[0]
+  visitor_goals = goals_predictions[1]
+
+  //local_goals_nT = goals_predictions[0] / (1 + tilt[0] / 100)
+  //visitor_goals_nT = goals_predictions[1] / (1 + tilt[1] / 100)
+
+  local_goals_nT = tilt[0]
+  visitor_goals_nT = tilt[1]
+
+  //local_goals_inc = goals_predictions[0] * (1 + elo_inc[0] / 100)
+  //visitor_goals_inc = goals_predictions[1] * (1 + elo_inc[1] / 100)
+
+  local_goals_inc = elo_inc[0]
+  visitor_goals_inc = elo_inc[1]
+
+  normal_distrib = new distrib_poisson(local_goals, visitor_goals, 25)
+  matrice_normal = normal_distrib.predict_proba();
+  normal_proba = matrice_normal['percent']
+  normal_goals_proba = matrice_normal
+  //console.log(normal_proba);
+
+  no_tilt_distrib = new distrib_poisson(local_goals_nT, visitor_goals_nT, 25)
+  matrice_no_tilt = no_tilt_distrib.predict_proba();
+  no_tilt_proba = matrice_no_tilt['percent']
+  no_tilt_goals_proba = matrice_no_tilt
+  //console.log(no_tilt_proba); 
+
+  inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 25)
+  matrice_inc = inc_distrib.predict_proba();
+  inc_proba = matrice_inc['percent']
+  //console.log(inc_proba); 
+
+  c_normal = [normal_proba[0], normal_proba[1], normal_proba[2]];
+  c_no_tilt = [no_tilt_proba[0], no_tilt_proba[1], no_tilt_proba[2]];
+  c_inc = [inc_proba[0], inc_proba[1], inc_proba[2]];
+
+  model_prob = null;
+
+  var options = {
+    method: 'GET',
+    url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
+  };
+
+  axios.request(options).then(function (response) {
+    //console.log(response.data),
+    res.render('event_detail_3', { idMatch: id, items: response.data.data, infos: response.data.event, c_normal: c_normal, c_no_tilt: c_no_tilt, c_inc: c_inc, goals_predictions: goals_predictions, tilt: tilt, elo_inc: elo_inc, normal_goals_proba: normal_goals_proba, no_tilt_goals_proba: no_tilt_goals_proba, header: 'Event Detail' });
   }).catch(function (error) {
     console.error(error);
   });
@@ -333,7 +497,64 @@ app.get('/five_soccer', (req, res) => {
     .fromFile(csvFilePath)
     .then((jsonObj) => {
       //console.log(jsonObj);
-      res.render('five_soccer', { data: jsonObj, header: 'Five Soccer 8' });
+      res.render('five_soccer_2', { data: jsonObj.reverse(), header: 'Five Soccer 8' });
+    })
+});
+
+app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
+  home_name = req.params.home_name
+  away_name = req.params.away_name
+  date_event = req.params.date_event
+  infos_event = JSON.parse('{"home_name":"'+ String(home_name) +'", "away_name":"'+ String(away_name) +'", "date_event":"'+ String(date_event) +'"}')
+  
+  const csvFilePath = './models/spi_matches_latest.csv'
+  csv()
+    .fromFile(csvFilePath)
+    .then((jsonObj) => {
+      //console.log(jsonObj);
+      var select_event;
+      var last_event_home = []
+      var last_event_away = []
+      var detail_home = []
+      var detail_away = []
+      jsonObj.forEach(element => {
+
+
+        if (infos_event.home_name == element.team1 && infos_event.away_name == element.team2 && infos_event.date_event == element.date) {
+          select_event = element;
+        }
+        if (moment(infos_event.date_event) > moment(element.date)) {
+          if (infos_event.home_name == element.team1 || infos_event.home_name == element.team2){
+            last_event_home.push(element)
+
+            if (infos_event.home_name == element.team1) {
+              detail_home_obj = JSON.parse('{"proj_score1":"'+ element.proj_score1 +'", "score1":"'+ element.score1 +'", "xg1":"'+ element.xg1 +'"}')
+              detail_home.push(detail_home_obj)
+            } else if (infos_event.home_name == element.team2) {
+              detail_home_obj = JSON.parse('{"proj_score1":"'+ element.proj_score2 +'", "score1":"'+ element.score2 +'", "xg1":"'+ element.xg2 +'"}')
+              detail_home.push(detail_home_obj)
+            }
+
+          }
+          if (infos_event.away_name == element.team2 || infos_event.away_name == element.team1){
+            last_event_away.push(element)
+
+            if (infos_event.away_name == element.team1) {
+              detail_away_obj = JSON.parse('{"proj_score2":"'+ element.proj_score1 +'", "score2":"'+ element.score1 +'", "xg2":"'+ element.xg1 +'"}')
+              detail_away.push(detail_away_obj)
+            } else if (infos_event.away_name == element.team2) {
+              detail_away_obj = JSON.parse('{"proj_score2":"'+ element.proj_score2 +'", "score2":"'+ element.score2 +'", "xg2":"'+ element.xg2 +'"}')
+              detail_away.push(detail_away_obj)
+            }
+
+          }
+        }
+      })
+
+      last_event = [last_event_home.reverse(), last_event_away.reverse()]
+      last_detail = [detail_home.reverse(), detail_away.reverse()]
+
+      res.render('five_soccer_event', { last_detail: last_detail, select_event: select_event, last_event: last_event, header: ''+home_name+' - '+away_name+'' });
     })
 });
 
@@ -344,7 +565,7 @@ app.get('/five_soccer_2', (req, res) => {
     .subscribe((json) => {
       return new Promise((resolve, reject) => {
         console.log(json)
-        //res.render('five_soccer', { data: jsonObj, header: 'Five Soccer 8'});
+        res.render('five_soccer_2', { data: json, header: 'Five Soccer 8'});
       })
 
     });
@@ -656,7 +877,7 @@ app.post('/predictions_by_fixture/:id/:dateISO', function (req, res) { // add in
   }).catch(function (error) {
     console.error(error);
   });
-})
+});
 
 app.get('/show_score_odds/:id', function (req, res) {
   my_id = String(req.params.id);
@@ -696,7 +917,7 @@ app.get('/exactScore/:id/:dateISO', (req, res) => {
   }).catch(function (error) {
     console.error(error);
   });
-})
+});
 
 
 //-> OddsPedia
@@ -929,6 +1150,19 @@ app.get('/miseEnForm', (req, res) => {
 })
 
 
+// SOFASCORE API  https://api.sofascore.com/api/v1/sport/footba/ll/scheduled-events/2021-12-07
+//ACCES DENIED: Jai pas le droit voir les mails avec sofascore 08/12/2021
 
+/*app.get('/sofEvent', (req, res) => {
+  var options = {
+    method: 'GET',
+    url: 'https://api.sofascore.com/api/v1/sport/football/scheduled-events/2021-12-07'
+  };
+  axios.request(options).then(function (response) {
+    console.log(response);
+  }).catch(function (error) {
+    console.error(error);
+  });
+});*/
 
 app.listen(40);

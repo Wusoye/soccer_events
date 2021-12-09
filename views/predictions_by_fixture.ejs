@@ -26,11 +26,17 @@ away_info = teams['away']
 id_home = home_info['id']
 name_home = home_info['name']
 logo_home = home_info['logo']
+home_last_5 = home_info['last_5']
+home_for = home_last_5['for']
+
+home_xG = (home_last_5['goals']['for']['average'] / home_last_5['goals']['against']['average']).toFixed(2)
 
 
 id_away = away_info['id']
 name_away = away_info['name']
 logo_away = away_info['logo']
+away_last_5 = away_info['last_5']
+away_xG = (away_last_5['goals']['for']['average'] / away_last_5['goals']['against']['average']).toFixed(2)
 
 //----  comparison
 
@@ -202,6 +208,11 @@ away_percent = percent_predictions['away']
                         <th scope="row">Goal</th>
                         <td><%= home_goals %></td>
                         <td><%= away_goals %></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">xG</th>
+                        <td><%= home_xG %></td>
+                        <td><%= away_xG %></td>
                     </tr>
                     <tr>
                         <th scope="row">Total</th>

@@ -7,17 +7,12 @@
                     <th scope="col">Date</th>
                     <th data-sortable="true" scope="col">League</th>
                     <th scope="col">Teams</th>
-                    <th scope="col">1</th>
-                    <th scope="col">2</th>
-                    <th scope="col">1</th>
-                    <th scope="col">N</th>
-                    <th scope="col">2</th>
                     <th scope="col">Score</th>  
                     <th scope="col">Rating</th>                    
                 </tr>
             </thead>
             <tbody>
-                <% console.log(data.length); data.forEach(element=> {  %>
+                <% data.forEach(element=> {  %>
                     <% 
                         var id_element = element.league_id
                         var nbDay = 30;
@@ -34,22 +29,8 @@
                             <%= (element.league).substring(0, 30) %>
                         </td>
                         <td>
-                            <%= element.team1 %> - <%= element.team2 %>
+                            <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= element.team1 %> - <%= element.team2 %></a> 
                         </td>
-                        <td>
-                            <%= element.proj_score1 %>
-                        </td>
-                        <td>
-                            <%= element.proj_score2 %>
-                        </td>
-                        <td>
-                            <%= (element.prob1 * 100).toFixed(1) %>
-                        </td>
-                        <td>
-                            <%= (element.probtie * 100).toFixed(1) %>
-                        </td>
-                        <td>
-                            <%= (element.prob2 * 100).toFixed(1) %>
                         </td>
                         <td>
                             <%= element.score1 %> - <%= element.score2 %>
