@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 
 var axios = require("axios").default;
+var midAxios = require("./config/axios");
+var api = new midAxios();
 var bodyParser = require('body-parser');
 var csv = require("csvtojson");
 const request = require('request')
@@ -91,9 +93,10 @@ app.post('/event_detail/:id', function (req, res) {
   id = req.params.id;
   whoWin = parseInt(req.body.whoWin);
 
-  //coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
+  coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
   //coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
 
+  console.log(coteBe);
 
   goals_predictions = [req.body.local_goal, req.body.visitor_goal];
   tilt = [req.body.local_tilt, req.body.visitor_tilt];
@@ -113,16 +116,16 @@ app.post('/event_detail/:id', function (req, res) {
   //local_goals_inc = local_goals_no_tilt * (1 + elo_inc[0] / 100)
   //visitor_goals_inc = visitor_goals_no_tilt * (1 + elo_inc[1] / 100)
 
-  normal_distrib = new distrib_poisson(local_goals, visitor_goals, 15)
+  normal_distrib = new distrib_poisson(local_goals, visitor_goals, 20)
   normal_proba = normal_distrib.predict_proba(false);
   //normal_distrib.show_distrib()
 
-  inc_distrib = new distrib_poisson(local_goals_nT, visitor_goals_nT, 15)
+  inc_distrib = new distrib_poisson(local_goals_nT, visitor_goals_nT, 20)
   inc_proba = inc_distrib.predict_proba(false);
 
   //console.log(normal_proba, inc_proba);
 
-  coteBe = [normal_proba[0], normal_proba[1], normal_proba[2]];
+  //coteBe = [normal_proba[0], normal_proba[1], normal_proba[2]];
   coteFte = [inc_proba[0], inc_proba[1], inc_proba[2]];
 
 
@@ -517,22 +520,35 @@ app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
       var last_event_away = []
       var detail_home = []
       var detail_away = []
+      var xg_home = []
+      var xg_away = []
+      var proj_score_home = []
+      var proj_score_away = []
+      var score_home = []
+      var score_away = []
       jsonObj.forEach(element => {
 
 
         if (infos_event.home_name == element.team1 && infos_event.away_name == element.team2 && infos_event.date_event == element.date) {
           select_event = element;
         }
-        if (moment(infos_event.date_event) > moment(element.date)) {
+        if (moment(infos_event.date_event) > moment(element.date) && element.xg1 != '' && element.xg2 != '' ) {
           if (infos_event.home_name == element.team1 || infos_event.home_name == element.team2){
             last_event_home.push(element)
 
             if (infos_event.home_name == element.team1) {
               detail_home_obj = JSON.parse('{"proj_score1":"'+ element.proj_score1 +'", "score1":"'+ element.score1 +'", "xg1":"'+ element.xg1 +'"}')
               detail_home.push(detail_home_obj)
+              xg_home.push(element.xg1)
+              proj_score_home.push(element.proj_score1)
+              score_home.push(element.score1)
+              
             } else if (infos_event.home_name == element.team2) {
               detail_home_obj = JSON.parse('{"proj_score1":"'+ element.proj_score2 +'", "score1":"'+ element.score2 +'", "xg1":"'+ element.xg2 +'"}')
               detail_home.push(detail_home_obj)
+              xg_home.push(element.xg2)
+              proj_score_home.push(element.proj_score2)
+              score_home.push(element.score2)
             }
 
           }
@@ -542,19 +558,54 @@ app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
             if (infos_event.away_name == element.team1) {
               detail_away_obj = JSON.parse('{"proj_score2":"'+ element.proj_score1 +'", "score2":"'+ element.score1 +'", "xg2":"'+ element.xg1 +'"}')
               detail_away.push(detail_away_obj)
+              xg_away.push(element.xg1)
+              proj_score_away.push(element.proj_score1)
+              score_away.push(element.score1)
             } else if (infos_event.away_name == element.team2) {
               detail_away_obj = JSON.parse('{"proj_score2":"'+ element.proj_score2 +'", "score2":"'+ element.score2 +'", "xg2":"'+ element.xg2 +'"}')
               detail_away.push(detail_away_obj)
+              xg_away.push(element.xg2)
+              proj_score_away.push(element.proj_score2)
+              score_away.push(element.score2)
             }
-
           }
         }
       })
 
       last_event = [last_event_home.reverse(), last_event_away.reverse()]
       last_detail = [detail_home.reverse(), detail_away.reverse()]
+      last_xg = [xg_home.reverse(), xg_away.reverse()]
+      last_proj_score = [proj_score_home.reverse(), proj_score_away.reverse()]
+      last_score = [score_home.reverse(), score_away.reverse()]
 
-      res.render('five_soccer_event', { last_detail: last_detail, select_event: select_event, last_event: last_event, header: ''+home_name+' - '+away_name+'' });
+      diffs_xg_proj_score_home = []
+      diffs_xg_proj_score_away = []
+      diffs_score_proj_score_home = []
+      diffs_score_proj_score_away = []
+
+      for (let k = 0; k < last_event[0].length; k++) {
+        diffs_xg_proj_score_home.push(last_xg[0][k] - last_proj_score[0][k])
+        diffs_score_proj_score_home.push(last_score[0][k] - last_proj_score[0][k])
+      }    
+      for (let k = 0; k < last_event[1].length; k++) {
+        diffs_xg_proj_score_away.push(last_xg[1][k] - last_proj_score[1][k])
+        diffs_score_proj_score_away.push(last_score[1][k] - last_proj_score[1][k])
+      }  
+
+      diffs_xg_proj_score = [diffs_xg_proj_score_home, diffs_xg_proj_score_away]
+      diffs_score_proj_score = [diffs_score_proj_score_home, diffs_score_proj_score_away]
+
+      res.render('five_soccer_event', { diffs_score_proj_score: diffs_score_proj_score, diffs_xg_proj_score: diffs_xg_proj_score, last_proj_score: last_proj_score, last_xg: last_xg, last_detail: last_detail, select_event: select_event, last_event: last_event, header: ''+home_name+' - '+away_name+'' });
+    })
+});
+
+app.get('/five_soccer_3', (req, res) => {
+  const csvFilePath = './models/event_today_13122021.csv'
+  csv()
+    .fromFile(csvFilePath)
+    .then((jsonObj) => {
+      //console.log(jsonObj);
+      res.render('five_soccer_3', { data: jsonObj, header: 'Five Soccer 8' });
     })
 });
 
@@ -688,23 +739,15 @@ app.post('/fixtures', function (req, res) {
   });
 });
 
-app.get('/predictions_by_fixture/:id/:dateISO', function (req, res) {
+app.get('/predictions_by_fixture/:id/:dateISO/:idHome/:idAway/:season', function (req, res) {
   my_id = req.params.id;
   dateISO = req.params.dateISO;
-  var options = {
-    method: 'GET',
-    url: 'https://api-football-v1.p.rapidapi.com/v3/predictions',
-    params: { fixture: my_id },
-    headers: {
-      'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-      'x-rapidapi-key': 'c5b77243e3mshe9ba9a33f164ba5p149e4bjsn1c1fdd2bc8f0'
-    }
-  };
-
-  axios.request(options).then(function (response_1) {
-    res.render('predictions_by_fixture', { id_fixture: my_id, dateISO: dateISO, data_pred: response_1.data.response[0], header: 'Prédiction' });
-  }).catch(function (error) {
-    console.error(error);
+  idHome = req.params.idHome;
+  idAway = req.params.idAway;
+  season = req.params.season;
+  console.log(idAway, season);
+  api.getPrdictionsByFixture(my_id, (response_1) => {
+    res.render('predictions_by_fixture', { id_fixture: my_id, dateISO: dateISO, data_pred: response_1.response[0], header: 'Prédiction' });
   });
 });
 
@@ -917,6 +960,23 @@ app.get('/exactScore/:id/:dateISO', (req, res) => {
   }).catch(function (error) {
     console.error(error);
   });
+});
+
+app.get('/leagues', (req, res) => {
+  api.getLeagues((response_leagues) => {
+    //console.log(response_leagues);
+    res.render('leagues', {leagues: response_leagues.response})
+  })
+})
+
+app.get('/topScorer/:league_id/:season/:league_name', (req, res) => {
+  league_id = req.params.league_id
+  season = req.params.season
+  league_name = req.params.league_name
+  api.getTopScorers(league_id, season, (response_topScorers) => {
+    //console.log(response_topScorers);
+    res.render('topScorers', { league_name: league_name, topScorers: response_topScorers.response, header: league_name})
+  })
 });
 
 

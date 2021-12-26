@@ -29,7 +29,7 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
 
     }
 
-    console.log(local_distrib[0] * visitor_distrib[0]);
+    //console.log(parseFloat(1/(local_distrib[1]+local_distrib[2]+local_distrib[3]+local_distrib[4]+local_distrib[5])));
 
     this.predict_goals = function(prob_percent) {
         if (prob_percent) {

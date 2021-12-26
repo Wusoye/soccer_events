@@ -1,0 +1,58 @@
+<%- include('include/header') %>
+
+<div class="row">
+    <div class="col-12" style="text-align: center;">
+        <h3><%= league_name %></h3>
+    </div>
+</div>
+
+<br>
+
+<table class="table table-striped table-bordered border-secondary" data-toggle="table" data-search="true" data-pagination="true">
+    <thead>
+        <tr>
+            <th data-sortable="true" scope="col">NAME</th>
+            <th data-sortable="true" scope="col">TEAM</th>
+            <th data-sortable="true" scope="col">GOALS / GAME</th>
+            <th data-sortable="true" scope="col">GOALS / MINUTES</th>
+            <th data-sortable="true" scope="col">RATING</th>
+            <th data-sortable="true" scope="col">GAME / MINUTES / GOALS</th>
+        </tr>
+    </thead>
+    <tbody>
+
+<% topScorers.forEach(function(scorer){ 
+    
+    name = scorer['player']['name']
+    player_id = scorer['player']['id']
+    statistic = scorer['statistics'][0]
+    team_name = statistic['team']['name']
+    team_id = statistic['team']['id']
+    console.log(name + ' ' + player_id + ' ' + team_id);
+    nb_games = parseInt(statistic['games']['appearences'])
+    tot_minutes = parseInt(statistic['games']['minutes'])
+    rating = parseFloat(statistic['games']['rating']).toFixed(2)
+    goals = parseInt(statistic['goals']['total'])
+    goal_per_minutes = parseFloat((tot_minutes / goals).toFixed(2))
+    goal_per_game = parseFloat((goals / nb_games).toFixed(2))
+    goal_per_game_minutes = parseFloat((90/goal_per_game).toFixed(2))
+    var scorer_poisson = new distrib_poisson(goal_per_game, 0, 10)
+    //scorer_poisson.show_distrib()
+%>
+        
+
+    <tr>
+        <td><%= name %></td>
+        <td><%= team_name %></td>
+        <td><%= goal_per_game %> / <%= goal_per_game_minutes %></td>
+        <td><%= goal_per_minutes %></td>
+        <td><%= rating %></td>
+        <td><%= nb_games %> / <%= tot_minutes %> / <%= goals %></td>
+    </tr>
+
+<% }); %> 
+
+    </tbody>
+</table>
+
+<%- include('include/footer') %>

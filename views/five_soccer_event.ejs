@@ -16,6 +16,15 @@ function im_positive(my_number){
     }
     return res;
 }
+
+function numAverage(a) {
+    var b = a.length,
+    c = 0, i;
+    for (i = 0; i < b; i++) { 
+        c +=Number(a[i]); 
+    } 
+    return parseFloat((c/b).toFixed(2)); 
+}
 %>
 
 <div class="row">
@@ -42,6 +51,90 @@ function im_positive(my_number){
         </div>
     </div>
 <% } %> 
+
+<br>
+
+<div class="row">
+    <div class="col-8 offset-2" style="text-align: center;">
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+            <thead>
+                <tr>
+                    <th scope="col">INFOS</th>
+                    <th scope="col">HOME</th>
+                    <th scope="col">AWAY</th>                   
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        xG / PROJ SOCRE
+                    </td>
+                    <td class="<%= im_positive(numAverage(diffs_xg_proj_score[0])) %>">
+                        <%= numAverage(diffs_xg_proj_score[0]) %>
+                    </td>
+                    <td class="<%= im_positive(numAverage(diffs_xg_proj_score[1])) %>">
+                        <%= numAverage(diffs_xg_proj_score[1]) %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        SCORE / PROJ SOCRE
+                    </td>
+                    <td class="<%= im_positive(numAverage(diffs_score_proj_score[0])) %>">
+                        <%= numAverage(diffs_score_proj_score[0]) %>
+                    </td>
+                    <td class="<%= im_positive(numAverage(diffs_score_proj_score[1])) %>">
+                        <%= numAverage(diffs_score_proj_score[1]) %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        AVG xG OVERALL
+                    </td>
+                    <td>
+                        <%= numAverage(last_xg[0]) %>
+                    </td>
+                    <td>
+                        <%= numAverage(last_xg[1]) %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        AVG xG LAST 10
+                    </td>
+                    <td class="<%= im_positive(numAverage(last_xg[0].slice(0,11)) - numAverage(last_xg[0])) %>">
+                        <%= numAverage(last_xg[0].slice(0,11)) %>
+                    </td>
+                    <td class="<%= im_positive(numAverage(last_xg[1].slice(0,11)) - numAverage(last_xg[1])) %>">
+                        <%= numAverage(last_xg[1].slice(0,11)) %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        AVG xG LAST 5
+                    </td>
+                    <td class="<%= im_positive(numAverage(last_xg[0].slice(0,6)) - numAverage(last_xg[0].slice(0,11))) %>">
+                        <%= numAverage(last_xg[0].slice(0,6)) %>
+                    </td>
+                    <td class="<%= im_positive(numAverage(last_xg[1].slice(0,6)) - numAverage(last_xg[1].slice(0,11))) %>">
+                        <%= numAverage(last_xg[1].slice(0,6)) %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        LAST
+                    </td>
+                    <td class="<%= im_positive(numAverage(last_xg[0].slice(0,1)) - numAverage(last_xg[0].slice(0,6))) %>">
+                        <%= numAverage(last_xg[0].slice(0,1)) %>
+                    </td>
+                    <td class="<%= im_positive(numAverage(last_xg[1].slice(0,1)) - numAverage(last_xg[1].slice(0,6))) %>">
+                        <%= numAverage(last_xg[1].slice(0,1)) %>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
     
 <br>
  
@@ -63,6 +156,8 @@ function im_positive(my_number){
                     detail_home = last_detail[0]
                     var score1 = parseFloat(detail_home[i].score1)
                     var xg1 = parseFloat(detail_home[i].xg1)
+                    var proj_score1 = parseFloat(detail_home[i].proj_score1)
+                    
                 %>
                     <tr>
                         <td>

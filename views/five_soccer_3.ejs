@@ -1,0 +1,50 @@
+<%- include('include/header') -%>
+
+ 
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table" data-search="true" data-pagination="true">
+            <thead>
+                <tr>
+                    <th scope="col">DATE</th>
+                    <th data-sortable="true" scope="col">LEAGUE</th>
+                    <th scope="col">TEAMS</th>
+                    <th scope="col">1</th>
+                    <th scope="col">N</th>
+                    <th scope="col">2</th>
+                    <th scope="col">PROJ SCORE</th>  
+                    <th scope="col">RATING</th>                    
+                </tr>
+            </thead>
+            <tbody>
+                <% data.forEach(element=> {  %>
+                    <tr>
+                        <td>
+                            <%= moment(element.date).format("DD-MM-YYYY") %>
+                        </td>
+                        <td>
+                            <%= (element.league).substring(0, 30) %>
+                        </td>
+                        <td>
+                            <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= element.team1 %> - <%= element.team2 %></a> 
+                        </td>
+                        </td>
+                        <td>
+                            <%= parseFloat(element.prob1*100).toFixed(1) %>
+                        </td>
+                        <td>
+                            <%= parseFloat(element.probN*100).toFixed(1) %>
+                        </td>
+                        <td>
+                            <%= parseFloat(element.prob2*100).toFixed(1) %>
+                        </td>
+                        <td>
+                            <%= element.proj_score1 %> - <%= element.proj_score2 %>
+                        </td>
+                        <td>
+                            <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+<%- include('include/footer') -%>

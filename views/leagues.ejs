@@ -1,0 +1,47 @@
+<%- include('include/header') %>
+
+<form action="" method="POST">
+    <div class="row" style="text-align: center;">
+        <div class="col">
+            <input type="date" name="dateMatch" id="dateMatch" class="input-group date">
+            
+        </div>
+        <div class="col">
+            <button type="submit" class="btn btn-primary btn-sm">Valider</button>
+        </div>
+    </div>
+</form>
+
+<br>
+
+<table class="table table-striped table-bordered border-secondary" data-toggle="table" data-search="true" data-pagination="true">
+    <thead>
+        <tr>
+            <th data-sortable="true" scope="col">Country</th>
+            <th data-sortable="true" scope="col">League</th>
+        </tr>
+    </thead>
+    <tbody>
+
+<% leagues.forEach(function(league){ 
+    
+    country_name = league['country']['name']
+    league_name = league['league']['name']
+    league_id = league['league']['id']
+    season = parseInt(league['seasons'][0]['year'])
+    if (season == 2021) {
+    
+%>
+        
+
+    <tr>
+        <td><%= country_name %></td>
+        <td><a target="_blank" style="color: inherit; text-decoration:none; " href="/topScorer/<%- league_id %>/<%- season %>/<%- league_name -%>"><%= league_name %></a></td>
+    </tr>
+
+<% }; }); %> 
+
+    </tbody>
+</table>
+
+<%- include('include/footer') %>
