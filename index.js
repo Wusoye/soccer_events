@@ -674,25 +674,33 @@ app.post('/calculator_drop_xG', (req, res) => {
   xG = [req.body.xG_1, req.body.xG_2];
   tilt = [req.body.tilt_1, req.body.tilt_2];
 
-  local_goals = xG[0]
-  visitor_goals = xG[1]
+  local_goals = parseFloat(xG[0])
+  visitor_goals = parseFloat(xG[1])
+
+  tlocal_goals = parseFloat(tilt[0])
+  tvisitor_goals = parseFloat(tilt[1])
 
   //local_goals_inc = elo_inc[0]
   //visitor_goals_inc = elo_inc[1]
 
-  local_goals_inc = xG[0] / (1 + tilt[0] / 100)
-  visitor_goals_inc = xG[1] / (1 + tilt[1] / 100)
+  //local_goals_inc = xG[0] / (1 + tilt[0] / 100)
+  //visitor_goals_inc = xG[1] / (1 + tilt[1] / 100)
 
   normal_distrib = new distrib_poisson(local_goals, visitor_goals, 15)
-  normal_proba = normal_distrib.predict_proba(false);
+  normal_proba = normal_distrib.predict_proba()['percent'];
+  
+
+  inc_distrib = new distrib_poisson(tlocal_goals, tvisitor_goals, 15)
+  inc_proba = inc_distrib.predict_proba()['percent'];
   //normal_distrib.show_distrib()
 
-  inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 15)
-  inc_proba = inc_distrib.predict_proba(false);
+  //inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 15)
+  //inc_proba = inc_distrib.predict_proba(false);
 
   cote_arr = [normal_proba[0], normal_proba[1], normal_proba[2]];
   cote_dep = [inc_proba[0], inc_proba[1], inc_proba[2]];
 
+  
 
   res.render('calculator_drop_xG', { cote_arr: cote_arr, cote_dep: cote_dep, xG: xG, tilt: tilt, header: 'Calc. Drop' })
 });
@@ -1208,6 +1216,18 @@ app.get('/miseEnForm', (req, res) => {
   my_distrib = new distrib_poisson(1, 1.32, 10)
   console.log(my_distrib.predict_proba());
 })
+
+//-> BESOCCER
+
+app.get('/besoccer_xG', (req, res) => {
+  const csvFilePath = './models/BESOCCER_MyxG.csv'
+  csv()
+    .fromFile(csvFilePath)
+    .then((jsonObj) => {
+      //console.log(jsonObj);
+      res.render('besoccer_xG', { data: jsonObj, header: 'BESOCCER xG' });
+    })
+});
 
 
 // SOFASCORE API  https://api.sofascore.com/api/v1/sport/footba/ll/scheduled-events/2021-12-07
