@@ -33,7 +33,18 @@ fs = require("fs");
 
 header = false;
 
-//--- 
+/** Function */
+
+function numAverage(a) {
+  var b = a.length,
+  c = 0, i;
+  for (i = 0; i < b; i++) { 
+      c +=Number(a[i]); 
+  } 
+  return parseFloat((c/b).toFixed(2)); 
+}
+
+/** */
 
 app.get('/', function (req, res) {
   console.log('Hello world !');
@@ -178,32 +189,51 @@ app.post('/event_detail_2/:id', function (req, res) {
   local_goals = goals_predictions[0]
   visitor_goals = goals_predictions[1]
 
-  //local_goals_nT = goals_predictions[0] / (1 + tilt[0] / 100)
-  //visitor_goals_nT = goals_predictions[1] / (1 + tilt[1] / 100)
+  local_tilt = tilt[0]
+  visitor_tilt = tilt[1]
 
-  local_goals_nT = tilt[0]
-  visitor_goals_nT = tilt[1]
+  new_local_goals = local_goals * (1 + local_tilt / 100)
+  new_visitor_goals = visitor_goals * (1 + visitor_tilt / 100)
 
-  local_goals_inc = goals_predictions[0] * (1 + elo_inc[0] / 100)
-  visitor_goals_inc = goals_predictions[1] * (1 + elo_inc[1] / 100)
+  local_pov_distrib = new distrib_poisson(new_local_goals, visitor_goals, 25)
+  matrice_local_pov = local_pov_distrib.predict_proba();
+  local_pov_proba = matrice_local_pov['percent']
+
+  visitor_pov_distrib = new distrib_poisson(local_goals, new_visitor_goals, 25)
+  matrice_visitor_pov = visitor_pov_distrib.predict_proba();
+  visitor_pov_proba = matrice_visitor_pov['percent']
+
+  local_goals_nT = goals_predictions[0] / (1 + tilt[0] / 100)
+  visitor_goals_nT = goals_predictions[1] / (1 + tilt[1] / 100)
+
+  //local_goals_nT = tilt[0]
+  //visitor_goals_nT = tilt[1]
+
+  local_goals_inc = goals_predictions[0] * (1 + tilt[0] / 100)
+  visitor_goals_inc = goals_predictions[1] * (1 + tilt[1] / 100)
 
   console.log('----------')
 
   normal_distrib = new distrib_poisson(local_goals, visitor_goals, 25)
-  normal_proba = normal_distrib.predict_proba(false);
-  console.log(normal_proba);
+  matrice_normal = normal_distrib.predict_proba();
+  normal_proba = matrice_normal['percent']
 
   no_tilt_distrib = new distrib_poisson(local_goals_nT, visitor_goals_nT, 25)
-  no_tilt_proba = no_tilt_distrib.predict_proba(false);
-  console.log(no_tilt_proba); 
+  matrice_no_tilt = no_tilt_distrib.predict_proba();
+  no_tilt_proba = matrice_no_tilt['percent']
+  //console.log(matrice_no_tilt); 
 
-  inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 15)
-  inc_proba = inc_distrib.predict_proba(false);
-
+  inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 25)
+  matrice_inc = inc_distrib.predict_proba();
+  inc_proba = matrice_inc['percent']
+  
+  
   c_normal = [normal_proba[0], normal_proba[1], normal_proba[2]];
   c_no_tilt = [no_tilt_proba[0], no_tilt_proba[1], no_tilt_proba[2]];
   c_inc = [inc_proba[0], inc_proba[1], inc_proba[2]];
-
+  local_pov = [local_pov_proba[0], local_pov_proba[1], local_pov_proba[2]];
+  visitor_pov = [visitor_pov_proba[0], visitor_pov_proba[1], visitor_pov_proba[2]];
+  
   model_prob = null;
 
   var options = {
@@ -213,7 +243,7 @@ app.post('/event_detail_2/:id', function (req, res) {
 
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail_2', { idMatch: id, items: response.data.data, infos: response.data.event, c_normal: c_normal, c_no_tilt: c_no_tilt, c_inc: c_inc, goals_predictions: goals_predictions, tilt: tilt, elo_inc: elo_inc, header: 'Event Detail' });
+    res.render('event_detail_2', { idMatch: id, items: response.data.data, infos: response.data.event, local_pov: local_pov, visitor_pov: visitor_pov, c_normal: c_normal, c_no_tilt: c_no_tilt, c_inc: c_inc, goals_predictions: goals_predictions, tilt: tilt, elo_inc: elo_inc, header: 'Event Detail' });
   }).catch(function (error) {
     console.error(error);
   });
@@ -299,6 +329,28 @@ app.post('/event_detail_3/:id', function (req, res) {
     console.error(error);
   });
 });
+
+app.get('/event_detail_book/:id/:book', (req, res) => {
+
+  id = req.params.id;
+  book = req.params.book;
+
+  var options = {
+    method: 'GET',
+    url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
+  };
+
+  axios.request(options).then(function (response) {
+    data = response.data.data
+    infos = response.data.event
+    historique = data[book].history
+    opening = data[book].history[historique.length - 1]
+
+    res.render('event_detail_book', { idMatch: id, infos: infos, book: book, historique: historique, opening: opening });
+  }).catch(function (error) {
+    console.error(error);
+  });
+})
 
 app.get('/event_detail_dc/:id', function (req, res) {
   id = req.params.id;
@@ -522,6 +574,10 @@ app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
       var detail_away = []
       var xg_home = []
       var xg_away = []
+      var nsxg_home = []
+      var nsxg_away = []
+      var adj_home = []
+      var adj_away = []
       var proj_score_home = []
       var proj_score_away = []
       var score_home = []
@@ -540,6 +596,8 @@ app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
               detail_home_obj = JSON.parse('{"proj_score1":"'+ element.proj_score1 +'", "score1":"'+ element.score1 +'", "xg1":"'+ element.xg1 +'"}')
               detail_home.push(detail_home_obj)
               xg_home.push(element.xg1)
+              nsxg_home.push(element.nsxg1)
+              adj_home.push(element.adj_score1)
               proj_score_home.push(element.proj_score1)
               score_home.push(element.score1)
               
@@ -547,6 +605,8 @@ app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
               detail_home_obj = JSON.parse('{"proj_score1":"'+ element.proj_score2 +'", "score1":"'+ element.score2 +'", "xg1":"'+ element.xg2 +'"}')
               detail_home.push(detail_home_obj)
               xg_home.push(element.xg2)
+              nsxg_home.push(element.nsxg2)
+              adj_home.push(element.adj_score2)
               proj_score_home.push(element.proj_score2)
               score_home.push(element.score2)
             }
@@ -559,12 +619,16 @@ app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
               detail_away_obj = JSON.parse('{"proj_score2":"'+ element.proj_score1 +'", "score2":"'+ element.score1 +'", "xg2":"'+ element.xg1 +'"}')
               detail_away.push(detail_away_obj)
               xg_away.push(element.xg1)
+              nsxg_away.push(element.nsxg1)
+              adj_away.push(element.adj_score1)
               proj_score_away.push(element.proj_score1)
               score_away.push(element.score1)
             } else if (infos_event.away_name == element.team2) {
               detail_away_obj = JSON.parse('{"proj_score2":"'+ element.proj_score2 +'", "score2":"'+ element.score2 +'", "xg2":"'+ element.xg2 +'"}')
               detail_away.push(detail_away_obj)
               xg_away.push(element.xg2)
+              nsxg_away.push(element.nsxg2)
+              adj_away.push(element.adj_score2)
               proj_score_away.push(element.proj_score2)
               score_away.push(element.score2)
             }
@@ -575,6 +639,8 @@ app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
       last_event = [last_event_home.reverse(), last_event_away.reverse()]
       last_detail = [detail_home.reverse(), detail_away.reverse()]
       last_xg = [xg_home.reverse(), xg_away.reverse()]
+      last_nsxg = [nsxg_home.reverse(), nsxg_away.reverse()]
+      last_adj = [adj_home.reverse(), adj_away.reverse()]
       last_proj_score = [proj_score_home.reverse(), proj_score_away.reverse()]
       last_score = [score_home.reverse(), score_away.reverse()]
 
@@ -582,20 +648,27 @@ app.get('/five_soccer_event/:home_name/:away_name/:date_event', (req, res) => {
       diffs_xg_proj_score_away = []
       diffs_score_proj_score_home = []
       diffs_score_proj_score_away = []
+      real_xg_home = []
+      real_xg_away = []
 
       for (let k = 0; k < last_event[0].length; k++) {
         diffs_xg_proj_score_home.push(last_xg[0][k] - last_proj_score[0][k])
         diffs_score_proj_score_home.push(last_score[0][k] - last_proj_score[0][k])
+
+        real_xg_home.push( numAverage( [last_xg[0][k], last_nsxg[0][k], last_adj[0][k]] ) )
       }    
       for (let k = 0; k < last_event[1].length; k++) {
         diffs_xg_proj_score_away.push(last_xg[1][k] - last_proj_score[1][k])
         diffs_score_proj_score_away.push(last_score[1][k] - last_proj_score[1][k])
+
+        real_xg_away.push( numAverage( [last_xg[1][k], last_nsxg[1][k], last_adj[1][k]] ) )
       }  
 
       diffs_xg_proj_score = [diffs_xg_proj_score_home, diffs_xg_proj_score_away]
       diffs_score_proj_score = [diffs_score_proj_score_home, diffs_score_proj_score_away]
+      real_xg = [real_xg_home, real_xg_away]
 
-      res.render('five_soccer_event', { diffs_score_proj_score: diffs_score_proj_score, diffs_xg_proj_score: diffs_xg_proj_score, last_proj_score: last_proj_score, last_xg: last_xg, last_detail: last_detail, select_event: select_event, last_event: last_event, header: ''+home_name+' - '+away_name+'' });
+      res.render('five_soccer_event', { real_xg: real_xg, diffs_score_proj_score: diffs_score_proj_score, diffs_xg_proj_score: diffs_xg_proj_score, last_proj_score: last_proj_score, last_xg: last_xg, last_detail: last_detail, select_event: select_event, last_event: last_event, header: ''+home_name+' - '+away_name+'' });
     })
 });
 
@@ -693,6 +766,18 @@ app.post('/calculator_drop_xG', (req, res) => {
   inc_distrib = new distrib_poisson(tlocal_goals, tvisitor_goals, 15)
   inc_proba = inc_distrib.predict_proba()['percent'];
   //normal_distrib.show_distrib()
+
+  normal_matrice = normal_distrib.predict_proba()
+  console.log('------');
+  Object.keys(normal_matrice).forEach(function(un_score){ 
+    if (un_score != 'proba' && un_score != 'percent') { 
+      score = un_score
+      normal_prob_score = (normal_matrice[un_score] * 100).toFixed(2)
+      console.log(score, ': ', normal_prob_score);
+    }
+  });
+
+  
 
   //inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 15)
   //inc_proba = inc_distrib.predict_proba(false);
@@ -1220,14 +1305,88 @@ app.get('/miseEnForm', (req, res) => {
 //-> BESOCCER
 
 app.get('/besoccer_xG', (req, res) => {
-  const csvFilePath = './models/BESOCCER_MyxG.csv'
+  const Folder = './models/BeSoccer_forme';
+  const fs = require('fs');
+
+  files = fs.readdirSync(Folder)
+
+  res.render('besoccer_xG', {data: false, files: files, header: 'BeSoccer' })
+})
+
+app.post('/besoccer_xG/', (req, res) => {
+  file = req.body.sel_file
+  //console.log(file);
+  const csvFilePath = './models/BeSoccer_forme/'+file
+  const Folder = './models/BeSoccer_forme';
+  const fs = require('fs');
+
+  files = fs.readdirSync(Folder)
+
   csv()
     .fromFile(csvFilePath)
     .then((jsonObj) => {
       //console.log(jsonObj);
-      res.render('besoccer_xG', { data: jsonObj, header: 'BESOCCER xG' });
+      res.render('besoccer_xG', { data: jsonObj, files: files, file: file, header: 'BeSoccer' });
     })
 });
+
+app.get('/besoccer', (req, res) => {
+  const Folder = './models/BeSoccer';
+  const fs = require('fs');
+
+  files = fs.readdirSync(Folder)
+
+  res.render('besoccer copy', {data: false, files: files, header: 'BeSoccer' })
+})
+
+app.post('/besoccer', (req, res) => {
+  file = req.body.sel_file
+  //console.log(file);
+  const csvFilePath = './models/BeSoccer/'+file
+  const Folder = './models/BeSoccer';
+  const fs = require('fs');
+
+  files = fs.readdirSync(Folder)
+
+  console.log(file);
+
+  header = 'BeSoccer ' + moment(file.split('_BeSoccer.csv')[0]).format('lll')
+
+  csv()
+    .fromFile(csvFilePath)
+    .then((jsonObj) => {
+      //console.log(jsonObj);
+      res.render('besoccer copy', { data: jsonObj, files: files, file: file, header: header });
+    })
+});
+
+app.get('/besoccer_detail/:id/:file', (req, res) => {
+  id = req.params.id
+  file = req.params.file
+  //console.log(id);
+  const csvFilePath = './models/BeSoccer_forme/'+file
+  csv()
+    .fromFile(csvFilePath)
+    .then((jsonObj) => {
+      jsonObj.forEach(element => {
+        if (parseInt(element.id) == parseInt(id)) {
+          local_form = element.local_form_str.split('µ').reverse()
+          local_date = element.local_date_str.split('µ').reverse()
+          visitor_form = element.visitor_form_str.split('µ').reverse()
+          visitor_date = element.visitor_date_str.split('µ').reverse()
+
+          local_infos = [local_date, local_form]
+          visitor_infos = [visitor_date, visitor_form]
+          infos = [local_infos, visitor_infos]
+
+          data = element
+
+          header = element.teams + '_' + element.date
+        }
+      })      
+      res.render('besoccer_detail', { data: data, infos: infos, header: header });
+    })
+})
 
 
 // SOFASCORE API  https://api.sofascore.com/api/v1/sport/footba/ll/scheduled-events/2021-12-07
@@ -1244,5 +1403,54 @@ app.get('/besoccer_xG', (req, res) => {
     console.error(error);
   });
 });*/
+
+
+app.get('/TEST', (req, res) => {
+
+  function numAverage(a) {
+    var b = a.length,
+      c = 0, i;
+    for (i = 0; i < b; i++) {
+      c += Number(a[i]);
+    }
+    return parseFloat((c / b).toFixed(2));
+  } 
+
+
+  tab_l = [9, -1, -2, -2, -4]
+  tab_v = [-6, -14, 2, -1, 8]
+  his_l = []
+  his_v = []
+  nb = 5
+  /*tab_l[0] = tab_l[0] * 5
+  tab_l[1] = tab_l[1] * 4
+  tab_l[2] = tab_l[2] * 3
+  tab_l[3] = tab_l[3] * 2
+  tab_l[4] = tab_l[4] * 1
+
+  tab_v[0] = tab_v[0] * 5
+  tab_v[1] = tab_v[1] * 4
+  tab_v[2] = tab_v[2] * 3
+  tab_v[3] = tab_v[3] * 2
+  tab_v[4] = tab_v[4] * 1*/
+
+  his_l[0] = tab_l[0]
+  his_l[1] = (tab_l[0] + tab_l[1]) / 2
+  his_l[2] = (tab_l[0] + tab_l[1] + tab_l[2]) / 3
+  his_l[3] = (tab_l[0] + tab_l[1] + tab_l[2] + tab_l[3]) / 4
+  his_l[4] = (tab_l[0] + tab_l[1] + tab_l[2] + tab_l[3] + tab_l[4]) / 5
+
+  his_v[0] = tab_v[0]
+  his_v[1] = (tab_v[0] + tab_v[1]) / 2
+  his_v[2] = (tab_v[0] + tab_v[1] + tab_v[2]) / 3
+  his_v[3] = (tab_v[0] + tab_v[1] + tab_v[2] + tab_v[3]) / 4
+  his_v[4] = (tab_v[0] + tab_v[1] + tab_v[2] + tab_v[3] + tab_v[4]) / 5
+
+  //console.log(numAverage(tab_l), numAverage(tab_v));
+  console.log(his_l, his_v);
+  console.log(numAverage(his_l), numAverage(his_v));
+})
+
+
 
 app.listen(40);

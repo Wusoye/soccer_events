@@ -1,0 +1,53 @@
+<%- include('include/header_detail') -%>
+
+<% 
+function dropping_me(odd_arrive, odd_depart){
+    return parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
+}
+var all_1 = []
+var all_N = []
+var all_2 = []
+var all_updated = []
+historique.forEach(function(element){
+    all_1.push(element['1'])
+    all_N.push(element['X'])
+    all_2.push(element['2'])
+    all_updated.push(element['updated'])
+})
+lenAll = all_updated.length - 1
+%> 
+
+<h4 style="text-align: center;"><%= book %></h4>
+
+<table class="table table-striped table-bordered border-secondary" data-toggle="table">
+    <thead>
+        <tr>
+            <th scope="col">DATE</th>
+            <th scope="col">DROP 1</th>
+            <th scope="col">DROP N</th>
+            <th scope="col">DROP 2</th>
+                       
+        </tr>
+    </thead>
+
+    <tbody>
+        <% for (let i = 1; i < lenAll; i++) { %>
+            <tr>
+                <td>
+                    <%= moment(all_updated[i]).add(1, 'hour').format('YYYY-MM-DD HH:mm') %>
+                </td>
+                <td>
+                    <%= dropping_me( parseFloat(all_1[i-1]), parseFloat(all_1[i]) ) %>
+                </td>
+                <td>
+                    <%= dropping_me( parseFloat(all_N[i-1]), parseFloat(all_N[i]) ) %>
+                </td>
+                <td>
+                    <%= dropping_me( parseFloat(all_2[i-1]), parseFloat(all_2[i]) ) %>
+                </td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<%- include('include/footer') -%>

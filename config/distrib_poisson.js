@@ -67,6 +67,7 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
                 }
 
                 if (local_i <= 5 && visitor_i <= 5) {
+                    
                     score = String(local_i + '-' + visitor_i)
                     matrice_goals[score] = local_prob_score * visitor_prob_score
                 }

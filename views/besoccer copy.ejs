@@ -1,0 +1,129 @@
+<%- include('include/header') -%>
+
+<% 
+
+class ValideMatch {
+    #local_note
+    #visitor_note
+    #local_tilt
+    #visitor_tilt
+    #delta_tilt
+    #classe = 'table-default';
+    #ouverture = '';
+
+    constructor(local_note, visitor_note, local_tilt, visitor_tilt){
+        this.#local_note = parseInt(local_note);
+        this.#visitor_note = parseInt(visitor_note);
+        this.#local_tilt = parseInt(local_tilt);
+        this.#visitor_tilt = parseInt(visitor_tilt);
+        this.#delta_tilt = Math.abs(parseInt(local_tilt) - parseInt(visitor_tilt))
+        this.#initializeOuverture();
+    }
+
+    #initializeOuverture() {
+        if (this.#delta_tilt <= 25) {
+            if (this.#local_tilt <= 55 && this.#local_tilt >= -55 && this.#local_tilt < this.#visitor_tilt) {
+                if (this.#local_note < 40) {
+                    this.#ouverture = '1N ' + this.#local_note;
+                    this.#classe = 'table-info';
+                } else {
+                    this.#ouverture = '1N';
+                    this.#classe = 'table-success';
+                }
+            }
+            if (this.#visitor_tilt <= 55 && this.#visitor_tilt >= -55 && this.#visitor_tilt < this.#local_tilt) {
+                if (this.#visitor_note < 40) {
+                    this.#ouverture = 'N2 ' + this.#visitor_note;
+                    this.#classe = 'table-info';
+                } else {
+                    this.#ouverture = 'N2';
+                    this.#classe = 'table-success';
+                }
+            }
+        }
+    }
+
+    getClasse(){
+        return this.#classe;
+    }
+
+    getOuverture(){
+        return this.#ouverture;
+    }
+}
+
+%> 
+
+<form action="" method="post">
+    <div class="row">
+
+        <div class="col-4">
+            <div class="input-group">
+                <select name="sel_file" id="sel_file" class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+                    <option selected>Open</option>
+                  <% files.forEach(element => { %>
+                    <option value="<%= element %>"><%= element %></option>
+                <% }); %> 
+                </select>
+                <div class="input-group-append">
+                  <input class="btn btn-outline-secondary" type="submit" value="Am">
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+</form>
+
+<br>
+
+<% if(data){ %> 
+
+    <div class="row">
+        <div class="col-12" style="text-align: center;">
+            <h1><%= moment(data[0].date).format("llll")  %></h1>
+        </div>
+    </div>
+
+ 
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table" data-search="true" data-pagination="true" style="text-align: center;">
+            <thead>
+                <tr>
+                    <th data-sortable="true" scope="col">TIME</th>
+                    <th data-sortable="true" scope="col">LEAGUE</th>
+                    <th scope="col">TEAMS</th>
+                    <th scope="col">OUVERTURE</th>
+                    <th scope="col">xG</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% data.forEach(element=> {  
+                    dateTime = element.date + ' ' + element.time
+                    id = element.id
+                    const p1 = new ValideMatch(element.local_note, element.visitor_note, element.local_tilt,  element.visitor_tilt);
+                %>
+                    <tr>
+                        <td>
+                            <%= moment(dateTime).subtract(1,'h').format("HH:mm") %>
+                        </td>
+                        <td>
+                            <%= (element.name_compet).substring(0, 25) %> <% if(element.coef_competition) { %>  <% } %>
+                        </td>
+                        <td>
+                            <%= (element.local_team).substring(0, 15) %> - <%= (element.visitor_team).substring(0, 15) %>
+                        </td>
+                        <td class="<%= p1.getClasse() %>">
+                            <%= p1.getOuverture() %>
+                        </td>
+                        <td>
+                            <%= parseFloat(element.local_goal_predict).toFixed(2) %> / <%= parseFloat(element.visitor_goal_predict).toFixed(2) %>
+                        </td>
+                    </tr>
+                <%  }); %>
+            </tbody>
+        </table>
+        <br>
+        <p><code>GOOD IS GREEN X2, WITHOUT ISOLATED FALL</code></p>
+<% } %>
+
+<%- include('include/footer') -%>

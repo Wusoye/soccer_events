@@ -1,5 +1,112 @@
 <%- include('include/header') -%>
 
+<% 
+
+function im_good(my_number){
+    var res;
+    if(parseFloat(my_number) >= 60){
+        res = "table-success";
+    }
+    else if(parseFloat(my_number) < 60){
+        res = "table-danger";
+    }
+    else{
+        res = "table-default";
+    }
+    return res;
+}
+
+function im_positive(my_number){
+    var res;
+    if(parseFloat(my_number) > 0){
+        res = "table-success";
+    }
+    else if(parseFloat(my_number) < 0){
+        res = "table-danger";
+    }
+    else{
+        res = "table-default";
+    }
+    return res;
+}
+
+function im_positive_forme(my_number){
+        var res;
+        if(parseFloat(my_number) > 6.99){
+            res = "table-success";
+        }
+        else if(parseFloat(my_number) > 6.49){
+            res = "table-info";
+        }
+        else if(parseFloat(my_number) > 5.99){
+            res = "table-warning";
+        }
+        else if(parseFloat(my_number) < 6){
+            res = "table-danger";
+        }
+        else if(parseFloat(my_number) < 0){
+            res = "table-danger";
+        }
+        else{
+            res = "table-default";
+            console.log(my_number);
+        }
+        return res;
+    }
+
+function dropping_me(odd_arrive, odd_depart){
+    return parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
+}
+
+function percent_to_odd(percent){
+    return 1 / percent * 100
+}
+
+function numAverage(a) {
+    var b = a.length,
+        c = 0, i;
+    for (i = 0; i < b; i++){
+        c += Number(a[i]);
+    }
+    return parseFloat((c/b).toFixed(2));
+} 
+
+function numAverageHarmo(a) {
+        var b = a.length,
+            c = 0, i;
+        for (i = 0; i < b; i++){
+            c += 1 / Number(a[i]);
+        }
+        return parseFloat((b/c).toFixed(2));
+    } 
+
+%> 
+
+<form action="" method="post">
+    <div class="row">
+
+        <div class="col-4">
+            <div class="input-group">
+                <select name="sel_file" id="sel_file" class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+                    <option selected>Open</option>
+                  <% files.forEach(element => { %>
+                    <option value="<%= element %>"><%= element %></option>
+                <% }); %> 
+                </select>
+                <div class="input-group-append">
+                  <input class="btn btn-outline-secondary" type="submit" value="Am">
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+</form>
+
+<br>
+
+<% if(data){ %> 
+
     <div class="row">
         <div class="col-12" style="text-align: center;">
             <h1><%= moment(data[0].date).format("llll")  %></h1>
@@ -7,47 +114,127 @@
     </div>
 
  
-        <table class="table table-striped table-bordered border-secondary" data-toggle="table" data-search="true" data-pagination="true">
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table" data-search="true" data-pagination="true" style="text-align: center;">
             <thead>
                 <tr>
-                    <th scope="col">TIME</th>
+                    <th data-sortable="true" scope="col">TIME</th>
                     <th data-sortable="true" scope="col">LEAGUE</th>
+                    <th scope="col">ELO</th>
                     <th scope="col">TEAMS</th>
-                    <th scope="col">LOCAL ELO</th>
-                    <th scope="col">VISITOR ELO</th> 
-                    <th scope="col">1</th>
-                    <th scope="col">2</th>                   
+                    <th scope="col">L xG7</th>
+                    <th scope="col">V xG7</th>
+                    <th scope="col">L FORME</th>
+                    <th scope="col">V FORME</th>
+                    <!--<th data-sortable="true" scope="col">Δ FORME</th>-->       
                 </tr>
             </thead>
             <tbody>
-                <% data.forEach(element=> {  dateTime = element.date + ' ' + element.time; %>
+                <% data.forEach(element=> {  
+                    dateTime = element.date + ' ' + element.time
+                    id = element.id
+                    l_tab_form = element.local_form_str.split('µ')
+                    v_tab_form = element.visitor_form_str.split('µ')
+                    l_tab_date = element.local_date_str.split('µ')
+                    v_tab_date = element.visitor_date_str.split('µ')
+
+                    local_len = l_tab_form.length - 1
+                    visitor_len = v_tab_form.length - 1
+
+                    l_tab_inc_form = []
+                    v_tab_inc_form = []
+
+                    l_tab_inc_form[0] = parseInt(l_tab_form[local_len])
+                    l_tab_inc_form[1] = (parseInt(l_tab_form[local_len]) + parseInt(l_tab_form[local_len-1])) /2
+                    l_tab_inc_form[2] = (parseInt(l_tab_form[local_len]) + parseInt(l_tab_form[local_len-1]) + parseInt(l_tab_form[local_len-2])) /3
+                    l_tab_inc_form[3] = (parseInt(l_tab_form[local_len]) + parseInt(l_tab_form[local_len-1]) + parseInt(l_tab_form[local_len-2]) + parseInt(l_tab_form[local_len-3])) /4
+                    l_tab_inc_form[4] = (parseInt(l_tab_form[local_len]) + parseInt(l_tab_form[local_len-1]) + parseInt(l_tab_form[local_len-2]) + parseInt(l_tab_form[local_len-3]) + parseInt(l_tab_form[local_len-4])) /5
+
+                    v_tab_inc_form[0] = parseInt(v_tab_form[visitor_len])
+                    v_tab_inc_form[1] = (parseInt(v_tab_form[visitor_len]) + parseInt(v_tab_form[visitor_len-1])) /2
+                    v_tab_inc_form[2] = (parseInt(v_tab_form[visitor_len]) + parseInt(v_tab_form[visitor_len-1]) + parseInt(v_tab_form[visitor_len-2])) /3
+                    v_tab_inc_form[3] = (parseInt(v_tab_form[visitor_len]) + parseInt(v_tab_form[visitor_len-1]) + parseInt(v_tab_form[visitor_len-2]) + parseInt(v_tab_form[visitor_len-3])) /4
+                    v_tab_inc_form[4] = (parseInt(v_tab_form[visitor_len]) + parseInt(v_tab_form[visitor_len-1]) + parseInt(v_tab_form[visitor_len-2]) + parseInt(v_tab_form[visitor_len-3]) + parseInt(v_tab_form[visitor_len-4])) /5
+
+                    l_inc_form = numAverage(l_tab_inc_form)
+                    v_inc_form = numAverage(v_tab_inc_form)
+                    
+                    l_avg_form = numAverage(l_tab_form)
+                    v_avg_form = numAverage(v_tab_form)
+
+                    
+
+                    local_form = parseFloat(l_tab_form[local_len])
+                    visitor_form = parseFloat(v_tab_form[visitor_len])
+
+                    l_f_5_tab = l_tab_form.slice(local_len-4, local_len+1)
+                    v_f_5_tab = v_tab_form.slice(visitor_len-4, visitor_len+1)
+
+                    h_l_f_5 = numAverageHarmo(l_tab_form.slice(local_len-4, local_len+1))
+                    h_v_f_5 = numAverageHarmo(v_tab_form.slice(visitor_len-4, visitor_len+1))
+
+                    l_f_3_tab = l_tab_form.slice(local_len-2, local_len+1)
+                    v_f_3_tab = v_tab_form.slice(visitor_len-2, visitor_len+1)
+
+                    //console.log(l_f_3_tab);
+
+                    diff_form_5 = 0
+                    diff_form_5_tab = []
+
+                    l_imp_form_3_tab = []
+                    v_imp_form_3_tab = []
+
+                    for (let k = 0; k < 5; k++) {
+                        diff_form_5 = diff_form_5 + (parseInt(l_f_5_tab[k]) - parseInt(v_f_5_tab[k]))
+                        diff_form_5_tab.push((parseInt(l_f_5_tab[k]) - parseInt(v_f_5_tab[k])))
+                    }
+
+                    for (let k = 0; k < 2; k++) {
+                        
+                        l_imp_form_3_tab.push((parseInt(l_f_3_tab[k+1]) - parseInt(l_f_3_tab[k])))
+                        v_imp_form_3_tab.push((parseInt(v_f_3_tab[k+1]) - parseInt(v_f_3_tab[k])))
+                    }
+
+                    avg_diff_form_5 = numAverage(diff_form_5_tab)
+
+                    l_avg_imp_form = numAverage(l_imp_form_3_tab)
+                    v_avg_imp_form = numAverage(v_imp_form_3_tab)
+
+                %>
                     <tr>
                         <td>
                             <%= moment(dateTime).subtract(1,'h').format("HH:mm") %>
                         </td>
                         <td>
-                            <%= (element.name_compet).substring(0, 30) %>
+                            <a target="_blank" href="/besoccer_detail/<%- id -%>/<%- file -%>" style="text-decoration:none; color: inherit;"><%= (element.name_compet).substring(0, 30) %></a>
                         </td>
                         <td>
-                            <%= element.local_team %> - <%= element.visitor_team %>
-                        </td>
-                        </td>
-                        <td>
-                            <%= parseInt(element.local_elo) %>
+                            <%= parseInt(element.local_elo) %> - <%= parseInt(element.visitor_elo) %>
                         </td>
                         <td>
-                            <%= parseInt(element.visitor_elo) %>
+                            <%= (element.local_team).substring(0, 15) %> - <%= (element.visitor_team).substring(0, 15) %>
+                        </td>
+                        </td>
+
+                        <td>
+                            <%= parseFloat(element.local_xG).toFixed(2) %>
                         </td>
                         <td>
-                            <%= parseFloat(element.l_avg_xG2_10).toFixed(2) %>
+                            <%= parseFloat(element.visitor_xG).toFixed(2) %>
                         </td>
-                        <td>
-                            <%= parseFloat(element.v_avg_xG2_10).toFixed(2) %>
+                        <td  class="<%= im_positive_forme(h_l_f_5) %>" > 
+                            <%= parseFloat(h_l_f_5).toFixed(2) %>
                         </td>
-                        
+                        <td class="<%= im_positive_forme(h_v_f_5) %>" >
+                            <%= parseFloat(h_v_f_5).toFixed(2) %>
+                        </td>
+
+                        <!--<td class="<%= im_positive(diff_form_5) %>" >
+                            <%= diff_form_5 %> / <%= avg_diff_form_5 %>
+                        </td>-->
                     </tr>
-                <% }); %>
+                <%  }); %>
             </tbody>
         </table>
+<% } %>
 
 <%- include('include/footer') -%>

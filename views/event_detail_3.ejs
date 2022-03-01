@@ -12,10 +12,10 @@
                     var b = a.length,
                         c = 0, i;
                     for (i = 0; i < b; i++){
-                      c += Number(a[i]);
+                        c += Number(a[i]);
                     }
                     return parseFloat((c/b).toFixed(2));
-                  } 
+                } 
                   
                 function one_to_many_tab(tab){
                     all1 = []
@@ -33,6 +33,11 @@
                 function dropping_me(odd_arrive, odd_depart){
                     return parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
                 }
+
+                function diff(odd_arrive, odd_depart){
+                    return parseFloat((odd_arrive - odd_depart).toFixed(2))
+                }
+
                 function dropping_me_modif(odd_arrive, odd_depart){
                     var res = parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
 
@@ -214,11 +219,34 @@
                         nb_book += 1;
 
                         live = items[book].live
-                        all_drop_1.push(live['1'])
-                        all_drop_X.push(live['X'])
-                        all_drop_2.push(live['2'])
+                        history = items[book].history
 
-                        history = items[book].history,
+                        
+                        /*all_drop_1.push(live['1'])
+                        all_drop_X.push(live['X'])
+                        all_drop_2.push(live['2'])*/
+
+                        dateLimite = moment(infos.time)
+                        //dateLimite = moment('2021-12-05 10:00')
+
+                        last_1 = 0
+                        last_X = 0
+                        last_2 = 0
+
+                        for (let i = history.length - 1; i > -1; i = i -1) {
+                            if (moment(history[i]['updated']) < dateLimite) {
+                                last_1 = history[i]['1']
+                                last_X = history[i]['X']
+                                last_2 = history[i]['2']
+                                last_updated = history[i]['updated']
+                            }
+                        }
+
+                        all_drop_1.push(last_1)
+                        all_drop_X.push(last_X)
+                        all_drop_2.push(last_2)
+                        
+
                         all_opening_1.push(parseFloat(history[history.length -1]['1']))
                         all_opening_X.push(parseFloat(history[history.length -1]['X']))
                         all_opening_2.push(parseFloat(history[history.length -1]['2']))
@@ -273,7 +301,9 @@
                         history_book.push([book, numAverage(history_odd_1), numAverage(history_odd_X), numAverage(history_odd_2)])
 
                         opening_of_each_book.push([book, history[history.length -1]['1'], history[history.length -1]['X'], history[history.length -1]['2'], history[history.length -1]['updated']])
-                        live_of_each_book.push([book, live['1'], live['X'], live['2'], live['updated']])
+                        live_of_each_book.push([book, last_1, last_X, last_2, last_updated])
+                        
+                        
                         
                         //console.log(opening_of_each_book.length, live_of_each_book.length);
                     }; 
@@ -340,6 +370,14 @@
                         percent_drop_X = odds_to_percent(average_drop_X),
                         percent_drop_2 = odds_to_percent(average_drop_2),
 
+                        percent_max_drop_1 = odds_to_percent(max_drop_1),
+                        percent_max_drop_X = odds_to_percent(max_drop_X),
+                        percent_max_drop_2 = odds_to_percent(max_drop_2),
+
+                        percent_min_drop_1 = odds_to_percent(min_drop_1),
+                        percent_min_drop_X = odds_to_percent(min_drop_X),
+                        percent_min_drop_2 = odds_to_percent(min_drop_2),
+
                         new_percent_drop_1 = percent_drop_1 + (percent_drop_X/2),
                         new_percent_drop_2 = percent_drop_2 + (percent_drop_X/2),
 
@@ -350,6 +388,18 @@
                         percent_drop_1 = dropping_me(average_drop_1, average_opening_1)
                         percent_drop_X = dropping_me(average_drop_X, average_opening_X)
                         percent_drop_2 = dropping_me(average_drop_2, average_opening_2)
+
+                        percent_drop_1_ptn = diff(average_drop_1, average_opening_1)
+                        percent_drop_X_ptn = diff(average_drop_X, average_opening_X)
+                        percent_drop_2_ptn = diff(average_drop_2, average_opening_2)
+
+                        percent_max_drop_1 = dropping_me(max_drop_1, average_opening_1)
+                        percent_max_drop_X = dropping_me(max_drop_X, average_opening_X)
+                        percent_max_drop_2 = dropping_me(max_drop_2, average_opening_2)
+
+                        percent_min_drop_1 = dropping_me(min_drop_1, average_opening_1)
+                        percent_min_drop_X = dropping_me(min_drop_X, average_opening_X)
+                        percent_min_drop_2 = dropping_me(min_drop_2, average_opening_2)
 
                         first_percent_drop_1 = dropping_me(nd_average_opening_1, average_opening_1)
                         first_percent_drop_X = dropping_me(nd_average_opening_X, average_opening_X)
@@ -373,7 +423,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Oppening  odds</td>
+                    <td>OPENING ODDS</td>
                     <td><%= average_opening_1 %></td>
                     <td><%= average_opening_X %></td>
                     <td><%= average_opening_2 %></td>
@@ -381,18 +431,30 @@
                 </tr>
                
                 <tr>
-                    <td>Live odds</td>
+                    <td>LIVE ODDS</td>
                     <td><%= average_drop_1 %></td>
                     <td><%= average_drop_X %></td>
                     <td><%= average_drop_2 %></td>
                     <td><%= ((1/average_drop_1 + 1/average_drop_X + 1/average_drop_2)*100-100).toFixed(2) %></td>
                 </tr>
                 <tr>
-                    <td>Dropping odds</td>
+                    <td>DROPPING AVG</td>
                     <td><%= percent_drop_1 %> %</td>
                     <td><%= percent_drop_X %> %</td>
                     <td><%= percent_drop_2 %> %</td>
                     <td><%= nb_book %> / 26</td>
+                </tr>
+                <tr>
+                    <td>MIN / MAX</td>
+                    <td>
+                        <%= dropping_me(max_opening_1, min_opening_1) %> %
+                    </td>
+                    <td>
+                        <%= dropping_me(max_opening_X, min_opening_X) %> %
+                    </td>
+                    <td>
+                        <%= dropping_me(max_opening_2, min_opening_2) %> %
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -403,7 +465,7 @@
             <!--<h5 style="text-align: center">PREDICTION PERCENT</h5>-->
 
             <br>
-            <h6>REAL GOALS</h6>
+            <h6>PRED. GOALS</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
                     <input placeholder="Local pred. (xG)" type="text" class="form-control" id="local_goal" name="local_goal" value=<% if(goals_predictions[0]){ %>"<%=
@@ -416,7 +478,7 @@
             </div>
 
             <br>
-            <h6>PRED. GOALS</h6> 
+            <h6>REAL GOALS</h6> 
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
                     <input placeholder="Local last 5 (xG)" type="text" class="form-control" id="local_inc" name="local_tilt" value=<% if(tilt[0]){ %>"<%=
@@ -439,12 +501,14 @@
 
         <% if(bool_aff_diff){ %>
         <br>
-        <h5 style="text-align: center">OPPENING / PREDICTION</h5>
+        <h3 style="text-align: center">OPPENING / PREDICTION</h5>
+        <br>
+        <h5 style="text-align: center">EN POURCENTAGE</h5>
         <br>
         <div class="row">
             
             <div class="col-12">
-                <h6>AVERAGE / POSSIBLE</h6>
+                
                 <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
                     <thead>
                         <tr style="text-align: center;">
@@ -491,7 +555,68 @@
                             <td class="<%= im_positive(dropping_me(min_opening_2, norm_odd_2)) %>" >
                                 <%= dropping_me(min_opening_2, norm_odd_2) %> % 
                             </td>
+                        </tr>                       
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <br>
+        <h5 style="text-align: center">EN POINT</h5>
+        <br>
+        <div class="row">
+            
+            <div class="col-12">
+                <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
+                    <thead>
+                        <tr style="text-align: center;">
+                            <th scope="col">Type</th>
+                            <th scope="col">1</th>
+                            <th scope="col">N</th>
+                            <th scope="col">2</th>
                         </tr>
+                    </thead>
+        
+                    <tbody>
+                        <tr>
+                            <td>Average</td>
+                            <td class="<%= im_positive(diff(average_opening_1, norm_odd_1)) %>" > 
+                                <%= diff(average_opening_1, norm_odd_1) %> ptns
+                            </td>
+                            <td class="<%= im_positive(diff(average_opening_X, norm_odd_X)) %>" >
+                                <%= diff(average_opening_X, norm_odd_X) %> ptns 
+                            </td>
+                            <td class="<%= im_positive(diff(average_opening_2, norm_odd_2)) %>" >
+                                <%= diff(average_opening_2, norm_odd_2) %> ptns 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Max</td>
+                            <td class="<%= im_positive(diff(max_opening_1, norm_odd_1)) %>" >
+                                <%= diff(max_opening_1, norm_odd_1) %> ptns 
+                            </td>
+                            <td class="<%= im_positive(diff(max_opening_X, norm_odd_X)) %>">
+                                <%= diff(max_opening_X, norm_odd_X) %> ptns 
+                            </td>
+                            <td class="<%= im_positive(diff(max_opening_2, norm_odd_2)) %>" >
+                                <%= diff(max_opening_2, norm_odd_2) %> ptns 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Min</td>
+                            <td class="<%= im_positive(diff(min_opening_1, norm_odd_1)) %>" >
+                                <%= diff(min_opening_1, norm_odd_1) %> ptns
+                            </td>
+                            <td class="<%= im_positive(diff(min_opening_X, norm_odd_X)) %>" >
+                                <%= diff(min_opening_X, norm_odd_X) %> ptns
+                            </td>
+                            <td class="<%= im_positive(diff(min_opening_2, norm_odd_2)) %>" >
+                                <%= diff(min_opening_2, norm_odd_2) %> ptns
+                            </td>
+                        </tr>
+
+                        
                         
                         
                     </tbody>
@@ -519,7 +644,7 @@
         
                     <tbody>
                         <tr>
-                            <td>REAL</td>
+                            <td>POSSIBLE</td>
                             <td>
                                 <%= c_normal[0].toFixed(2) %> %
                             </td>
@@ -531,7 +656,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>POSSIBLE</td>
+                            <td>REAL</td>
                             <td>
                                 <%= c_no_tilt[0].toFixed(2) %> %
                             </td>
@@ -546,16 +671,16 @@
                         <tr>
                             <td>REAL / POSSIBLE</td>
                             <td
-                                class="<%= im_positive((dropping_me(nT_odd_1, norm_odd_1)).toFixed(2)) %>">
-                                <%= dropping_me(nT_odd_1, norm_odd_1).toFixed(2) %> 
+                                class="<%= im_positive((dropping_me(norm_odd_1, nT_odd_1)).toFixed(2)) %>">
+                                <%= dropping_me(norm_odd_1, nT_odd_1).toFixed(2) %> 
                             </td>
                             <td
-                                class="<%= im_positive((dropping_me(nT_odd_X, norm_odd_X)).toFixed(2)) %>">
-                                <%= dropping_me(nT_odd_X, norm_odd_X).toFixed(2) %> 
+                                class="<%= im_positive((dropping_me(norm_odd_X, nT_odd_X)).toFixed(2)) %>">
+                                <%= dropping_me(norm_odd_X, nT_odd_X).toFixed(2) %> 
                             </td>
                             <td
-                                class="<%= im_positive((dropping_me(nT_odd_2, norm_odd_2)).toFixed(2)) %>">
-                                <%= dropping_me(nT_odd_2, norm_odd_2).toFixed(2) %> 
+                                class="<%= im_positive((dropping_me(norm_odd_2, nT_odd_2)).toFixed(2)) %>">
+                                <%= dropping_me(norm_odd_2, nT_odd_2).toFixed(2) %> 
                             </td>
                         </tr>
                         
@@ -567,7 +692,7 @@
         <br>
 
         <br>
-        <!--<table class="table table-striped table-bordered border-secondary" data-toggle="table">
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table">
             <thead>
                 <tr style="text-align: center;">
                     <th scope="col" data-sortable="true">SCORE</th> 
@@ -609,7 +734,7 @@
 
         <% 
             }; 
-        %>-->
+        %>
 
         
             
@@ -643,11 +768,12 @@
         <table class="table table-striped table-bordered border-secondary" data-toggle="table">
             <thead>
                 <tr style="text-align: center;">
-                    <th scope="col" data-sortable="true">Bookmaker</th> <!-- Average of Bookmaker -->
+                    <th scope="col" data-sortable="true">BOOKMAKER</th>
+                    <th scope="col" data-sortable="true">DATE</th> <!-- Average of Bookmaker -->
                     <th scope="col" data-sortable="true">1 ( % )</th>
                     <th scope="col" data-sortable="true">N ( % )</th>
                     <th scope="col" data-sortable="true">2 ( % )</th>
-                    <th scope="col" data-sortable="true">Opening date</th>
+                    <th scope="col" data-sortable="true">OPENING DATE</th>
                 </tr>
             </thead>
 
@@ -668,9 +794,11 @@
                     %>
                 <tr>
                     <td>
-                        <%= date_live %> / <%= un_book %>
+                        <a target="_blank" href="/event_detail_book/<%- idMatch %>/<%- un_book %>" style="text-decoration:none; color: inherit;"><%= un_book %></a> 
                     </td>
-                
+                    <td>
+                        <%= date_live %> 
+                    </td>
                     <td>
                         <%= dropping_me(live_1, opening_1) %>
                     </td>
@@ -695,4 +823,4 @@
 
     <p><%= infos.hometeam.name %>_<%= infos.awayteam.name %>_<%= moment(infos.time).add(1,'h').format('lll') %></p>
                
-    <%- include('include/footer') -%>
+    <%- include('include/footer') -%> 

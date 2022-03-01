@@ -17,6 +17,23 @@ function im_positive(my_number){
     return res;
 }
 
+function good_date(last_date, selected_date){
+    var res;
+    if(moment(last_date).add(2, 'M') > moment(selected_date)){
+        res = "table-success";
+    }
+    else if(moment(last_date).add(2, 'M') < moment(selected_date)){
+        res = "table-danger";
+    }
+    else if(moment(last_date).add(1, 'M') < moment(selected_date)){
+        res = "table-warning";
+    }
+    else{
+        res = "table-default";
+    }
+    return res;
+}
+
 function numAverage(a) {
     var b = a.length,
     c = 0, i;
@@ -25,6 +42,46 @@ function numAverage(a) {
     } 
     return parseFloat((c/b).toFixed(2)); 
 }
+function dropping_me(odd_arrive, odd_depart){
+    return parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
+}
+function percent_to_odd(percent){
+    return 1 / percent * 100
+}
+console.log('--------');
+
+
+
+
+
+
+form1 = []
+form2 = []
+k1 = last_proj_score[0].length-1
+k2 = last_proj_score[1].length-1
+
+for (let i = 0; i < k1; i++) {
+    form1.push((real_xg[0][i] - last_proj_score[0][i]))
+}
+for (let i = 0; i < k2; i++) {
+    form2.push((real_xg[1][i] - last_proj_score[1][i]))
+}
+
+new_proj_score1 = (parseFloat(select_event.proj_score1) + numAverage(form1.slice(0,7)) ).toFixed(2)
+new_proj_score2 = (parseFloat(select_event.proj_score2) + numAverage(form2.slice(0,7)) ).toFixed(2)
+
+normal_distrib = new distrib_poisson(select_event.proj_score1, select_event.proj_score2, 25)
+matrice_normal = normal_distrib.predict_proba()['percent'];
+
+latest_distrib = new distrib_poisson(new_proj_score1, new_proj_score2, 25)
+matrice_latest = latest_distrib.predict_proba()['percent'];
+
+drop_1 = dropping_me(matrice_latest[0], matrice_normal[0])
+drop_N = dropping_me(matrice_latest[1], matrice_normal[1])
+drop_2 = dropping_me(matrice_latest[2], matrice_normal[2])
+
+
+
 %>
 
 <div class="row">
@@ -65,77 +122,93 @@ function numAverage(a) {
                 </tr>
             </thead>
             <tbody>
+                <% if(last_event[0].length > 0 && last_event[1].length > 0){ %> 
                 <tr>
                     <td>
-                        xG / PROJ SOCRE
+                        AVG LAST 7 XG
                     </td>
-                    <td class="<%= im_positive(numAverage(diffs_xg_proj_score[0])) %>">
-                        <%= numAverage(diffs_xg_proj_score[0]) %>
+                    <td>
+                        <%= numAverage(real_xg[0].slice(0,7)) %>
                     </td>
-                    <td class="<%= im_positive(numAverage(diffs_xg_proj_score[1])) %>">
-                        <%= numAverage(diffs_xg_proj_score[1]) %>
+                    <td>
+                        <%= numAverage(real_xg[1].slice(0,7)) %>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        SCORE / PROJ SOCRE
+                        NEW PROJ SCORE
                     </td>
-                    <td class="<%= im_positive(numAverage(diffs_score_proj_score[0])) %>">
-                        <%= numAverage(diffs_score_proj_score[0]) %>
+                    <td>
+                        <%= new_proj_score1 %>
                     </td>
-                    <td class="<%= im_positive(numAverage(diffs_score_proj_score[1])) %>">
-                        <%= numAverage(diffs_score_proj_score[1]) %>
+                    <td>
+                        <%= new_proj_score2 %>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        AVG xG OVERALL
+                        LAST MATCH USE
                     </td>
-                    <td>
-                        <%= numAverage(last_xg[0]) %>
+                    <td class="<%= good_date(last_event[0][6].date, select_event.date) %>">
+                        <%= last_event[0][6].date %>
                     </td>
-                    <td>
-                        <%= numAverage(last_xg[1]) %>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        AVG xG LAST 10
-                    </td>
-                    <td class="<%= im_positive(numAverage(last_xg[0].slice(0,11)) - numAverage(last_xg[0])) %>">
-                        <%= numAverage(last_xg[0].slice(0,11)) %>
-                    </td>
-                    <td class="<%= im_positive(numAverage(last_xg[1].slice(0,11)) - numAverage(last_xg[1])) %>">
-                        <%= numAverage(last_xg[1].slice(0,11)) %>
+                    <td class="<%= good_date(last_event[1][6].date, select_event.date) %>">
+                        <%= last_event[1][6].date %>
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        AVG xG LAST 5
-                    </td>
-                    <td class="<%= im_positive(numAverage(last_xg[0].slice(0,6)) - numAverage(last_xg[0].slice(0,11))) %>">
-                        <%= numAverage(last_xg[0].slice(0,6)) %>
-                    </td>
-                    <td class="<%= im_positive(numAverage(last_xg[1].slice(0,6)) - numAverage(last_xg[1].slice(0,11))) %>">
-                        <%= numAverage(last_xg[1].slice(0,6)) %>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        LAST
-                    </td>
-                    <td class="<%= im_positive(numAverage(last_xg[0].slice(0,1)) - numAverage(last_xg[0].slice(0,6))) %>">
-                        <%= numAverage(last_xg[0].slice(0,1)) %>
-                    </td>
-                    <td class="<%= im_positive(numAverage(last_xg[1].slice(0,1)) - numAverage(last_xg[1].slice(0,6))) %>">
-                        <%= numAverage(last_xg[1].slice(0,1)) %>
-                    </td>
-                </tr>
+                <% }; %> 
             </tbody>
         </table>
     </div>
 </div>
     
+<br>
+<div class="row">
+    <div class="col-10 offset-1" style="text-align: center;">
+        <table class="table table-striped table-bordered border-secondary" data-toggle="table">
+            <thead>
+                <tr>
+                    <th scope="col">INFOS</th>
+                    <th scope="col">1</th>
+                    <th scope="col">N</th>
+                    <th scope="col">2</th>                   
+                </tr>
+            </thead>
+            <tbody>
+                <% if(last_event[0].length > 0 && last_event[1].length > 0){ %> 
+                <tr>
+                    <td>
+                        FORME
+                    </td>
+                    <td class="<%= im_positive(drop_1) %>" >
+                        <%= drop_1 %>
+                    </td>
+                    <td class="<%= im_positive(drop_N) %>" >
+                        <%= drop_N %>
+                    </td>
+                    <td class="<%= im_positive(drop_2) %>" >
+                        <%= drop_2 %>
+                    </td>
+                </tr> 
+                <tr>
+                    <td>
+                        ODDS
+                    </td>
+                    <td>
+                        <%= (matrice_normal[0]).toFixed(2) %>
+                    </td>
+                    <td>
+                        <%= (matrice_normal[1]).toFixed(2) %>
+                    </td>
+                    <td>
+                        <%= (matrice_normal[2]).toFixed(2) %>
+                    </td>
+                </tr> 
+                <% }; %> 
+            </tbody>
+        </table>
+    </div>
+</div>
 <br>
  
 <div class="row">
@@ -146,18 +219,50 @@ function numAverage(a) {
                     <th data-sortable="true" scope="col">DATE</th>
                     <th data-sortable="true" scope="col">LEAGUE</th>
                     <th scope="col">TEAMS</th>
-                    <th scope="col">SCORE</th>    
-                    <th scope="col">xG</th> 
-                    <th scope="col">FORM</th>                      
+                    <th scope="col">SCORE</th>      
+                    <th scope="col">FORME</th>                
                 </tr>
             </thead>
             <tbody>
                 <% var i = 0; last_event[0].forEach(element=> { 
+
                     detail_home = last_detail[0]
                     var score1 = parseFloat(detail_home[i].score1)
                     var xg1 = parseFloat(detail_home[i].xg1)
                     var proj_score1 = parseFloat(detail_home[i].proj_score1)
-                    
+                    var real_xg1 = real_xg[0][i]
+                    var forme = (parseFloat(real_xg1) - parseFloat(proj_score1)).toFixed(2)
+                    var win = false
+                    var home = false
+
+                    var score = (parseFloat(element.score1) - parseFloat(element.score2))
+
+                    if (String(select_event.team1) == String(element.team1)) {
+                        home = true
+                    }
+                    if (home) {
+                        if (score > 0) {
+                            win = 1
+                        }
+                        if (score == 0) {
+                            win = 0
+                        }
+                        if (score < 0) {
+                            win = -1
+                        }
+                    } else {
+                        if (score > 0) {
+                            win = -1
+                        }
+                        if (score == 0) {
+                            win = 0
+                        }
+                        if (score < 0) {
+                            win = 1
+                        }
+                    }
+
+
                 %>
                     <tr>
                         <td>
@@ -170,18 +275,13 @@ function numAverage(a) {
                             <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= element.team1 %> - <%= element.team2 %></a> 
                         </td>
                         </td>
-                        <td>
+                        <td class="<%= im_positive(win) %>" >
                             <%= element.score1 %> - <%= element.score2 %>
                         </td>
-                        <td>
-                            <%= element.xg1 %> - <%= element.xg2 %>
+                        <td  class="<%= im_positive(forme) %>">
+                            <%= forme %>
                         </td>
-                        <!--<td>
-                            <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>
-                        </td>-->
-                        <td class="<%= im_positive((score1 - xg1)) %>">
-                            <%= (score1 - xg1).toFixed(2) %>
-                        </td>
+
                     </tr>
                 <% i+=1 }); %>
             </tbody>
@@ -194,16 +294,49 @@ function numAverage(a) {
                     <th data-sortable="true" scope="col">DATE</th>
                     <th data-sortable="true" scope="col">LEAGUE</th>
                     <th scope="col">TEAMS</th>
-                    <th scope="col">SCORE</th>    
-                    <th scope="col">xG</th> 
-                    <th scope="col">FORM</th>                    
+                    <th scope="col">SCORE</th> 
+                    <th scope="col">FORME</th>                    
                 </tr>
             </thead>
             <tbody>
                 <% var k = 0; last_event[1].forEach(element=> { 
+                    
                     detail_home = last_detail[1]
                     var score2 = parseFloat(detail_home[k].score2)
                     var xg2 = parseFloat(detail_home[k].xg2)
+                    var proj_score2 = parseFloat(detail_home[k].proj_score2)
+                    var real_xg2 = real_xg[1][k]
+                    var forme = (parseFloat(real_xg2) - parseFloat(proj_score2)).toFixed(2)
+
+                    var win = false
+                    var home = false
+
+                    var score = (parseFloat(element.score1) - parseFloat(element.score2))
+                    if (String(select_event.team2) == String(element.team1)) {
+                        home = true
+                    }
+                    if (home) {
+                        if (score > 0) {
+                            win = 1
+                        }
+                        if (score == 0) {
+                            win = 0
+                        }
+                        if (score < 0) {
+                            win = -1
+                        }
+                    } else {
+                        if (score > 0) {
+                            win = -1
+                        }
+                        if (score == 0) {
+                            win = 0
+                        }
+                        if (score < 0) {
+                            win = 1
+                        }
+                    }
+
                  %>
                     <tr>
                         <td>
@@ -216,18 +349,13 @@ function numAverage(a) {
                             <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= element.team1 %> - <%= element.team2 %></a> 
                         </td>
                         </td>
-                        <td>
+                        <td class="<%= im_positive(win) %>" >
                             <%= element.score1 %> - <%= element.score2 %>
                         </td>
-                        <td>
-                            <%= element.xg1 %> - <%= element.xg2 %>
+                        <td class="<%= im_positive(forme) %>">
+                            <%= forme %>
                         </td>
-                        <!--<td>
-                            <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>
-                        </td>-->
-                        <td class="<%= im_positive(score2 - xg2) %>">
-                            <%= (score2 - xg2).toFixed(2) %>
-                        </td>
+
                     </tr>
                 <% k+=1 }); %>
             </tbody>

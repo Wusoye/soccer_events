@@ -10,12 +10,20 @@
                     <th scope="col">1</th>
                     <th scope="col">N</th>
                     <th scope="col">2</th>
-                    <th scope="col">PROJ SCORE</th>  
+                    <th scope="col">SCORE</th>  
                     <th scope="col">RATING</th>                    
                 </tr>
             </thead>
             <tbody>
                 <% data.forEach(element=> {  %>
+                    <% 
+                        var id_element = element.league_id
+                        var nbDay = 60;
+                        var min_quality = 15; 
+                        var quality = (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2);
+                        
+                        if ( quality > min_quality && moment(element.date) < moment().add(1, 'days') && moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days') && (id_element != 7921 && id_element != 1983 && id_element != 2413 && id_element != 2414 && id_element != 2160 && id_element != 4582)){ 
+                    %>
                     <tr>
                         <td>
                             <%= moment(element.date).format("DD-MM-YYYY") %>
@@ -24,25 +32,26 @@
                             <%= (element.league).substring(0, 30) %>
                         </td>
                         <td>
-                            <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= element.team1 %> - <%= element.team2 %></a> 
+                            <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= (element.team1).substring(0, 15) %> - <%= (element.team2).substring(0, 15) %></a> 
                         </td>
                         </td>
                         <td>
                             <%= parseFloat(element.prob1*100).toFixed(1) %>
                         </td>
                         <td>
-                            <%= parseFloat(element.probN*100).toFixed(1) %>
+                            <%= parseFloat(element.probtie*100).toFixed(1) %>
                         </td>
                         <td>
                             <%= parseFloat(element.prob2*100).toFixed(1) %>
                         </td>
                         <td>
-                            <%= element.proj_score1 %> - <%= element.proj_score2 %>
+                            <%= element.score1 %> - <%= element.score2 %>
                         </td>
                         <td>
                             <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>
                         </td>
                     </tr>
+                    <% }; %>
                 <% }); %>
             </tbody>
         </table>
