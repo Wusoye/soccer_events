@@ -21,9 +21,16 @@ class ValideMatch {
     }
 
     #initializeOuverture() {
-        if (this.#delta_tilt <= 25) {
-            if (this.#local_tilt <= 55 && this.#local_tilt >= -55 && this.#local_tilt < this.#visitor_tilt) {
-                if (this.#local_note < 40) {
+        let maxDeltaTilt = 25;
+        let strictDeltaTilt = 10;
+        let maxTilt = 50;
+        let minNote = 40;
+        if (this.#delta_tilt <= maxDeltaTilt && 
+            this.#local_tilt < maxTilt && this.#local_tilt > -maxTilt && 
+            this.#visitor_tilt < maxTilt && this.#visitor_tilt > -maxTilt) {     
+
+            if (this.#local_tilt < this.#visitor_tilt) {
+                if (this.#local_note < minNote) {
                     this.#ouverture = '1N ' + this.#local_note;
                     this.#classe = 'table-info';
                 } else {
@@ -31,13 +38,35 @@ class ValideMatch {
                     this.#classe = 'table-success';
                 }
             }
-            if (this.#visitor_tilt <= 55 && this.#visitor_tilt >= -55 && this.#visitor_tilt < this.#local_tilt) {
-                if (this.#visitor_note < 40) {
+            else if (this.#visitor_tilt < this.#local_tilt) {
+                if (this.#visitor_note < minNote) {
                     this.#ouverture = 'N2 ' + this.#visitor_note;
                     this.#classe = 'table-info';
                 } else {
                     this.#ouverture = 'N2';
                     this.#classe = 'table-success';
+                }
+            }
+        } else if (this.#delta_tilt <= strictDeltaTilt && 
+            ((this.#local_tilt > maxTilt || this.#local_tilt < -maxTilt) ||
+            (this.#visitor_tilt > maxTilt || this.#visitor_tilt < -maxTilt))) {     
+
+            if (this.#local_tilt < this.#visitor_tilt) {
+                if (this.#local_note < minNote) {
+                    this.#ouverture = '1N ' + this.#local_note + ' Δ' + this.#delta_tilt + '%';
+                    this.#classe = 'table-warning';
+                } else {
+                    this.#ouverture = '1N Δ' + this.#delta_tilt + '%';
+                    this.#classe = 'table-warning';
+                }
+            }
+            else if (this.#visitor_tilt < this.#local_tilt) {
+                if (this.#visitor_note < minNote) {
+                    this.#ouverture = 'N2 ' + this.#visitor_note + ' Δ' + this.#delta_tilt + '%';
+                    this.#classe = 'table-warning';
+                } else {
+                    this.#ouverture = 'N2 Δ' + this.#delta_tilt + '%';
+                    this.#classe = 'table-warning';
                 }
             }
         }
@@ -97,26 +126,26 @@ class ValideMatch {
                 </tr>
             </thead>
             <tbody>
-                <% data.forEach(element=> {  
-                    dateTime = element.date + ' ' + element.time
-                    id = element.id
-                    const p1 = new ValideMatch(element.local_note, element.visitor_note, element.local_tilt,  element.visitor_tilt);
+                <% data.forEach(el=> {  
+                    dateTime = el.date + ' ' + el.time
+                    id = el.id
+                    const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt,  el.visitor_tilt);
                 %>
                     <tr>
                         <td>
                             <%= moment(dateTime).subtract(1,'h').format("HH:mm") %>
                         </td>
                         <td>
-                            <%= (element.name_compet).substring(0, 25) %> <% if(element.coef_competition) { %>  <% } %>
+                            <%= (el.name_compet).substring(0, 25) %> <% if(el.coef_competition) { %>  <% } %>
                         </td>
                         <td>
-                            <%= (element.local_team).substring(0, 15) %> - <%= (element.visitor_team).substring(0, 15) %>
+                            <%= (el.local_team).substring(0, 15) %> - <%= (el.visitor_team).substring(0, 15) %>
                         </td>
                         <td class="<%= p1.getClasse() %>">
                             <%= p1.getOuverture() %>
                         </td>
                         <td>
-                            <%= parseFloat(element.local_goal_predict).toFixed(2) %> / <%= parseFloat(element.visitor_goal_predict).toFixed(2) %>
+                            <%= parseFloat(el.local_goal_predict).toFixed(2) %> / <%= parseFloat(el.visitor_goal_predict).toFixed(2) %>
                         </td>
                     </tr>
                 <%  }); %>
