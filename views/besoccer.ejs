@@ -78,8 +78,8 @@ function dropping_me(odd_arrive, odd_depart){
     return parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
 }
 
-function percent_to_odd(percent){
-    return 1 / percent * 100
+function odd_to_percent(odd){
+    return 1 / odd * 100
 }
 
 function numAverage(a) {
@@ -231,9 +231,9 @@ function valide(local_note, visitor_note, local_tilt,  visitor_tilt) {
                     matrice_inc = inc_distrib.predict_proba();
                     ip = matrice_inc['percent']
 
-                    d1 = diff(percent_to_odd(np[0]), percent_to_odd(ip[0])).toFixed(2)
-                    dN = diff(percent_to_odd(np[1]), percent_to_odd(ip[1])).toFixed(2)
-                    d2 = diff(percent_to_odd(np[2]), percent_to_odd(ip[2])).toFixed(2)
+                    d1 = dropping_me(percent_to_odd(np[0]), percent_to_odd(ip[0])).toFixed(2)
+                    dN = dropping_me(percent_to_odd(np[1]), percent_to_odd(ip[1])).toFixed(2)
+                    d2 = dropping_me(percent_to_odd(np[2]), percent_to_odd(ip[2])).toFixed(2)
 
                     if (parseInt(element.local_elo) > parseInt(element.visitor_elo)) {
                         delta_elo = parseInt(element.local_elo) - parseInt(element.visitor_elo);

@@ -10,6 +10,7 @@ class ValideMatch {
     #delta_tilt
     #classe = 'table-default';
     #ouverture = '';
+    #isOpen = false;
 
     constructor(local_note, visitor_note, local_tilt, visitor_tilt){
         this.#local_note = parseInt(local_note);
@@ -21,8 +22,8 @@ class ValideMatch {
     }
 
     #initializeOuverture() {
-        let maxDeltaTilt = 25;
-        let strictDeltaTilt = 10;
+        let maxDeltaTilt = 15;
+        let strictDeltaTilt = 15;
         let maxTilt = 50;
         let minNote = 40;
         if (this.#delta_tilt <= maxDeltaTilt && 
@@ -30,21 +31,25 @@ class ValideMatch {
             this.#visitor_tilt < maxTilt && this.#visitor_tilt > -maxTilt) {     
 
             if (this.#local_tilt < this.#visitor_tilt) {
-                if (this.#local_note < minNote) {
-                    this.#ouverture = '1N ' + this.#local_note;
+                if (this.#local_note <= minNote) {
+                    this.#ouverture = '1N';
                     this.#classe = 'table-info';
+                    this.#isOpen = true;
                 } else {
                     this.#ouverture = '1N';
                     this.#classe = 'table-success';
+                    this.#isOpen = true;
                 }
             }
             else if (this.#visitor_tilt < this.#local_tilt) {
-                if (this.#visitor_note < minNote) {
-                    this.#ouverture = 'N2 ' + this.#visitor_note;
+                if (this.#visitor_note <= minNote) {
+                    this.#ouverture = 'N2';
                     this.#classe = 'table-info';
+                    this.#isOpen = true;
                 } else {
                     this.#ouverture = 'N2';
                     this.#classe = 'table-success';
+                    this.#isOpen = true;
                 }
             }
         } else if (this.#delta_tilt <= strictDeltaTilt && 
@@ -52,21 +57,25 @@ class ValideMatch {
             (this.#visitor_tilt > maxTilt || this.#visitor_tilt < -maxTilt))) {     
 
             if (this.#local_tilt < this.#visitor_tilt) {
-                if (this.#local_note < minNote) {
-                    this.#ouverture = '1N ' + this.#local_note + ' Δ' + this.#delta_tilt + '%';
-                    this.#classe = 'table-warning';
+                if (this.#local_note <= minNote) {
+                    this.#ouverture = '1N';
+                    this.#classe = 'table-danger';
+                    this.#isOpen = true;
                 } else {
-                    this.#ouverture = '1N Δ' + this.#delta_tilt + '%';
+                    this.#ouverture = '1N';
                     this.#classe = 'table-warning';
+                    this.#isOpen = true;
                 }
             }
             else if (this.#visitor_tilt < this.#local_tilt) {
-                if (this.#visitor_note < minNote) {
-                    this.#ouverture = 'N2 ' + this.#visitor_note + ' Δ' + this.#delta_tilt + '%';
-                    this.#classe = 'table-warning';
+                if (this.#visitor_note <= minNote) {
+                    this.#ouverture = 'N2';
+                    this.#classe = 'table-danger';
+                    this.#isOpen = true;
                 } else {
-                    this.#ouverture = 'N2 Δ' + this.#delta_tilt + '%';
+                    this.#ouverture = 'N2';
                     this.#classe = 'table-warning';
+                    this.#isOpen = true;
                 }
             }
         }
@@ -79,17 +88,37 @@ class ValideMatch {
     getOuverture(){
         return this.#ouverture;
     }
+
+    getIsOpen(){
+        return this.#isOpen;
+    }
+
+    tiltToString(){
+        if (true){
+            return '' + this.#local_tilt + ' / ' + this.#visitor_tilt + ' | Δ' + this.#delta_tilt;
+        } else {
+            return '';
+        }
+    }
+
+    noteToString(){
+        if (true) {
+            return '' + this.#local_note + ' - ' + this.#visitor_note;
+        } else {
+            return '';
+        }
+    }
 }
 
 %> 
 
-<form action="" method="post">
+<form action="" method="post" id="form-id">
     <div class="row">
 
         <div class="col-4">
             <div class="input-group">
-                <select name="sel_file" id="sel_file" class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
-                    <option selected>Open</option>
+                <select name="sel_file" id="sel_file" class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon" >
+                    <option selected value="<% if(file){ %><%= file %><% } %>">Open</option>
                   <% files.forEach(element => { %>
                     <option value="<%= element %>"><%= element %></option>
                 <% }); %> 
@@ -99,7 +128,13 @@ class ValideMatch {
                 </div>
             </div>
         </div>
-        
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="true" id="flexCheckDefault" name="showAll" <% if(showAll){ %>checked<% } %>>
+            <label class="form-check-label" for="flexCheckDefault" >
+                SHOW ALL
+            </label>
+        </div>
 
     </div>
 </form>
@@ -122,6 +157,8 @@ class ValideMatch {
                     <th data-sortable="true" scope="col">LEAGUE</th>
                     <th scope="col">TEAMS</th>
                     <th scope="col">OUVERTURE</th>
+                    <th scope="col">TILT</th>
+                    <th scope="col">NOTE</th>
                     <th scope="col">xG</th>
                 </tr>
             </thead>
@@ -130,6 +167,7 @@ class ValideMatch {
                     dateTime = el.date + ' ' + el.time
                     id = el.id
                     const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt,  el.visitor_tilt);
+                    if (p1.getIsOpen() || showAll) {
                 %>
                     <tr>
                         <td>
@@ -145,14 +183,28 @@ class ValideMatch {
                             <%= p1.getOuverture() %>
                         </td>
                         <td>
+                            <%= p1.tiltToString() %>
+                        </td>
+                        <td>
+                            <%= p1.noteToString() %>
+                        </td>
+                        <td>
                             <%= parseFloat(el.local_goal_predict).toFixed(2) %> / <%= parseFloat(el.visitor_goal_predict).toFixed(2) %>
                         </td>
                     </tr>
-                <%  }); %>
+                <% }; }); %>
             </tbody>
         </table>
         <br>
         <p><code>GOOD IS GREEN X2, WITHOUT ISOLATED FALL</code></p>
 <% } %>
+
+<script>
+    var form = document.getElementById("form-id");
+
+    document.getElementById("flexCheckDefault").addEventListener("click", function () {
+        form.submit();
+    });
+</script>
 
 <%- include('include/footer') -%>
