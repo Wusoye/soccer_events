@@ -45,7 +45,7 @@
                     return parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
                 }
 
-                /*function dropping_me(odd_arrive, odd_depart){
+                function dropping_me_spe(odd_arrive, odd_depart){
                     if (odd_arrive < odd_depart) {
                         return parseFloat(((odd_depart - odd_arrive)/(odd_arrive - 1)*100).toFixed(2));
                     } else if (odd_arrive > odd_depart) {
@@ -54,7 +54,7 @@
                         return 0;
                     }
                     
-                }*/
+                }
 
                 function dropping_me_modif(odd_depart, odd_arrive){
                     var res = parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
@@ -225,6 +225,10 @@
                     norm_odd_X = percent_to_odd(c_normal[1])
                     norm_odd_2 = percent_to_odd(c_normal[2])
                     bool_aff_diff = true;
+                } else {
+                    norm_odd_1 = 0
+                    norm_odd_X = 0
+                    norm_odd_2 = 0
                 }
 
                 if(c_no_tilt.length == 3){
@@ -489,22 +493,22 @@
                 
             %> 
             
-        <br>
+        <!--<br>
         <h3 style="text-align: center;">AVERAGE ODDS</h3>
-        <br>
+        <br>-->
         <table class="table table-striped table-bordered border-secondary" data-toggle="table">
             <thead>
                 <tr style="text-align: center;">
-                    <th>Type</th>
+                    <th></th>
                     <th>1 </th>
                     <th>N </th>
                     <th>2 </th>
-                    <th>Margin </th>
+                    <th>INFO</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Oppening  odds</td>
+                    <td>OPPENING ODDS</td>
                     <td><%= average_opening_1 %></td>
                     <td><%= average_opening_X %></td>
                     <td><%= average_opening_2 %></td>
@@ -512,7 +516,7 @@
                 </tr>
                
                 <tr>
-                    <td>Live odds</td>
+                    <td>LIVE ODDS</td>
                     <td><%= average_drop_1 %></td>
                     <td><%= average_drop_X %></td>
                     <td><%= average_drop_2 %></td>
@@ -536,20 +540,28 @@
                 </tr>
                 -->
                 <tr>
-                    <td>Dropping odds</td>
-                    <td><%= percent_drop_1 %>% </td>
-                    <td><%= percent_drop_X %>% </td>
-                    <td><%= percent_drop_2 %>% </td>
+                    <td>DROPPING ODDS</td>
+                    <td><%= percent_drop_1 %> %</td>
+                    <td><%= percent_drop_X %> %</td>
+                    <td><%= percent_drop_2 %> %</td>
                     <td><%= nb_book %> / 26</td> 
                 </tr>
 
-                <% if(bool_aff_diff && cpt) { %>
+                <% if(bool_aff_diff) { %>
                 <tr>
-                    <td>NEGATIF</td>
-                    <td><%= cpt1 %> / <%= rCpt1%></td>
-                    <td><%= cptN %> / <%= rCptN%></td>
-                    <td><%= cpt2 %> / <%= rCpt2%></td>
-                    <td><% if(fallN){ %>N | YES<% } %><% if(fall1){ %>1 | YES<% } %><% if(fall2){ %>2 | YES<% } %></td> 
+                    <td class="table-info">NEGATIF</td>
+                    <td class="table-info"><%= cpt1 %> / <%= rCpt1%></td>
+                    <td class="table-info"><%= cptN %> / <%= rCptN%></td>
+                    <td class="table-info"><%= cpt2 %> / <%= rCpt2%></td>
+                    <td class="table-info"><% if(fallN){ %>FALL ON : N<% } %><% if(fall1){ %>FALL ON : 1<% } %><% if(fall2){ %>FALL ON : 2<% } %></td> 
+                </tr>
+
+                <tr>
+                    <td class="table-info">PROB. XG</td>
+                    <td class="table-info"><%= c_normal[0].toFixed(2) %> %</td>
+                    <td class="table-info"><%= c_normal[1].toFixed(2) %> %</td>
+                    <td class="table-info"><%= c_normal[2].toFixed(2) %> %</td>
+                    <td class="table-info"></td> 
                 </tr>
                 <% } %>
             </tbody>
@@ -1042,26 +1054,6 @@
                 <% 
                     }); 
                 %>
-
-                <tr>
-                    <td>
-                       NEGATIF
-                    </td>
-                
-                    <td class="" > 
-                        <%= cpt1 %> 
-                    </td>
-                    <td class="" > 
-                        <%= cptN %> 
-                    </td>
-                    <td class="" > 
-                        <%= cpt2 %> 
-                    </td>
-                    <td>
-                        <% if(fallN){ %>YES<% } %>
-                    </td>
-                
-                </tr>
 
             </tbody>
         </table>
