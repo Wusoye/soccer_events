@@ -8,7 +8,15 @@
 
                 <% 
 
-                
+                function getClasse(nbr){
+                    if(nbr > 50.5){
+                        return 'table-success'
+                    } else if(nbr > 40.5){
+                        return 'table-info'
+                    } else {
+                        return 'table-default'
+                    }
+                }
                 
                 function numAverage(a) {
                     var b = a.length,
@@ -549,19 +557,19 @@
 
                 <% if(bool_aff_diff) { %>
                 <tr>
-                    <td class="table-info">NEGATIF</td>
-                    <td class="table-info"><%= cpt1 %> / <%= rCpt1%></td>
-                    <td class="table-info"><%= cptN %> / <%= rCptN%></td>
-                    <td class="table-info"><%= cpt2 %> / <%= rCpt2%></td>
-                    <td class="table-info"><% if(fallN){ %>FALL ON : N<% } %><% if(fall1){ %>FALL ON : 1<% } %><% if(fall2){ %>FALL ON : 2<% } %></td> 
+                    <td>NEGATIF</td>
+                    <td><%= cpt1 %> / <%= rCpt1%></td>
+                    <td><%= cptN %> / <%= rCptN%></td>
+                    <td><%= cpt2 %> / <%= rCpt2%></td>
+                    <td><% if(fallN){ %>FALL ON : N<% } %><% if(fall1){ %>FALL ON : 1<% } %><% if(fall2){ %>FALL ON : 2<% } %></td> 
                 </tr>
 
                 <tr>
-                    <td class="table-info">PROB. XG</td>
-                    <td class="table-info"><%= c_normal[0].toFixed(2) %> %</td>
-                    <td class="table-info"><%= c_normal[1].toFixed(2) %> %</td>
-                    <td class="table-info"><%= c_normal[2].toFixed(2) %> %</td>
-                    <td class="table-info"></td> 
+                    <td>PROB. XG</td>
+                    <td class="<%= getClasse(c_normal[0]) %>"><%= c_normal[0].toFixed(2) %> %</td>
+                    <td class="<%= getClasse(c_normal[1]) %>"><%= c_normal[1].toFixed(2) %> %</td>
+                    <td class="<%= getClasse(c_normal[2]) %>"><%= c_normal[2].toFixed(2) %> %</td>
+                    <td></td> 
                 </tr>
                 <% } %>
             </tbody>

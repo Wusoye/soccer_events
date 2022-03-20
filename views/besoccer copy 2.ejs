@@ -6,23 +6,26 @@ class ValideMatch {
     #coefLeague
     #IsPricipalLeague = false;
 
+    #delta_elo = 0;
     #local_note
     #visitor_note
+    #local_elo
+    #visitor_elo
     #local_tilt
     #visitor_tilt
     #delta_tilt
     #local_xg
     #visitor_xg
     #classe = 'table-default';
-    #ouverture = '';
     #isOpen = false;
     #maxGoal = 25;
     #home_prob = 0;
     #draw_prob = 0;
     #away_prob = 0;
+    #limitPercent = 0.405;
    
    
-    constructor(local_note, visitor_note, local_tilt, visitor_tilt, local_xg, visitor_xg, coefLeague){
+    constructor(local_note, visitor_note, local_tilt, visitor_tilt, local_xg, visitor_xg, local_elo, visitor_elo, coefLeague){
         this.#coefLeague = coefLeague;
         this.#IsPricipalLeague = this.#coefLeague > 40;
         this.#local_note = parseInt(local_note);
@@ -32,7 +35,17 @@ class ValideMatch {
         this.#delta_tilt = (parseInt(local_tilt) - parseInt(visitor_tilt));
         this.#local_xg = parseFloat(local_xg);
         this.#visitor_xg = parseFloat(visitor_xg);
+        this.#local_elo = parseInt(local_elo);
+        this.#visitor_elo = parseInt(visitor_elo);
+        if(parseInt(local_elo) != 625 && parseInt(visitor_elo) != 625){
+            if(parseInt(local_elo) > parseInt(visitor_elo)){
+                this.#delta_elo = (((parseInt(visitor_elo) - parseInt(local_elo)) / parseInt(local_elo)) * 100).toFixed(2)
+            } else if(parseInt(local_elo) < parseInt(visitor_elo)){
+                this.#delta_elo = (((parseInt(local_elo) - parseInt(visitor_elo)) / parseInt(visitor_elo)) * 100).toFixed(2)
+            }
+        }
         this.#poissonPourcent();
+        this.#ouverture();
     }
 
     #fact(nbr) {
@@ -81,45 +94,57 @@ class ValideMatch {
         }
     }
 
-    getOuverture(){
-        if (this.#home_prob > 0.5 && this.#delta_tilt > 5){
+    #ouverture(){
+        /*
+        if (this.#home_prob > this.#limitPercent){
+            
+            if ((this.#delta_tilt > 5 && this.#delta_tilt < 85 && this.#delta_elo > -35 )) {
+                this.#classe = 'table-success';
+                this.#isOpen = true;
+            } else if((this.#delta_tilt > 85 && this.#delta_elo > -35 ) || (this.#delta_tilt > 5 && this.#delta_tilt < 85 && this.#delta_elo < -35)){
+                this.#classe = 'table-warning';
+                this.#isOpen = true;
+            }
+
+        } else if (this.#away_prob > this.#limitPercent) {
+
+            if ((this.#delta_tilt < -5 && this.#delta_tilt > -85 && this.#delta_elo > -35)) {
+                this.#classe = 'table-success';
+                this.#isOpen = true;
+            } else if((this.#delta_tilt < -85 && this.#delta_elo > -35) || (this.#delta_tilt < -5 && this.#delta_tilt > -85 && this.#delta_elo < -35)){
+                this.#classe = 'table-warning';
+                this.#isOpen = true;
+            }
+        }
+        */
+        
+        if (this.#home_prob > this.#away_prob && this.#delta_tilt > 5){
             this.#classe = 'table-success';
-            //return '1 | ' + this.#local_note + ' / ' + this.#visitor_note + ' | Δ' + this.#delta_tilt;
-        } else if (this.#away_prob > 0.5 && this.#delta_tilt < -5) {
+            if (this.#delta_elo < -45) {
+                this.#classe = 'table-warning';
+            }
+            this.#isOpen = true;
+        } else if (this.#home_prob < this.#away_prob && this.#delta_tilt < -5){
             this.#classe = 'table-success';
-            //return '2 | ' + this.#local_note + ' / ' + this.#visitor_note + ' | Δ' + this.#delta_tilt;
-        } else if (this.#home_prob < 0.5 && this.#away_prob < 0.5 && Math.abs(this.#delta_tilt) > 30) {
-            this.#classe = 'table-info';
-            //return 'N | ' + this.#local_note + ' / ' + this.#visitor_note + ' | Δ' + this.#delta_tilt;
-        } else {
-            //return '';
-        } 
+            if (this.#delta_elo < -45) {
+                this.#classe = 'table-warning';
+            }
+            this.#isOpen = true;
+        }
+        
     }
 
-    getClass(){
-        if (this.#home_prob > 0.5){
-
-            if (this.#delta_tilt > 5) {
-                this.#classe = 'table-success';
-            } else if(this.#delta_tilt < -5){
-                this.#classe = 'table-info';
-            }
-            
-        } else if (this.#away_prob > 0.5) {
-
-            if (this.#delta_tilt < -5) {
-                this.#classe = 'table-success';
-            } else if(this.#delta_tilt > 5){
-                this.#classe = 'table-info';
-            }
-
-        }
-         
+    getClass(){         
         return this.#classe;
     }
 
+    getOuverture(){         
+        return this.#isOpen;
+    }
+
     getInfos(){
-        return this.#local_note + ' / ' + this.#visitor_note + ' | ' + this.#local_tilt + ' / ' + this.#visitor_tilt + ' | Δ' + this.#delta_tilt
+        //return this.#local_note + ' / ' + this.#visitor_note + ' | ' + this.#local_tilt + ' / ' + this.#visitor_tilt + ' | Δ' + this.#delta_tilt;
+        return 'Δ' + this.#delta_elo + ' % | Δ' + this.#delta_tilt;
     }
 
     getNote(){
@@ -185,9 +210,9 @@ class ValideMatch {
                 <% data.forEach(el=> {  
                     dateTime = el.date + ' ' + el.time
                     id = el.id
-                    const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.coef_competition);
+                    const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition);
                     // Valide à partir du : sam. 12 févr. 2022
-                    if (p1.getIsPricipalLeague() || showAll) {
+                    if (p1.getOuverture() || showAll) {
                 %>
                     <tr>
                         <td>
