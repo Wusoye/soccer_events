@@ -146,6 +146,37 @@
                     return nb_min;
                 }
 
+                function my_max_history(tab){
+                    indice = 0
+                    cpt = 0
+                    nb_max = 0
+                    tab.forEach(element => {
+                        
+                        if(element > nb_max){
+                            nb_max = element
+                            indice = cpt
+                        }
+
+                        cpt + 1
+                    });
+                    return indice;
+                }
+
+                function my_min_history(tab){
+                    indice = 0
+                    cpt = 0
+                    nb_min = 100
+                    tab.forEach(element => {
+                        if(element < nb_min && element != 0){
+                            nb_min = element
+                            indice = cpt
+                        }
+                        cpt+1
+                    });
+                   
+                    return indice;
+                }
+
                 function im_positive(my_number){
                     var res;
                     if(parseFloat(my_number) > 0){
@@ -244,6 +275,10 @@
                     nT_odd_X = percent_to_odd(c_no_tilt[1])
                     nT_odd_2 = percent_to_odd(c_no_tilt[2])
                     bool_aff_diff = true;
+                } else {
+                    nT_odd_1 = 0
+                    nT_odd_X = 0
+                    nT_odd_2 = 0
                 }
 
                 if(c_inc.length == 3){
@@ -288,14 +323,35 @@
                         last_X = 0
                         last_2 = 0
 
+                        tab_1 = []
+                        tab_N = []
+                        tab_2 = []
+
+                        history_min_1 = null
+                        history_min_N = null
+                        history_min_2 = null
+
                         for (let i = history.length - 1; i > -1; i = i -1) {
                             if (moment(history[i]['updated']) < dateLimite) {
                                 last_1 = history[i]['1']
                                 last_X = history[i]['X']
                                 last_2 = history[i]['2']
                                 last_updated = history[i]['updated']
+                                tab_1.push(history[i]['1'])
+                                tab_N.push(history[i]['X'])
+                                tab_2.push(history[i]['2'])
                             }
                         }
+
+                        history_min_1 = my_min(tab_1)
+                        history_min_N = my_min(tab_N)
+                        history_min_2 = my_min(tab_2)
+
+                        history_max_1 = my_max(tab_1)
+                        history_max_N = my_max(tab_N)
+                        history_max_2 = my_max(tab_2)
+                                             
+                        
 
                         all_drop_1.push(last_1)
                         all_drop_X.push(last_X)
@@ -384,6 +440,14 @@
                         min_opening_1 = my_min(all_opening_1),
                         min_opening_X = my_min(all_opening_X),
                         min_opening_2 = my_min(all_opening_2),
+
+                        percent_extreme_p_1 = dropping_me(max_opening_1, min_opening_1);
+                        percent_extreme_p_X = dropping_me(max_opening_X, min_opening_X);
+                        percent_extreme_p_2 = dropping_me(max_opening_2, min_opening_2);
+
+                        percent_extreme_n_1 = dropping_me(min_opening_1, max_opening_1);
+                        percent_extreme_n_X = dropping_me(min_opening_X, max_opening_X);
+                        percent_extreme_n_2 = dropping_me(min_opening_2, max_opening_2);
                         
                         ecart_type_1 = ecart_type(all_opening_1),
                         ecart_type_X = ecart_type(all_opening_X),
@@ -453,6 +517,17 @@
                     fall1 = true;
                     fallN = true;
                     fall2 = true;
+                    up1 = true;
+                    upN = true;
+                    up2 = true;
+
+                    nfall1 = true;
+                    nfallN = true;
+                    nfall2 = true;
+                    nup1 = true;
+                    nupN = true;
+                    nup2 = true;
+                    
                     Object.keys(opening_of_each_book).forEach(function(book){ 
                             
                         opening_1 = opening_of_each_book[book][1], 
@@ -485,6 +560,7 @@
                                 rCpt2++;
                             }
                         }
+
                         if((diff(opening_X, norm_odd_X) > diff(opening_1, norm_odd_1)) || (diff(opening_X, norm_odd_X) > diff(opening_2, norm_odd_2))){
                             fallN = false;
                         }
@@ -494,11 +570,48 @@
                         if((diff(opening_2, norm_odd_2) > diff(opening_X, norm_odd_X)) || (diff(opening_2, norm_odd_2) > diff(opening_1, norm_odd_1))){
                             fall2 = false;
                         }
+
+                        if((diff(opening_X, norm_odd_X) < diff(opening_1, norm_odd_1)) || (diff(opening_X, norm_odd_X) < diff(opening_2, norm_odd_2))){
+                            upN = false;
+                        }
+                        if((diff(opening_1, norm_odd_1) < diff(opening_X, norm_odd_X)) || (diff(opening_1, norm_odd_1) < diff(opening_2, norm_odd_2))){
+                            up1 = false;
+                        }
+                        if((diff(opening_2, norm_odd_2) < diff(opening_X, norm_odd_X)) || (diff(opening_2, norm_odd_2) < diff(opening_1, norm_odd_1))){
+                            up2 = false;
+                        }
+
+                        // NO TILT
+
+                        if(bool_aff_diff){
+                            if((diff(opening_X, nT_odd_X) > diff(opening_1, nT_odd_1)) || (diff(opening_X, nT_odd_X) > diff(opening_2, nT_odd_2))){
+                                nfallN = false;
+                            }
+                            if((diff(opening_1, nT_odd_1) > diff(opening_X, nT_odd_X)) || (diff(opening_1, nT_odd_1) > diff(opening_2, nT_odd_2))){
+                                nfall1 = false;
+                            }
+                            if((diff(opening_2, nT_odd_2) > diff(opening_X, nT_odd_X)) || (diff(opening_2, nT_odd_2) > diff(opening_1, nT_odd_1))){
+                                nfall2 = false;
+                            }
+
+                            if((diff(opening_X, nT_odd_X) < diff(opening_1, nT_odd_1)) || (diff(opening_X, nT_odd_X) < diff(opening_2, nT_odd_2))){
+                                nupN = false;
+                            }
+                            if((diff(opening_1, nT_odd_1) < diff(opening_X, nT_odd_X)) || (diff(opening_1, nT_odd_1) < diff(opening_2, nT_odd_2))){
+                                nup1 = false;
+                            }
+                            if((diff(opening_2, nT_odd_2) < diff(opening_X, nT_odd_X)) || (diff(opening_2, nT_odd_2) < diff(opening_1, norm_odd_1))){
+                                nup2 = false;
+                            }
+                        }
+
+                        
+
                     });
                     if(cpt1 == 0 || cpt2 == 0 || cptN == 0){
                         cpt = false;
                     }
-                
+
             %> 
             
         <!--<br>
@@ -552,7 +665,7 @@
                     <td><%= percent_drop_1 %> %</td>
                     <td><%= percent_drop_X %> %</td>
                     <td><%= percent_drop_2 %> %</td>
-                    <td><%= nb_book %> / 26</td> 
+                    <td><%= nb_book %> / 27</td> 
                 </tr>
 
                 <% if(bool_aff_diff) { %>
@@ -561,7 +674,10 @@
                     <td><%= cpt1 %> / <%= rCpt1%></td>
                     <td><%= cptN %> / <%= rCptN%></td>
                     <td><%= cpt2 %> / <%= rCpt2%></td>
-                    <td><% if(fallN){ %>FALL ON : N<% } %><% if(fall1){ %>FALL ON : 1<% } %><% if(fall2){ %>FALL ON : 2<% } %></td> 
+                    <td>
+                        <% if(fallN){ %>FALL ON : N<% } %><% if(fall1){ %>FALL ON : 1<% } %><% if(fall2){ %>FALL ON : 2<% } %> | 
+                        <% if(upN){ %>UP ON : N<% } %><% if(up1){ %>UP ON : 1<% } %><% if(up2){ %>UP ON : 2<% } %>
+                    </td> 
                 </tr>
 
                 <tr>
@@ -569,7 +685,10 @@
                     <td class="<%= getClasse(c_normal[0]) %>"><%= c_normal[0].toFixed(2) %> %</td>
                     <td class="<%= getClasse(c_normal[1]) %>"><%= c_normal[1].toFixed(2) %> %</td>
                     <td class="<%= getClasse(c_normal[2]) %>"><%= c_normal[2].toFixed(2) %> %</td>
-                    <td></td> 
+                    <td>
+                        <% if(nfallN){ %>FALL ON : N<% } %><% if(nfall1){ %>FALL ON : 1<% } %><% if(nfall2){ %>FALL ON : 2<% } %> | 
+                        <% if(nupN){ %>UP ON : N<% } %><% if(nup1){ %>UP ON : 1<% } %><% if(nup2){ %>UP ON : 2<% } %>
+                    </td> 
                 </tr>
                 <% } %>
             </tbody>
@@ -579,6 +698,23 @@
 
         <form action="" method="POST">
             <h5 style="text-align: center">PREDICTION PERCENT</h5>
+
+            <!--<br>
+            <h6>Percent winning</h6>
+            <div class="row justify-content-md-center" style="text-align: center">
+                <div class="col">
+                    <input placeholder="percent_winning" type="text" class="form-control" id="percent_1" name="percent_1" value=<% if(c_normal[0]){ %>"<%=
+                    c_normal[0] %>"<%}%>>
+                </div>
+                <div class="col">
+                    <input placeholder="percent_winning" type="text" class="form-control" id="percent_N" name="percent_N" value=<% if(c_normal[1]){ %>"<%=
+                    c_normal[1] %>"<%}%>>
+                </div>
+                <div class="col">
+                    <input placeholder="percent_winning" type="text" class="form-control" id="percent_2" name="percent_2" value=<% if(c_normal[2]){ %>"<%=
+                    c_normal[2] %>"<%}%>>
+                </div>
+            </div>-->
 
             <br>
             <h6>Goals prédiction</h6>
@@ -620,8 +756,8 @@
             </div>-->
 
             <br>
-            <div class="row justify-content-md-center">
-                <div class="col col-6 col-md-1">
+            <div class="row justify-content-center">
+                <div style="max-width: 1000px;" >
                     <button type="submit" class="btn btn-primary btn-sm">valider</button>
                 </div>
             </div>
@@ -629,16 +765,16 @@
         <br>
 
         <% if(bool_aff_diff){ %>
-        <br>
-        <h3 style="text-align: center">OPPENING / PREDICTION</h5>
-        <br>
-        <br>
-        <h5 style="text-align: center">EN POURCENTAGE</h5>
-        <br>
+        
         <div class="row">
             
-            <div class="col-12">
-                
+            <div class="col-6">
+                <br>
+                <h3 style="text-align: center">OPPENING / PREDICTION</h5>
+                <br>
+                <br>
+                <h5 style="text-align: center">EN POURCENTAGE</h5>
+                <br>
                 <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
                     <thead>
                         <tr style="text-align: center;">
@@ -690,12 +826,71 @@
                     </tbody>
                 </table>
             </div>
+            <div class="col-6">
+                <br>
+                <h3 style="text-align: center">OPPENING / NO TILT</h5>
+                <br>
+                <br>
+                <h5 style="text-align: center">EN POURCENTAGE</h5>
+                <br>
+                <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
+                    <thead>
+                        <tr style="text-align: center;">
+                            <th scope="col">Type</th>
+                            <th scope="col">1</th>
+                            <th scope="col">N</th>
+                            <th scope="col">2</th>
+                        </tr>
+                    </thead>
+        
+                    <tbody>
+                        <tr>
+                            <td>Average</td>
+                            <td class="<%= im_positive(dropping_me(average_opening_1, nT_odd_1)) %>" > 
+                                <%= dropping_me(average_opening_1, nT_odd_1) %> %
+                            </td>
+                            <td class="<%= im_positive(dropping_me(average_opening_X, nT_odd_X)) %>" >
+                                <%= dropping_me(average_opening_X, nT_odd_X) %> % 
+                            </td>
+                            <td class="<%= im_positive(dropping_me(average_opening_2, nT_odd_2)) %>" >
+                                <%= dropping_me(average_opening_2, nT_odd_2) %> % 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Max</td>
+                            <td class="<%= im_positive(dropping_me(max_opening_1, nT_odd_1)) %>" >
+                                <%= dropping_me(max_opening_1, nT_odd_1) %> % 
+                            </td>
+                            <td class="<%= im_positive(dropping_me(max_opening_X, nT_odd_X)) %>">
+                                <%= dropping_me(max_opening_X, nT_odd_X) %> % 
+                            </td>
+                            <td class="<%= im_positive(dropping_me(max_opening_2, nT_odd_2)) %>" >
+                                <%= dropping_me(max_opening_2, nT_odd_2) %> % 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Min</td>
+                            <td class="<%= im_positive(dropping_me(min_opening_1, nT_odd_1)) %>" >
+                                <%= dropping_me(min_opening_1, nT_odd_1) %> %
+                            </td>
+                            <td class="<%= im_positive(dropping_me(min_opening_X, nT_odd_X)) %>" >
+                                <%= dropping_me(min_opening_X, nT_odd_X) %> %
+                            </td>
+                            <td class="<%= im_positive(dropping_me(min_opening_2, nT_odd_2)) %>" >
+                                <%= dropping_me(min_opening_2, nT_odd_2) %> %
+                            </td>
+                        </tr>
+                    
+                    </tbody>
+                </table>
+            </div>
         </div>
+
         <br>
         <br>
         
         <div class="row">
-            <div class="col-12">
+            <div class="col-6">
                 <h5 style="text-align: center">EN POINT</h5>
                 <br>
                 <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
@@ -749,127 +944,64 @@
                     </tbody>
                 </table>
             </div>
+            <div class="col-6">
+                <h5 style="text-align: center">EN POINT</h5>
+                <br>
+                <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
+                    <thead>
+                        <tr style="text-align: center;">
+                            <th scope="col">Type</th>
+                            <th scope="col">1</th>
+                            <th scope="col">N</th>
+                            <th scope="col">2</th>
+                        </tr>
+                    </thead>
+        
+                    <tbody>
+                        <tr>
+                            <td>Average</td>
+                            <td class="<%= im_positive(diff(average_opening_1, nT_odd_1)) %>" > 
+                                <%= diff(average_opening_1, nT_odd_1) %> ptns
+                            </td>
+                            <td class="<%= im_positive(diff(average_opening_X, nT_odd_X)) %>" >
+                                <%= diff(average_opening_X, nT_odd_X) %> ptns 
+                            </td>
+                            <td class="<%= im_positive(diff(average_opening_2, nT_odd_2)) %>" >
+                                <%= diff(average_opening_2, nT_odd_2) %> ptns 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Max</td>
+                            <td class="<%= im_positive(diff(max_opening_1, nT_odd_1)) %>" >
+                                <%= diff(max_opening_1, nT_odd_1) %> ptns 
+                            </td>
+                            <td class="<%= im_positive(diff(max_opening_X, nT_odd_X)) %>">
+                                <%= diff(max_opening_X, nT_odd_X) %> ptns 
+                            </td>
+                            <td class="<%= im_positive(diff(max_opening_2, nT_odd_2)) %>" >
+                                <%= diff(max_opening_2, nT_odd_2) %> ptns 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Min</td>
+                            <td class="<%= im_positive(diff(min_opening_1, nT_odd_1)) %>" >
+                                <%= diff(min_opening_1, nT_odd_1) %> ptns
+                            </td>
+                            <td class="<%= im_positive(diff(min_opening_X, nT_odd_X)) %>" >
+                                <%= diff(min_opening_X, nT_odd_X) %> ptns
+                            </td>
+                            <td class="<%= im_positive(diff(min_opening_2, nT_odd_2)) %>" >
+                                <%= diff(min_opening_2, nT_odd_2) %> ptns
+                            </td>
+                        </tr>
+                    
+                    </tbody>
+                </table>
+            </div>
         </div>
         <br>
         <% if (tilt[0] && tilt[1]) { %>
-            
-            <div class="row">
-                <div class="col-6">
-                    <h5 style="text-align: center">NO / EN POINT</h5>
-                    <br>
-                    <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
-                        <thead>
-                            <tr style="text-align: center;">
-                                <th scope="col">Type</th>
-                                <th scope="col">1</th>
-                                <th scope="col">N</th>
-                                <th scope="col">2</th>
-                            </tr>
-                        </thead>
-            
-                        <tbody>
-                            <tr>
-                                <td>Average</td>
-                                <td class="<%= im_positive(diff(average_opening_1, nT_odd_1)) %>" > 
-                                    <%= diff(average_opening_1, nT_odd_1) %> ptns
-                                </td>
-                                <td class="<%= im_positive(diff(average_opening_X, nT_odd_X)) %>" >
-                                    <%= diff(average_opening_X, nT_odd_X) %> ptns 
-                                </td>
-                                <td class="<%= im_positive(diff(average_opening_2, nT_odd_2)) %>" >
-                                    <%= diff(average_opening_2, nT_odd_2) %> ptns 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Max</td>
-                                <td class="<%= im_positive(diff(max_opening_1, nT_odd_1)) %>" >
-                                    <%= diff(max_opening_1, nT_odd_1) %> ptns 
-                                </td>
-                                <td class="<%= im_positive(diff(max_opening_X, nT_odd_X)) %>">
-                                    <%= diff(max_opening_X, nT_odd_X) %> ptns 
-                                </td>
-                                <td class="<%= im_positive(diff(max_opening_2, nT_odd_2)) %>" >
-                                    <%= diff(max_opening_2, nT_odd_2) %> ptns 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Min</td>
-                                <td class="<%= im_positive(diff(min_opening_1, nT_odd_1)) %>" >
-                                    <%= diff(min_opening_1, nT_odd_1) %> ptns
-                                </td>
-                                <td class="<%= im_positive(diff(min_opening_X, nT_odd_X)) %>" >
-                                    <%= diff(min_opening_X, nT_odd_X) %> ptns
-                                </td>
-                                <td class="<%= im_positive(diff(min_opening_2, nT_odd_2)) %>" >
-                                    <%= diff(min_opening_2, nT_odd_2) %> ptns
-                                </td>
-                            </tr>
-                        
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-6">
-                    <h5 style="text-align: center">WITH / EN POINT</h5>
-                    <br>
-                    <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
-                        <thead>
-                            <tr style="text-align: center;">
-                                <th scope="col">Type</th>
-                                <th scope="col">1</th>
-                                <th scope="col">N</th>
-                                <th scope="col">2</th>
-                            </tr>
-                        </thead>
-            
-                        <tbody>
-                            <tr>
-                                <td>Average</td>
-                                <td class="<%= im_positive(diff(average_opening_1, inc_odd_1)) %>" > 
-                                    <%= diff(average_opening_1, inc_odd_1) %> ptns
-                                </td>
-                                <td class="<%= im_positive(diff(average_opening_X, inc_odd_X)) %>" >
-                                    <%= diff(average_opening_X, inc_odd_X) %> ptns 
-                                </td>
-                                <td class="<%= im_positive(diff(average_opening_2, inc_odd_2)) %>" >
-                                    <%= diff(average_opening_2, inc_odd_2) %> ptns 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Max</td>
-                                <td class="<%= im_positive(diff(max_opening_1, inc_odd_1)) %>" >
-                                    <%= diff(max_opening_1, inc_odd_1) %> ptns 
-                                </td>
-                                <td class="<%= im_positive(diff(max_opening_X, inc_odd_X)) %>">
-                                    <%= diff(max_opening_X, inc_odd_X) %> ptns 
-                                </td>
-                                <td class="<%= im_positive(diff(max_opening_2, inc_odd_2)) %>" >
-                                    <%= diff(max_opening_2, inc_odd_2) %> ptns 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Min</td>
-                                <td class="<%= im_positive(diff(min_opening_1, inc_odd_1)) %>" >
-                                    <%= diff(min_opening_1, inc_odd_1) %> ptns
-                                </td>
-                                <td class="<%= im_positive(diff(min_opening_X, inc_odd_X)) %>" >
-                                    <%= diff(min_opening_X, inc_odd_X) %> ptns
-                                </td>
-                                <td class="<%= im_positive(diff(min_opening_2, inc_odd_2)) %>" >
-                                    <%= diff(min_opening_2, inc_odd_2) %> ptns
-                                </td>
-                            </tr>
-                            
-                        </tbody>
-                    </table>
-                </div>
-            </div>
             <br>
-
-            
-            
-
-            <br>
-
             <div class="row">
                 <div class="col-12">
             
@@ -899,7 +1031,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>NO TILT</td>
+                                <td>No tilt</td>
                                 <td>
                                     <%= c_no_tilt[0].toFixed(2) %> %
                                 </td>
@@ -910,49 +1042,7 @@
                                     <%= c_no_tilt[2].toFixed(2) %> %
                                 </td>
                             </tr>
-                            <tr>
-                                <td>WITH TILT</td>
-                                <td>
-                                    <%= c_inc[0].toFixed(2) %> %
-                                </td>
-                                <td>
-                                    <%= c_inc[1].toFixed(2) %> %
-                                </td>
-                                <td>
-                                    <%= c_inc[2].toFixed(2) %> %
-                                </td>
-                            </tr>
                             
-                            <tr>
-                                <td>WITH TILT / NORMAL</td>
-                                <td
-                                    class="<%= im_positive((diff_reverse(nT_odd_1, norm_odd_1)).toFixed(2)) %>">
-                                    <%= diff_reverse(nT_odd_1, norm_odd_1).toFixed(2) %> 
-                                </td>
-                                <td
-                                    class="<%= im_positive((diff_reverse(nT_odd_X, norm_odd_X)).toFixed(2)) %>">
-                                    <%= diff_reverse(nT_odd_X, norm_odd_X).toFixed(2) %> 
-                                </td>
-                                <td
-                                    class="<%= im_positive((diff_reverse(nT_odd_2, norm_odd_2)).toFixed(2)) %>">
-                                    <%= diff_reverse(nT_odd_2, norm_odd_2).toFixed(2) %> 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>WITH TILT / NORMAL</td>
-                                <td
-                                    class="<%= im_positive((dropping_me_reverse2(nT_odd_1, norm_odd_1)).toFixed(2)) %>">
-                                    <%= dropping_me_reverse2(nT_odd_1, norm_odd_1).toFixed(2) %> 
-                                </td>
-                                <td
-                                    class="<%= im_positive((dropping_me_reverse2(nT_odd_X, norm_odd_X)).toFixed(2)) %>">
-                                    <%= dropping_me_reverse2(nT_odd_X, norm_odd_X).toFixed(2) %> 
-                                </td>
-                                <td
-                                    class="<%= im_positive((dropping_me_reverse2(nT_odd_2, norm_odd_2)).toFixed(2)) %>">
-                                    <%= dropping_me_reverse2(nT_odd_2, norm_odd_2).toFixed(2) %> 
-                                </td>
-                            </tr>
                             
                         
                             
@@ -1044,14 +1134,14 @@
                         <%= date_live %> / <%= un_book %>
                     </td>
                 
-                    <td class="<%= im_positive(diff(opening_1, norm_odd_1)) %>" > 
-                        <%= diff(opening_1, norm_odd_1) %> ptns
+                    <td class="<%= im_positive(diff(live_1, opening_1)) %>" > 
+                        <%= dropping_me(live_1, opening_1) %> %
                     </td>
-                    <td class="<%= im_positive(diff(opening_X, norm_odd_X)) %>" >
-                        <%= diff(opening_X, norm_odd_X) %> ptns 
+                    <td class="<%= im_positive(diff(live_X, opening_X)) %>" >
+                        <%= dropping_me(live_X, opening_X) %> % 
                     </td>
-                    <td class="<%= im_positive(diff(opening_2, norm_odd_2)) %>" >
-                        <%= diff(opening_2, norm_odd_2) %> ptns 
+                    <td class="<%= im_positive(diff(live_2, opening_2)) %>" >
+                        <%= dropping_me(live_2, opening_2) %> % 
                     </td>
                     <td>
                         <%= moment(opening_date).from(infos.time) %> <!--/ <%= moment(opening_date).format('lll') %>-->
@@ -1068,6 +1158,6 @@
         <% }; %>
     </div>
 
-    <p><%= infos.hometeam.name %>_<%= infos.awayteam.name %>_<%= moment(infos.time).add(1,'h').format('lll') %></p>
+    <p><%= infos.hometeam.name %> vs <%= infos.awayteam.name %> : match Foot Direct<%= moment(infos.time).add(1,'h').format('lll') %></p>
                
     <%- include('include/footer') -%>

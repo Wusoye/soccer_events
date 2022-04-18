@@ -14,12 +14,12 @@ rank,name,confed,off,def,spi
 13,Croatia,UEFA,2.5,0.68,81.2
 14,Morocco,CAF,2.34,0.61,80.56
 15,Mexico,CONCACAF,2.25,0.57,80.25
-16,Ecuador,CONMEBOL,2.21,0.61,78.75
-17,Colombia,CONMEBOL,2.04,0.52,78.29
-18,Algeria,CAF,2.35,0.73,78.08
+16,Algeria,CAF,2.42,0.71,79.51
+17,Ecuador,CONMEBOL,2.21,0.61,78.75
+18,Colombia,CONMEBOL,2.04,0.52,78.29
 19,Czech Republic,UEFA,2.27,0.68,78.03
-20,USA,CONCACAF,2.15,0.64,77.35
-21,Chile,CONMEBOL,2.11,0.63,76.82
+20,USA,CONCACAF,2.12,0.62,77.21
+21,Chile,CONMEBOL,2.1,0.63,76.76
 22,Serbia,UEFA,2.29,0.78,76.22
 23,Canada,CONCACAF,2.17,0.72,75.73
 24,Sweden,UEFA,2.23,0.78,75.38
@@ -44,19 +44,19 @@ rank,name,confed,off,def,spi
 43,Greece,UEFA,1.55,0.7,65.12
 44,Turkey,UEFA,1.95,1.03,65.0
 45,Venezuela,CONMEBOL,1.7,0.84,64.63
-46,Ghana,CAF,1.43,0.66,63.77
-47,Egypt,CAF,1.62,0.82,63.62
-48,Rep of Ireland,UEFA,1.51,0.75,63.01
-49,Nigeria,CAF,1.7,0.95,62.1
-50,Mali,CAF,1.25,0.59,61.42
-51,Bosnia and Herzegovina,UEFA,1.67,0.95,61.33
+46,Egypt,CAF,1.62,0.82,63.62
+47,Rep of Ireland,UEFA,1.51,0.75,63.01
+48,Burkina Faso,CAF,1.39,0.68,62.4
+49,Ghana,CAF,1.4,0.69,62.23
+50,Nigeria,CAF,1.7,0.95,62.1
+51,Bosnia and Herzegovina,UEFA,1.65,0.94,61.25
 52,North Macedonia,UEFA,1.69,0.98,61.22
-53,Burkina Faso,CAF,1.38,0.72,60.83
-54,Romania,UEFA,1.64,0.97,60.2
-55,Slovakia,UEFA,1.68,1.05,59.32
-56,Basque Country,UEFA,1.63,1.0,59.32
-57,Finland,UEFA,1.56,0.95,59.19
-58,Guatemala,CONCACAF,1.52,0.93,58.79
+53,Romania,UEFA,1.64,0.97,60.2
+54,Slovakia,UEFA,1.68,1.05,59.32
+55,Basque Country,UEFA,1.63,1.0,59.32
+56,Finland,UEFA,1.56,0.95,59.19
+57,Guatemala,CONCACAF,1.52,0.93,58.79
+58,Mali,CAF,1.21,0.65,58.73
 59,Panama,CONCACAF,1.52,0.95,58.21
 60,Northern Ireland,UEFA,1.33,0.84,56.65
 61,Bolivia,CONMEBOL,1.68,1.17,56.6
@@ -66,9 +66,9 @@ rank,name,confed,off,def,spi
 65,Jamaica,CONCACAF,1.38,0.92,55.8
 66,Qatar,AFC,1.58,1.13,55.46
 67,South Africa,CAF,1.35,0.92,55.24
-68,Bahrain,AFC,1.61,1.2,54.55
-69,Israel,UEFA,1.8,1.42,53.57
-70,Uganda,CAF,1.24,0.89,53.26
+68,Uganda,CAF,1.28,0.86,54.9
+69,Bahrain,AFC,1.61,1.2,54.55
+70,Israel,UEFA,1.8,1.42,53.57
 71,China PR,AFC,1.42,1.08,53.0
 72,Montenegro,UEFA,1.35,1.01,53.0
 73,Costa Rica,CONCACAF,1.23,0.9,52.8
@@ -82,46 +82,46 @@ rank,name,confed,off,def,spi
 81,United Arab Emirates,AFC,1.34,1.2,48.29
 82,Zambia,CAF,1.46,1.37,47.51
 83,Namibia,CAF,1.13,1.02,47.49
-84,Gabon,CAF,1.28,1.17,47.47
-85,New Zealand,OFC,1.31,1.21,47.47
-86,Bulgaria,UEFA,1.24,1.14,47.33
-87,Kosovo,UEFA,1.36,1.29,46.69
-88,Kenya,CAF,1.18,1.1,46.66
-89,Zimbabwe,CAF,1.22,1.17,46.03
-90,Benin,CAF,0.96,0.9,45.72
+84,New Zealand,OFC,1.31,1.21,47.47
+85,Bulgaria,UEFA,1.24,1.14,47.33
+86,Kosovo,UEFA,1.36,1.29,46.69
+87,Kenya,CAF,1.18,1.1,46.66
+88,Benin,CAF,0.96,0.9,45.72
+89,Gabon,CAF,1.25,1.22,45.7
+90,Zimbabwe,CAF,1.17,1.14,45.53
 91,Libya,CAF,1.2,1.18,45.49
 92,Oman,AFC,1.15,1.16,44.76
-93,El Salvador,CONCACAF,0.96,0.97,44.25
+93,El Salvador,CONCACAF,0.96,0.96,44.22
 94,Armenia,UEFA,1.32,1.37,44.15
 95,Cape Verde Islands,CAF,1.16,1.21,43.64
 96,Togo,CAF,1.2,1.27,43.42
 97,Belarus,UEFA,1.24,1.32,43.38
-98,Suriname,CONCACAF,1.32,1.44,42.8
-99,Iraq,AFC,1.05,1.14,42.69
-100,Curacao,CONCACAF,1.17,1.28,42.62
-101,Ethiopia,CAF,1.12,1.21,42.56
-102,Tanzania,CAF,1.16,1.27,42.5
-103,Angola,CAF,1.04,1.14,42.46
-104,Guinea,CAF,1.13,1.3,41.18
+98,Ethiopia,CAF,1.17,1.25,43.24
+99,Suriname,CONCACAF,1.32,1.44,42.8
+100,Iraq,AFC,1.05,1.14,42.69
+101,Curacao,CONCACAF,1.17,1.28,42.62
+102,Angola,CAF,1.04,1.14,42.46
+103,Guinea,CAF,1.13,1.3,41.18
+104,Tanzania,CAF,1.12,1.3,40.81
 105,Congo,CAF,1.04,1.22,40.57
-106,Estonia,UEFA,1.1,1.32,39.91
-107,Equatorial Guinea,CAF,1.03,1.25,39.69
-108,Gambia,CAF,1.12,1.39,39.11
-109,Luxembourg,UEFA,1.12,1.39,39.03
-110,Botswana,CAF,0.81,1.08,37.55
-111,Malawi,CAF,0.83,1.1,37.51
-112,Mauritania,CAF,0.88,1.17,37.38
+106,Malawi,CAF,0.91,1.06,40.48
+107,Estonia,UEFA,1.1,1.32,39.91
+108,Equatorial Guinea,CAF,1.03,1.25,39.69
+109,Gambia,CAF,1.12,1.39,39.11
+110,Luxembourg,UEFA,1.12,1.39,39.03
+111,Botswana,CAF,0.81,1.08,37.55
+112,Mauritania,CAF,0.85,1.14,37.31
 113,Jordan,AFC,0.94,1.25,37.18
 114,Trinidad and Tobago,CONCACAF,1.0,1.34,37.02
 115,Guinea-Bissau,CAF,1.13,1.52,36.66
-116,Sudan,CAF,1.04,1.49,35.11
+116,Sudan,CAF,1.04,1.5,34.91
 117,Azerbaijan,UEFA,0.95,1.43,34.08
 118,Mozambique,CAF,0.9,1.39,33.55
 119,Comoros,CAF,1.02,1.55,33.46
 120,Sierra Leone,CAF,1.0,1.52,33.44
 121,Cuba,CONCACAF,0.85,1.34,33.12
 122,Rwanda,CAF,0.75,1.21,33.09
-123,Vietnam,AFC,0.87,1.4,32.3
+123,Vietnam,AFC,0.8,1.31,32.37
 124,Palestine,AFC,0.89,1.46,31.93
 125,Madagascar,CAF,1.07,1.69,31.91
 126,Burundi,CAF,0.84,1.41,31.72
@@ -142,15 +142,15 @@ rank,name,confed,off,def,spi
 141,Martinique,CONCACAF,0.99,1.85,27.58
 142,Kyrgyzstan,AFC,1.04,1.94,27.31
 143,Cyprus,UEFA,0.84,1.66,27.12
-144,Niger,CAF,0.88,1.76,26.52
-145,Fiji,OFC,0.67,1.45,26.35
-146,Dominican Republic,CONCACAF,0.75,1.6,25.91
-147,St. Kitts and Nevis,CONCACAF,0.94,1.99,24.47
-148,Tajikistan,AFC,0.88,1.9,24.45
-149,Turkmenistan,AFC,0.93,2.04,23.49
-150,South Sudan,CAF,0.69,1.69,23.27
-151,Chad,CAF,0.8,1.86,23.2
-152,Thailand,AFC,0.77,1.82,22.95
+144,Thailand,AFC,0.84,1.67,27.03
+145,Niger,CAF,0.88,1.76,26.52
+146,Fiji,OFC,0.67,1.45,26.35
+147,Dominican Republic,CONCACAF,0.75,1.6,25.91
+148,St. Kitts and Nevis,CONCACAF,0.94,1.99,24.47
+149,Tajikistan,AFC,0.88,1.9,24.45
+150,Turkmenistan,AFC,0.93,2.04,23.49
+151,South Sudan,CAF,0.69,1.69,23.27
+152,Chad,CAF,0.8,1.86,23.2
 153,Solomon Islands,OFC,0.69,1.71,22.71
 154,Malta,UEFA,0.79,1.88,22.53
 155,Lesotho,CAF,0.7,1.81,21.64
@@ -163,25 +163,25 @@ rank,name,confed,off,def,spi
 162,Guyana,CONCACAF,0.94,2.4,19.06
 163,India,AFC,0.54,1.8,18.05
 164,Grenada,CONCACAF,0.6,1.92,17.96
-165,Philippines,AFC,0.66,2.02,17.89
-166,Antigua and Barbuda,CONCACAF,0.89,2.42,17.86
+165,Antigua and Barbuda,CONCACAF,0.89,2.42,17.86
+166,Philippines,AFC,0.65,2.1,16.85
 167,Belize,CONCACAF,0.67,2.15,16.72
-168,Malaysia,AFC,0.72,2.24,16.59
-169,Sao Tome and Principe,CAF,0.8,2.4,16.54
-170,Vanuatu,OFC,0.64,2.17,15.99
-171,Hong Kong,AFC,0.41,1.72,15.92
-172,Mauritius,CAF,0.7,2.31,15.5
-173,Montserrat,CONCACAF,0.82,2.54,15.46
+168,Sao Tome and Principe,CAF,0.8,2.4,16.54
+169,Vanuatu,OFC,0.64,2.17,15.99
+170,Hong Kong,AFC,0.41,1.72,15.92
+171,Mauritius,CAF,0.7,2.31,15.5
+172,Montserrat,CONCACAF,0.82,2.54,15.46
+173,Malaysia,AFC,0.68,2.34,14.88
 174,Dominica,CONCACAF,0.51,2.04,14.71
 175,St. Vincent and the Grenadines,CONCACAF,0.62,2.28,14.42
 176,Afghanistan,AFC,0.59,2.35,13.29
 177,Andorra,UEFA,0.43,2.02,13.28
-178,Singapore,AFC,0.57,2.39,12.51
-179,St. Lucia,CONCACAF,0.47,2.19,12.3
-180,French Guiana,CONCACAF,0.66,2.58,12.28
-181,Yemen,AFC,0.42,2.15,11.81
+178,St. Lucia,CONCACAF,0.47,2.19,12.3
+179,French Guiana,CONCACAF,0.66,2.58,12.28
+180,Yemen,AFC,0.42,2.15,11.81
+181,Indonesia,AFC,0.74,2.81,11.74
 182,Nepal,AFC,0.57,2.55,11.14
-183,Indonesia,AFC,0.68,2.99,9.55
+183,Singapore,AFC,0.53,2.48,11.06
 184,Gibraltar,UEFA,0.47,2.57,9.35
 185,Guadeloupe,CONCACAF,0.51,2.69,9.22
 186,Papua New Guinea,OFC,0.6,2.88,9.16
@@ -191,21 +191,21 @@ rank,name,confed,off,def,spi
 190,Seychelles,CAF,0.42,2.88,6.74
 191,Aruba,CONCACAF,0.54,3.25,6.45
 192,Bahamas,CONCACAF,0.5,3.17,6.34
-193,Myanmar,AFC,0.51,3.25,6.09
+193,Myanmar,AFC,0.53,3.32,5.97
 194,Cayman Islands,CONCACAF,0.36,2.95,5.68
 195,Mongolia,AFC,0.25,2.7,5.46
 196,San Marino,UEFA,0.33,2.98,5.22
 197,Maldives,AFC,0.37,3.18,4.89
 198,Bangladesh,AFC,0.22,2.82,4.6
 199,Chinese Taipei,AFC,0.45,3.59,4.23
-200,Bonaire,CONCACAF,0.44,3.58,4.17
-201,Cambodia,AFC,0.35,3.36,4.06
+200,Cambodia,AFC,0.35,3.31,4.21
+201,Bonaire,CONCACAF,0.44,3.58,4.17
 202,Guam,AFC,0.49,4.18,2.92
 203,Brunei,AFC,0.21,3.71,2.13
 204,Sri Lanka,AFC,0.28,4.0,2.0
 205,St. Martin,CONCACAF,0.29,4.19,1.78
 206,Pakistan,AFC,0.2,3.92,1.71
-207,Laos,AFC,0.2,4.02,1.56
+207,Laos,AFC,0.2,4.11,1.45
 208,British Virgin Islands,CONCACAF,0.28,4.52,1.29
 209,US Virgin Islands,CONCACAF,0.2,4.25,1.28
 210,Anguilla,CONCACAF,0.22,4.34,1.26
@@ -213,7 +213,7 @@ rank,name,confed,off,def,spi
 212,Turks and Caicos Islands,CONCACAF,0.46,5.62,0.87
 213,Cook Islands,OFC,0.2,4.72,0.85
 214,Tuvalu,OFC,0.38,5.62,0.7
-215,Timor-Leste,AFC,0.3,5.38,0.67
+215,Timor-Leste,AFC,0.27,5.35,0.63
 216,Macau,AFC,0.2,5.11,0.6
 217,Sint Maarten,CONCACAF,0.22,5.59,0.43
 218,Samoa,OFC,0.2,5.78,0.34

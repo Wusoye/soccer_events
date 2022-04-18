@@ -113,6 +113,16 @@
                     return res;
                 }
 
+                function good_form(form){
+                    if (parseFloat(form) > 50 && parseFloat(form) < 60) {
+                        return "table-success";
+                    } else if (parseFloat(form) > 44) {
+                        return "table-info";
+                    } else if (parseFloat(form) < 25) {
+                        return "table-danger";
+                    }
+                }
+
                 %> 
 
                 <% 
@@ -149,6 +159,13 @@
                     my_oddBe_1 = percent_to_odd(coteBe[0])
                     my_oddBe_X = percent_to_odd(coteBe[1])
                     my_oddBe_2 = percent_to_odd(coteBe[2])
+                    bool_aff_diff = true;
+                }
+
+                if (coteBasic.length == 3) {
+                    my_oddBas_1 = percent_to_odd(coteBasic[0])
+                    my_oddBas_X = percent_to_odd(coteBasic[1])
+                    my_oddBas_2 = percent_to_odd(coteBasic[2])
                     bool_aff_diff = true;
                 }
 
@@ -343,7 +360,7 @@
         <form action="" method="POST">
             <h5 style="text-align: center">PREDICTION PERCENT</h5>
             <br>
-            <h6>BeSoccer</h6>
+            <h6>Forme</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
                     <input placeholder="Percent 1" type="text" class="form-control" id="coteBe1" name="coteBe1" value=<% if(coteBe[0]){ %>"<%=
@@ -358,24 +375,16 @@
                     coteBe[2] %>"<%}%>>
                 </div>
             </div>
-            <br>
-            <!--<h6>Five Soccer 8</h6>
-            <div class="row justify-content-md-center" style="text-align: center">
-                <div class="col">
-                    <input placeholder="Percent 1" type="text" class="form-control" id="cote1" name="cote1" value=<% if(coteFte[0]){ %>"<%=
-                    coteFte[0] %>"<%}%>>
-                </div>
-                <div class="col">
-                    <input placeholder="Percent N" type="text" class="form-control" id="coteX" name="coteX" value=<% if(coteFte[1]){ %>"<%=
-                    coteFte[1] %>"<%}%>> 
-                </div>
-                <div class="col">
-                    <input placeholder="Percent 2" type="text" class="form-control" id="cote2" name="cote2" value=<% if(coteFte[2]){ %>"<%=
-                    coteFte[2] %>"<%}%>>
-                </div>
-            </div>-->
 
             <br>
+            <h6>Goals prédictions</h6>
+            <div class="row justify-content-md-center" style="text-align: center">
+                <div class="col">
+                    <input class="form-control" type="text" placeholder="All goals with ' | '" name="all_xgs" value="<% if(allXgs) { %><%= allXgs %><% } %>">
+                </div>
+            </div>
+
+            <!--<br>
             <h6>Goals prédiction</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
@@ -389,7 +398,7 @@
             </div>
 
             <br>
-            <h6>Elo inclinaison</h6>
+            <h6>Goals basic</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
                     <input placeholder="Local inclinaison" type="text" class="form-control" id="local_inc" name="local_inc" value=<% if(elo_inc[0]){ %>"<%=
@@ -399,7 +408,7 @@
                     <input placeholder="Visitor inclinaison" type="text" class="form-control" id="visitor_inc" name="visitor_inc" value=<% if(elo_inc[1]){ %>"<%=
                     elo_inc[1] %>"<%}%>>
                 </div>
-            </div>
+            </div>-->
 
             <br>
             <div class="row justify-content-md-center">
@@ -415,8 +424,8 @@
         <h5 style="text-align: center">OPPENING / PREDICTION</h5>
         <br>
         <div class="row">
-            <div class="col-6">
-                <h6>NoTilt</h6>
+            <div class="col-4">
+                <h6>Goals prediction</h6>
                 <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
                     <thead>
                         <tr style="text-align: center;">
@@ -467,8 +476,61 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-6">
-                <h6>WithTilt</h6>
+            <div class="col-4">
+                <h6>Goals Basic</h6>
+                <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
+                    <thead>
+                        <tr style="text-align: center;">
+                            <th scope="col">Type</th>
+                            <th scope="col">1</th>
+                            <th scope="col">N</th>
+                            <th scope="col">2</th>
+                        </tr>
+                    </thead>
+        
+                    <tbody>
+                        <tr>
+                            <td>Average</td>
+                            <td class="<%= im_positive(dropping_me(average_opening_1, my_oddBas_1)) %>" > 
+                                <%= dropping_me(average_opening_1, my_oddBas_1) %> % <% av1 = dropping_me(average_opening_1, my_oddBe_1) %>
+                            </td>
+                            <td class="<%= im_positive(dropping_me(average_opening_X, my_oddBas_X)) %>" >
+                                <%= dropping_me(average_opening_X, my_oddBas_X) %> % <% avN = dropping_me(average_opening_X, my_oddBe_X) %>
+                            </td>
+                            <td class="<%= im_positive(dropping_me(average_opening_2, my_oddBas_2)) %>" >
+                                <%= dropping_me(average_opening_2, my_oddBas_2) %> % <% av2 = dropping_me(average_opening_2, my_oddBe_2) %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Max</td>
+                            <td class="<%= im_positive(dropping_me(max_opening_1, my_oddBas_1)) %>" >
+                                <%= dropping_me(max_opening_1, my_oddBas_1) %> % <% ma1 = dropping_me(max_opening_1, my_oddBe_1) %>
+                            </td>
+                            <td class="<%= im_positive(dropping_me(max_opening_X, my_oddBas_X)) %>">
+                                <%= dropping_me(max_opening_X, my_oddBas_X) %> % <% maN = dropping_me(max_opening_X, my_oddBe_X) %>
+                            </td>
+                            <td class="<%= im_positive(dropping_me(max_opening_2, my_oddBas_2)) %>" >
+                                <%= dropping_me(max_opening_2, my_oddBas_2) %> % <% ma2 = dropping_me(max_opening_2, my_oddBe_2) %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Min</td>
+                            <td class="<%= im_positive(dropping_me(min_opening_1, my_oddBas_1)) %>" >
+                                <%= dropping_me(min_opening_1, my_oddBas_1) %> % <% mi1 = dropping_me(min_opening_1, my_oddBe_1) %>
+                            </td>
+                            <td class="<%= im_positive(dropping_me(min_opening_X, my_oddBas_X)) %>" >
+                                <%= dropping_me(min_opening_X, my_oddBas_X) %> % <% miN = dropping_me(min_opening_X, my_oddBe_X) %>
+                            </td>
+                            <td class="<%= im_positive(dropping_me(min_opening_2, my_oddBas_2)) %>" >
+                                <%= dropping_me(min_opening_2, my_oddBas_2) %> % <% mi2 = dropping_me(min_opening_2, my_oddBe_2) %>
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-4">
+                <h6>Forme</h6>
                 <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
                     <thead>
                         <tr style="text-align: center;">
@@ -526,8 +588,7 @@
 
         <div class="row">
             <div class="col-12">
-        
-                <h6>NoTilt - WithTilt</h6>
+    
                 <table style="text-align: center;" class="table table-striped table-bordered border-secondary"
                     data-toggle="table">
                     <thead>
@@ -541,7 +602,7 @@
         
                     <tbody>
                         <tr>
-                            <td>Drop</td>
+                            <td>Prediction / forme</td>
                             <td
                                 class="<%= im_positive((dropping_me(my_odd_1, my_oddBe_1)).toFixed(2)) %>">
                                 <%= dropping_me(my_odd_1, my_oddBe_1).toFixed(2) %> %
@@ -555,6 +616,45 @@
                                 <%= dropping_me(my_odd_2, my_oddBe_2).toFixed(2) %> %
                             </td>
                         </tr>
+                        <tr>
+                            <td>Basic / forme</td>
+                            <td
+                                class="<%= im_positive((dropping_me(my_oddBas_1, my_oddBe_1)).toFixed(2)) %>">
+                                <%= dropping_me(my_oddBas_1, my_oddBe_1).toFixed(2) %> %
+                            </td>
+                            <td
+                                class="<%= im_positive((dropping_me(my_oddBas_X, my_oddBe_X)).toFixed(2)) %>">
+                                <%= dropping_me(my_oddBas_X, my_oddBe_X).toFixed(2) %> %
+                            </td>
+                            <td
+                                class="<%= im_positive((dropping_me(my_oddBas_2, my_oddBe_2)).toFixed(2)) %>">
+                                <%= dropping_me(my_oddBas_2, my_oddBe_2).toFixed(2) %> %
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Prediction</td>
+                            <td class="<%= good_form(coteBe[0]) %>">
+                                <%= parseFloat(coteFte[0]).toFixed(2) %> %
+                            </td>
+                            <td class="<%= good_form(coteBe[1]) %>">
+                                <%= parseFloat(coteFte[1]).toFixed(2) %> %
+                            </td>
+                            <td class="<%= good_form(coteBe[2]) %>">
+                                <%= parseFloat(coteFte[2]).toFixed(2) %> %
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Basic</td>
+                            <td class="<%= good_form(coteBe[0]) %>">
+                                <%= parseFloat(coteBasic[0]).toFixed(2) %> %
+                            </td>
+                            <td class="<%= good_form(coteBe[1]) %>">
+                                <%= parseFloat(coteBasic[1]).toFixed(2) %> %
+                            </td>
+                            <td class="<%= good_form(coteBe[2]) %>">
+                                <%= parseFloat(coteBasic[2]).toFixed(2) %> %
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -562,10 +662,10 @@
 
         <br>
 
-        <div class="row">
+        <!--<div class="row">
             <div class="col-12">
 
-            <h6>[NoTilt] - [WithTilt]</h6>
+            <h6>[Goals pred.] - [Forme]</h6>
             <table style="text-align: center;" class="table table-striped table-bordered border-secondary" data-toggle="table">
                 <thead>
                     <tr style="text-align: center;">
@@ -616,7 +716,7 @@
                 </tbody>
             </table>  
             </div>          
-        </div>
+        </div>-->
 
         
         
@@ -726,6 +826,6 @@
         </table>
     </div>
 
-        <p><%= infos.hometeam.name %>_<%= infos.awayteam.name %>_<%= moment(infos.time).add(2,'h').format('lll') %></p>
+        <p style="font-weight: bold;"><%= infos.hometeam.name %> - <%= infos.awayteam.name %> | <%= moment(infos.time).add(2,'h').format('lll') %></p>
                
         <%- include('include/footer') -%>

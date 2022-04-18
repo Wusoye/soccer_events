@@ -46,10 +46,10 @@
                                 <% if(events[Event].livescore){ %> <%= events[Event].livescore.status %> <% if(events[Event].livescore.value){ %> / <%= events[Event].livescore.value %> <% }} %>
                             </td>
                             <td>
-                                <%= moment(events[Event].time).add(1,'h').format('lll') %>
+                                <%= moment(events[Event].time).add(2,'h').format('lll') %>
                             </td>
                             <td>
-                                <a target="_blank" href="/event_detail_2/<%- events[Event].id -%>"><i>Détail 1N2</i></a>
+                                <a target="_blank" href="/event_detail/<%- events[Event].id -%>"><i>Détail 1N2</i></a>
                             </td>
                         </tr>
                         <% }) %>

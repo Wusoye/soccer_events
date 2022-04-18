@@ -83,10 +83,12 @@ app.get('/event_detail/:id', function (req, res) {
   id = req.params.id;
   coteFte = [];
   coteBe = [];
+  coteBasic = [];
   goals_predictions = [];
   tilt = [];
   elo_inc = [];
   model_prob = null;
+  allXgs = null;
   var options = {
     method: 'GET',
     url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
@@ -94,7 +96,7 @@ app.get('/event_detail/:id', function (req, res) {
 
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, goals_predictions: goals_predictions, elo_inc: elo_inc, header: 'Event Detail' });
+    res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, coteBasic: coteBasic, goals_predictions: goals_predictions, elo_inc: elo_inc,allXgs: allXgs, header: 'Event Detail' });
   }).catch(function (error) {
     console.error(error);
   });
@@ -105,39 +107,31 @@ app.post('/event_detail/:id', function (req, res) {
   whoWin = parseInt(req.body.whoWin);
 
   coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
-  //coteFte = [req.body.cote1, req.body.coteX, req.body.cote2];
+  //coteFte = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
 
-  console.log(coteBe);
-
+  /*
   goals_predictions = [req.body.local_goal, req.body.visitor_goal];
   tilt = [req.body.local_tilt, req.body.visitor_tilt];
   elo_inc = [req.body.local_inc, req.body.visitor_inc];
+  */
 
-  local_goals = goals_predictions[0]
-  visitor_goals = goals_predictions[1]
+  allXgs = req.body.all_xgs;
+  goals_predictions = [allXgs.split('|')[0], allXgs.split('|')[1]];
+  elo_inc = [allXgs.split('|')[2], allXgs.split('|')[3]];
 
-  local_goals_nT = goals_predictions[0] * (1 + elo_inc[0] / 100)
-  visitor_goals_nT = goals_predictions[1] * (1 + elo_inc[1] / 100)
+  normal_distrib = new distrib_poisson(goals_predictions[0], goals_predictions[1], 25)
+  matrice_normal = normal_distrib.predict_proba();
+  normal_proba = matrice_normal['percent']
 
-  console.log(local_goals_nT, visitor_goals_nT);
+  basic_distrib = new distrib_poisson(elo_inc[0], elo_inc[1], 25)
+  matrice_basic = basic_distrib.predict_proba();
+  basic_proba = matrice_basic['percent']
 
-  //local_goals_no_tilt = goals_predictions[0] / (1 + tilt[0] / 100)
-  //visitor_goals_no_tilt = goals_predictions[1] / (1 + tilt[1] / 100)
-
-  //local_goals_inc = local_goals_no_tilt * (1 + elo_inc[0] / 100)
-  //visitor_goals_inc = visitor_goals_no_tilt * (1 + elo_inc[1] / 100)
-
-  normal_distrib = new distrib_poisson(local_goals, visitor_goals, 20)
-  normal_proba = normal_distrib.predict_proba(false);
-  //normal_distrib.show_distrib()
-
-  inc_distrib = new distrib_poisson(local_goals_nT, visitor_goals_nT, 20)
-  inc_proba = inc_distrib.predict_proba(false);
-
-  //console.log(normal_proba, inc_proba);
-
+  
   //coteBe = [normal_proba[0], normal_proba[1], normal_proba[2]];
-  coteFte = [inc_proba[0], inc_proba[1], inc_proba[2]];
+  coteFte = [normal_proba[0], normal_proba[1], normal_proba[2]];
+  coteBasic = [basic_proba[0], basic_proba[1], basic_proba[2]];
+
 
 
 
@@ -150,7 +144,7 @@ app.post('/event_detail/:id', function (req, res) {
 
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, goals_predictions: goals_predictions, elo_inc: elo_inc, header: 'Event Detail' });
+    res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, coteBasic: coteBasic, goals_predictions: goals_predictions, elo_inc: elo_inc,allXgs: allXgs, header: 'Event Detail' });
   }).catch(function (error) {
     console.error(error);
   });
@@ -185,6 +179,7 @@ app.post('/event_detail_2/:id', function (req, res) {
   goals_predictions = [req.body.local_goal, req.body.visitor_goal];
   tilt = [req.body.local_tilt, req.body.visitor_tilt];
   elo_inc = [req.body.local_inc, req.body.visitor_inc];
+  percent_winning = [parseInt(req.body.percent_1), parseInt(req.body.percent_N), parseInt(req.body.percent_2)];
 
   local_goals = goals_predictions[0]
   visitor_goals = goals_predictions[1]
@@ -205,6 +200,8 @@ app.post('/event_detail_2/:id', function (req, res) {
 
   local_goals_nT = goals_predictions[0] / (1 + tilt[0] / 100)
   visitor_goals_nT = goals_predictions[1] / (1 + tilt[1] / 100)
+
+  console.log(local_goals_nT);
 
   //local_goals_nT = tilt[0]
   //visitor_goals_nT = tilt[1]
@@ -233,6 +230,7 @@ app.post('/event_detail_2/:id', function (req, res) {
   c_inc = [inc_proba[0], inc_proba[1], inc_proba[2]];
   local_pov = [local_pov_proba[0], local_pov_proba[1], local_pov_proba[2]];
   visitor_pov = [visitor_pov_proba[0], visitor_pov_proba[1], visitor_pov_proba[2]];
+  //c_normal = [percent_winning[0], percent_winning[1], percent_winning[2]];
   
   model_prob = null;
 
@@ -1315,7 +1313,7 @@ app.get('/besoccer_xG', (req, res) => {
 
 app.post('/besoccer_xG/', (req, res) => {
   file = req.body.sel_file
-  //console.log(file);
+
   const csvFilePath = './models/BeSoccer_forme/'+file
   const Folder = './models/BeSoccer_forme';
   const fs = require('fs');
@@ -1336,19 +1334,18 @@ app.get('/besoccer', (req, res) => {
 
   files = fs.readdirSync(Folder)
 
-  res.render('besoccer copy', {data: false, files: files, header: 'BeSoccer' })
+  res.render('besoccer copy 2', {data: false, files: files, file: null, showAll: false, header: 'BeSoccer' })
 })
 
 app.post('/besoccer', (req, res) => {
   file = req.body.sel_file
-  //console.log(file);
+  showAll = req.body.showAll == 'true';
+
   const csvFilePath = './models/BeSoccer/'+file
   const Folder = './models/BeSoccer';
   const fs = require('fs');
 
   files = fs.readdirSync(Folder)
-
-  console.log(file);
 
   header = 'BeSoccer ' + moment(file.split('_BeSoccer.csv')[0]).format('lll')
 
@@ -1356,14 +1353,14 @@ app.post('/besoccer', (req, res) => {
     .fromFile(csvFilePath)
     .then((jsonObj) => {
       //console.log(jsonObj);
-      res.render('besoccer copy', { data: jsonObj, files: files, file: file, header: header });
+      res.render('besoccer copy 2', { data: jsonObj, files: files, file: file, showAll: showAll, header: header });
     })
 });
 
 app.get('/besoccer_detail/:id/:file', (req, res) => {
   id = req.params.id
   file = req.params.file
-  //console.log(id);
+
   const csvFilePath = './models/BeSoccer_forme/'+file
   csv()
     .fromFile(csvFilePath)

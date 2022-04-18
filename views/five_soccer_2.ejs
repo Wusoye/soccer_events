@@ -17,31 +17,32 @@
                 <% data.forEach(element=> {  %>
                     <% 
                         var id_element = element.league_id
-                        var nbDay = 120;
+                        var nbDay = 365;
                         var min_quality = 15; 
                         var quality = (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2);
                         
-                        if ( quality > min_quality && moment(element.date) < moment().add(7, 'days') && moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days') && (id_element != 7921 && id_element != 1983 && id_element != 2413 && id_element != 2414 && id_element != 2160 && id_element != 4582)){ 
+                        if ( quality > min_quality && moment(element.date) < moment().add(7, 'days') && moment(element.date) > moment().subtract(nbDay, 'days') && moment(element.date) < moment().add(nbDay, 'days')){ 
+                        //&& (id_element != 7921 && id_element != 1983 && id_element != 2413 && id_element != 2414 && id_element != 2160 && id_element != 4582)
                     %>
                     <tr>
                         <td>
                             <%= moment(element.date).format("DD-MM-YYYY") %>
                         </td>
                         <td>
-                            <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= (element.league).substring(0, 30) %></a> 
+                            <%=id_element%> | <a target="_blank" href="/five_soccer_event/<%- element.team1 %>/<%- element.team2 %>/<%- element.date %>" style="text-decoration:none; color: inherit;"><%= (element.league).substring(0, 30) %></a> 
                         </td>
                         <td>
-                            <%= (element.team1).substring(0, 15) %> - <%= (element.team2).substring(0, 15) %>
+                           <%= (element.team1).substring(0, 15) %> - <%= (element.team2).substring(0, 15) %>
                         </td>
                         </td>
                         <td>
                             <%= element.proj_score1 %> - <%= element.proj_score2 %>
                         </td>
                         <td>
-                            <%= element.score1 %> - <%= element.score2 %>
+                            <%= element.score1 %> - <%= element.score2 %> 
                         </td>
                         <td>
-                            <%= element.importance1 %> - <%= element.importance2 %>
+                            <%= element.importance1 %> - <%= element.importance2 %> | <% if(parseFloat(element.importance1) > parseFloat(element.importance2)){ %> 2 <% } else { %> 1 <% };%>
                         </td>
                         <td>
                             <%= (((2/(1/parseFloat(element.spi1) + 1/parseFloat(element.spi2))) + ((parseFloat(element.importance1) + parseFloat(element.importance2))/2))/2).toFixed(2) %>

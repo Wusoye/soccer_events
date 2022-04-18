@@ -8,8 +8,6 @@ function fact(nbr) {
 
 module.exports = function (local_predict, visitor_predict, max_goal) {
 
-    //console.log(max_goal);
-
     local_distrib = []
     visitor_distrib = []
     matrice_goals = {}
@@ -28,8 +26,6 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
         visitor_distrib.push(visitor)
 
     }
-
-    //console.log(parseFloat(1/(local_distrib[1]+local_distrib[2]+local_distrib[3]+local_distrib[4]+local_distrib[5])));
 
     this.predict_goals = function(prob_percent) {
         if (prob_percent) {
@@ -67,7 +63,6 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
                 }
 
                 if (local_i <= 5 && visitor_i <= 5) {
-                    
                     score = String(local_i + '-' + visitor_i)
                     matrice_goals[score] = local_prob_score * visitor_prob_score
                 }
@@ -77,7 +72,6 @@ module.exports = function (local_predict, visitor_predict, max_goal) {
 
         matrice_goals['proba'] = [home_prob, draw_prob, away_prob]
         matrice_goals['percent'] = [home_prob * 100, draw_prob * 100, away_prob * 100]
-        //console.log(matrice_goals);
         return matrice_goals
 
     }

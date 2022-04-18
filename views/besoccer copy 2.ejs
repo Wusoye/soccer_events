@@ -5,6 +5,8 @@
 class ValideMatch {
     #coefLeague
     #IsPricipalLeague = false;
+    #IsPricipalTeams = false;
+    #IsAvailable = false;
 
     #delta_elo = 0;
     #local_note
@@ -16,35 +18,55 @@ class ValideMatch {
     #delta_tilt
     #local_xg
     #visitor_xg
+    #old_local_goal
+    #old_visitor_goal
+    #local_goal_add
+    #visitor_goal_add
     #classe = 'table-default';
     #isOpen = false;
     #maxGoal = 25;
     #home_prob = 0;
     #draw_prob = 0;
     #away_prob = 0;
+    #old_home_prob = 0;
+    #old_draw_prob = 0;
+    #old_away_prob = 0;
     #limitPercent = 0.405;
+    #pWinner = '';
    
    
     constructor(local_note, visitor_note, local_tilt, visitor_tilt, local_xg, visitor_xg, local_elo, visitor_elo, coefLeague){
-        this.#coefLeague = coefLeague;
+        this.#coefLeague = parseFloat(coefLeague);
         this.#IsPricipalLeague = this.#coefLeague > 40;
         this.#local_note = parseInt(local_note);
         this.#visitor_note = parseInt(visitor_note);
+        this.#IsPricipalTeams = this.#local_note > 30 && this.#visitor_note > 30;
         this.#local_tilt = parseInt(local_tilt);
         this.#visitor_tilt = parseInt(visitor_tilt);
         this.#delta_tilt = (parseInt(local_tilt) - parseInt(visitor_tilt));
         this.#local_xg = parseFloat(local_xg);
         this.#visitor_xg = parseFloat(visitor_xg);
+        this.#old_local_goal = parseFloat((this.#local_xg / (1 + this.#local_tilt / 100)));
+        this.#old_visitor_goal = parseFloat((this.#visitor_xg / (1 + this.#visitor_tilt / 100)));
+        this.#local_goal_add = parseFloat((((this.#local_tilt * this.#old_local_goal) / 100)));
+        this.#visitor_goal_add = parseFloat((((this.#visitor_tilt * this.#old_visitor_goal) / 100)));
+        this.#IsAvailable = this.#local_xg > 0 && this.#visitor_xg > 0;
         this.#local_elo = parseInt(local_elo);
         this.#visitor_elo = parseInt(visitor_elo);
-        if(parseInt(local_elo) != 625 && parseInt(visitor_elo) != 625){
+        //if(parseInt(local_elo) != 625 && parseInt(visitor_elo) != 625){
             if(parseInt(local_elo) > parseInt(visitor_elo)){
                 this.#delta_elo = (((parseInt(visitor_elo) - parseInt(local_elo)) / parseInt(local_elo)) * 100).toFixed(2)
             } else if(parseInt(local_elo) < parseInt(visitor_elo)){
                 this.#delta_elo = (((parseInt(local_elo) - parseInt(visitor_elo)) / parseInt(visitor_elo)) * 100).toFixed(2)
             }
-        }
-        this.#poissonPourcent();
+        //}
+        this.#home_prob = this.#poissonPourcent(this.#local_xg, this.#visitor_xg)[0];
+        this.#draw_prob = this.#poissonPourcent(this.#local_xg, this.#visitor_xg)[1];
+        this.#away_prob = this.#poissonPourcent(this.#local_xg, this.#visitor_xg)[2];
+
+        this.#old_home_prob = this.#poissonPourcent(this.#old_local_goal, this.#old_visitor_goal)[0];
+        this.#old_draw_prob = this.#poissonPourcent(this.#old_local_goal, this.#old_visitor_goal)[1];
+        this.#old_away_prob = this.#poissonPourcent(this.#old_local_goal, this.#old_visitor_goal)[2];
         this.#ouverture();
     }
 
@@ -56,18 +78,21 @@ class ValideMatch {
         return f;
     }
 
-    #poissonPourcent(){
+    #poissonPourcent(local_goal, visitor_goal){
 
         this.local_distrib = []
         this.visitor_distrib = []
+        this.home_prob = 0;
+        this.draw_prob = 0;
+        this.away_prob = 0;
 
         for (let i = 0; i <= this.#maxGoal; i++) {
 
             this.k = i
             this.kFact = this.#fact(i)
 
-            this.local = Math.exp(-this.#local_xg) * (Math.pow(this.#local_xg, this.k) / this.kFact)
-            this.visitor = Math.exp(-this.#visitor_xg) * (Math.pow(this.#visitor_xg, this.k) / this.kFact)
+            this.local = Math.exp(-local_goal) * (Math.pow(local_goal, this.k) / this.kFact)
+            this.visitor = Math.exp(-visitor_goal) * (Math.pow(visitor_goal, this.k) / this.kFact)
 
             this.local_distrib.push(this.local)
             this.visitor_distrib.push(this.visitor)
@@ -82,55 +107,51 @@ class ValideMatch {
                 
 
                 if (local_i > visitor_i) {
-                    this.#home_prob = this.local_prob_score * this.visitor_prob_score + this.#home_prob
+                    this.home_prob = this.local_prob_score * this.visitor_prob_score + this.home_prob
                 }
                 if (local_i == visitor_i) {
-                    this.#draw_prob = this.local_prob_score * this.visitor_prob_score + this.#draw_prob
+                    this.draw_prob = this.local_prob_score * this.visitor_prob_score + this.draw_prob
                 }
                 if (local_i < visitor_i) {
-                    this.#away_prob = this.local_prob_score * this.visitor_prob_score + this.#away_prob
+                    this.away_prob = this.local_prob_score * this.visitor_prob_score + this.away_prob
                 }
             }
         }
+
+        return [this.home_prob, this.draw_prob, this.away_prob];
     }
 
-    #ouverture(){
-        /*
-        if (this.#home_prob > this.#limitPercent){
-            
-            if ((this.#delta_tilt > 5 && this.#delta_tilt < 85 && this.#delta_elo > -35 )) {
-                this.#classe = 'table-success';
-                this.#isOpen = true;
-            } else if((this.#delta_tilt > 85 && this.#delta_elo > -35 ) || (this.#delta_tilt > 5 && this.#delta_tilt < 85 && this.#delta_elo < -35)){
-                this.#classe = 'table-warning';
-                this.#isOpen = true;
+    #ouverture(){      
+
+        this.diff_goal_add = this.#local_goal_add - this.#visitor_goal_add
+        this.total_goal_add = Math.abs(this.#local_goal_add) + Math.abs(this.#visitor_goal_add)
+        this.percent_diff_sum = Math.abs(this.#local_goal_add - this.#visitor_goal_add)*100/(Math.abs(this.#local_goal_add) + Math.abs(this.#visitor_goal_add));
+        this.percent_diff_total = Math.abs(this.#local_goal_add - this.#visitor_goal_add)*100/(this.#local_xg + this.#visitor_xg);
+        this.total_xg = this.#local_xg + this.#visitor_xg
+        this.part_total = (this.total_goal_add*100/this.total_xg)
+        this.local_part = (this.#local_xg*100/this.total_xg)
+        this.visitor_part = (this.#visitor_xg*100/this.total_xg)
+
+        //this.#pWinner = this.diff_goal_add.toFixed(2) + ' | ' + this.percent_diff_sum.toFixed(2) + ' | ' + this.percent_diff_total.toFixed(2) + ' | ' + this.local_part.toFixed(2)  + ' | ' +  this.visitor_part.toFixed(2);
+
+        if (this.diff_goal_add > 0) {
+            this.#pWinner = '1 | ' + this.#pWinner
+            if (this.diff_goal_add > 0.10) {
+                if ((this.percent_diff_sum < 99.9 && this.percent_diff_total < 15 && this.local_part < 80 && this.visitor_part < 80)) {
+                    this.#classe = 'table-success';
+                    this.#isOpen = true;
+                }
             }
-
-        } else if (this.#away_prob > this.#limitPercent) {
-
-            if ((this.#delta_tilt < -5 && this.#delta_tilt > -85 && this.#delta_elo > -35)) {
-                this.#classe = 'table-success';
-                this.#isOpen = true;
-            } else if((this.#delta_tilt < -85 && this.#delta_elo > -35) || (this.#delta_tilt < -5 && this.#delta_tilt > -85 && this.#delta_elo < -35)){
-                this.#classe = 'table-warning';
-                this.#isOpen = true;
+        } else if (this.diff_goal_add < -0) {
+            this.#pWinner = '2 | ' + this.#pWinner
+            if (this.diff_goal_add < -0.10) {
+                if ((this.percent_diff_sum < 99.9 && this.percent_diff_total < 15 && this.local_part < 80 && this.visitor_part < 80)) {
+                    this.#classe = 'table-success';
+                    this.#isOpen = true;
+                }
             }
         }
-        */
-        
-        if (this.#home_prob > this.#away_prob && this.#delta_tilt > 5){
-            this.#classe = 'table-success';
-            if (this.#delta_elo < -45) {
-                this.#classe = 'table-warning';
-            }
-            this.#isOpen = true;
-        } else if (this.#home_prob < this.#away_prob && this.#delta_tilt < -5){
-            this.#classe = 'table-success';
-            if (this.#delta_elo < -45) {
-                this.#classe = 'table-warning';
-            }
-            this.#isOpen = true;
-        }
+
         
     }
 
@@ -143,8 +164,20 @@ class ValideMatch {
     }
 
     getInfos(){
-        //return this.#local_note + ' / ' + this.#visitor_note + ' | ' + this.#local_tilt + ' / ' + this.#visitor_tilt + ' | Δ' + this.#delta_tilt;
-        return 'Δ' + this.#delta_elo + ' % | Δ' + this.#delta_tilt;
+
+        this.res = '';
+
+        //this.res = 'Δ' + this.#delta_elo + ' | ' + this.#local_elo + ' / ' + this.#visitor_elo + ' | Δ' + this.#delta_tilt+ ' | ' + this.#local_tilt + ' / ' + this.#visitor_tilt;
+
+       //this.res = this.#local_goal_add + ' | ' + this.#visitor_goal_add;
+        
+       //this.res = (this.#local_goal_add - this.#visitor_goal_add).toFixed(2);
+
+       //this.res = '' + (this.#home_prob * 100).toFixed(0) + ' | ' + (this.#draw_prob * 100).toFixed(0) + ' | ' + (this.#away_prob * 100).toFixed(0)
+
+        this.res = this.#pWinner + this.res;
+        
+        return this.res;
     }
 
     getNote(){
@@ -153,6 +186,46 @@ class ValideMatch {
 
     getIsPricipalLeague(){
         return this.#IsPricipalLeague;
+    }
+
+    getIsPricipalTeams(){
+        return this.#IsPricipalTeams;
+    }
+
+    getIsAvailable(){
+        return this.#IsAvailable;
+    }
+
+    getCoefLeague(){
+        return this.#coefLeague;
+    }
+
+    getDeltaElo(){
+        return this.#delta_elo;
+    }
+
+    getGoalPredict(val){
+        if (val == 1) {
+            return [this.#local_xg, this.#visitor_xg];
+        } else if (val == 2){
+            return [this.#old_local_goal, this.#old_visitor_goal];
+        } else if (val == 3){
+            return [this.#local_goal_add, this.#visitor_goal_add];
+        } else {
+            return [0, 0];
+        }
+    }
+
+    getProba(val){
+        if (val) {
+            return [(this.#old_home_prob * 100).toFixed(0), (this.#old_draw_prob * 100).toFixed(0), (this.#old_away_prob * 100).toFixed(0)];
+        } else {
+            return [(this.#home_prob * 100).toFixed(0), (this.#draw_prob * 100).toFixed(0), (this.#away_prob * 100).toFixed(0)];
+        }
+    }
+
+    getTilt(){
+        return [this.#local_tilt, this.#visitor_tilt];
     }
 }
 
@@ -203,7 +276,10 @@ class ValideMatch {
                     <th data-sortable="true" scope="col">LEAGUE</th>
                     <th scope="col">TEAMS</th>
                     <th scope="col">OUVERTURE</th>
-                    <th scope="col">xG</th>
+                    <!--<th scope="col">XG</th>
+                    <th scope="col">TILT</th>
+                    <th scope="col">XG ADD</th>-->
+                    <th scope="col">NORMAL | NO TILT</th>
                 </tr>
             </thead>
             <tbody>
@@ -212,24 +288,36 @@ class ValideMatch {
                     id = el.id
                     const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition);
                     // Valide à partir du : sam. 12 févr. 2022
-                    if (p1.getOuverture() || showAll) {
+                    if ((p1.getOuverture() || showAll) && p1.getIsAvailable()) {
                 %>
                     <tr>
                         <td>
-                            <%= moment(dateTime).subtract(1,'h').format("HH:mm") %>
+                            <%= moment(dateTime).subtract(0,'h').format("HH:mm") %>
                         </td>
                         <td>
-                            <%= (el.name_compet).substring(0, 100) %> <% if(el.coef_competition) { %>  <% } %>
+                            <%= (el.name_compet).substring(0, 100) %> <% if(el.id_compet) { %><%= el.id_compet %><% } %>
                         </td>
                         <td>
                             <%= (el.local_team).substring(0, 100) %> - <%= (el.visitor_team).substring(0, 15) %>
                         </td>
+
                         <td class="<%= p1.getClass() %>">
                             <%= p1.getInfos() %>
                         </td>
-                        <td>
-                            <%= parseFloat(el.local_goal_predict).toFixed(2) %> | <%= parseFloat(el.visitor_goal_predict).toFixed(2) %>
+
+                        <!--<td style="font-weight: bold;">
+                            <%= p1.getGoalPredict(1)[0] %> | <%= p1.getGoalPredict(1)[1] %>
                         </td>
+                        <td>
+                            <%= p1.getTilt()[0] %> | <%= p1.getTilt()[1] %>
+                        </td>
+                        <td style="font-weight: bold;">
+                            <%= p1.getGoalPredict(2)[0].toFixed(2) %> | <%= p1.getGoalPredict(2)[1].toFixed(2) %>
+                        </td>-->
+
+                        <td class="user-select-all" style="font-weight: bold;">
+                            <%= p1.getGoalPredict(1)[0] %>|<%= p1.getGoalPredict(1)[1] %>|<%= p1.getGoalPredict(2)[0].toFixed(2) %>|<%= p1.getGoalPredict(2)[1].toFixed(2) %>
+                        </td>                        
                     </tr>
                 <% }; }); %>
             </tbody>
@@ -244,6 +332,16 @@ class ValideMatch {
     document.getElementById("flexCheckDefault").addEventListener("click", function () {
         form.submit();
     });
+
+    function copyToClipBoard() {
+
+        var content = document.getElementById('copyXgs');
+
+        content.select();
+        document.execCommand('copy');
+
+        alert("Copied!");
+    }
 </script>
 
 <%- include('include/footer') -%>
