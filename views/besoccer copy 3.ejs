@@ -14,6 +14,8 @@ function dropping_me(odd_arrive, odd_depart){
     return parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2));
 }
 
+
+
 class ValideMatch {
     #coefLeague
     #IsPricipalLeague = false;
@@ -43,11 +45,14 @@ class ValideMatch {
     #old_home_prob = 0;
     #old_draw_prob = 0;
     #old_away_prob = 0;
+    #local_string_form;
+    #visitor_string_form;
+    #form;
     #limitPercent = 0.405;
     #pWinner = '';
    
    
-    constructor(local_note, visitor_note, local_tilt, visitor_tilt, local_xg, visitor_xg, local_elo, visitor_elo, coefLeague){
+    constructor(local_note, visitor_note, local_tilt, visitor_tilt, local_xg, visitor_xg, local_elo, visitor_elo, coefLeague, local_string_form, visitor_string_form){
         this.#coefLeague = parseFloat(coefLeague);
         this.#IsPricipalLeague = this.#coefLeague > 40;
         this.#local_note = parseInt(local_note);
@@ -79,7 +84,41 @@ class ValideMatch {
         this.#old_home_prob = this.#poissonPourcent(this.#old_local_goal, this.#old_visitor_goal)[0];
         this.#old_draw_prob = this.#poissonPourcent(this.#old_local_goal, this.#old_visitor_goal)[1];
         this.#old_away_prob = this.#poissonPourcent(this.#old_local_goal, this.#old_visitor_goal)[2];
+        this.#form = this.#calcForm(local_string_form, visitor_string_form)
+        this.#local_string_form = local_string_form;
+        this.#visitor_string_form = visitor_string_form;
         this.#ouverture();
+
+    }
+
+    #calcForm(local, visitor){
+        var local_win = 0;
+        var local_draw = 0;
+        var local_lose = 0;
+        var visitor_win = 0;
+        var visitor_draw = 0;
+        var visitor_lose = 0;
+        for (let i = 0; i < local.length; i++) {
+            const el = local.charAt(i);
+            if (el == 'w') {
+                local_win++;
+            } else if (el == 'd') {
+                local_draw++;
+            } else if (el == 'l') {
+                local_lose++;
+            }
+        }
+        for (let i = 0; i < visitor.length; i++) {
+            const el = visitor.charAt(i);
+            if (el == 'w') {
+                visitor_win++;
+            } else if (el == 'd') {
+                visitor_draw++;
+            } else if (el == 'l') {
+                visitor_lose++;
+            }
+        }
+        return [local_win, ((local_draw + visitor_draw) / 2).toFixed(1), visitor_win];
     }
 
     #fact(nbr) {
@@ -135,6 +174,10 @@ class ValideMatch {
 
     #ouverture(){      
 
+        console.log(this.#form);
+        this.localDiffForm = parseFloat(this.#home_prob * 5) - parseFloat(this.#form[0])
+        this.drawDiffForm = parseFloat(this.#draw_prob * 5) - parseFloat(this.#form[1])
+        this.visitorDiffForm = parseFloat(this.#away_prob * 5) - parseFloat(this.#form[2])
 
 
         this.diff_goal_add = this.#local_goal_add - this.#visitor_goal_add
@@ -190,25 +233,83 @@ class ValideMatch {
         //this.#pWinner = this.local_less.toFixed(2) + ' | ' + this.visitor_less.toFixed(2)
         //this.#pWinner = this.#local_goal_add.toFixed(2) + ' | ' + this.#visitor_goal_add.toFixed(2) + ' |_| ' + this.abs_percent_diff_total.toFixed(2);
         //this.#pWinner = this.percent_sum_total.toFixed(2) + ' | ' + this.percent_diff_total.toFixed(2) + ' |_| ' + this.#local_goal_add.toFixed(2) + ' | ' + this.#visitor_goal_add.toFixed(2) + ' | ' + this.percent_diff_old_total.toFixed(2)
+        //this.#pWinner = this.#local_string_form + ' - ' + this.#visitor_string_form + ' | ' + this.localDiffForm.toFixed(2) + ' | ' + this.drawDiffForm.toFixed(2) + ' | ' + this.visitorDiffForm.toFixed(2) + ' [_] ';
 
-        if (this.drop_1 > 0 && this.#old_home_prob > 0.449) {
-            this.#isOpen = true;
+        
+        if (this.#home_prob > 0.50) {
+            this.#pWinner = '1 | ' + this.#pWinner
             this.#classe = 'table-success';
-            this.#pWinner = '1 | ' + this.#pWinner;
-        } else if (this.drop_2 > 0 && this.#old_away_prob > 0.449) {
             this.#isOpen = true;
+        } else if (this.#away_prob > 0.50) {
+            this.#pWinner = '2 | ' + this.#pWinner
             this.#classe = 'table-success';
-            this.#pWinner = '2 | ' + this.#pWinner;
+            this.#isOpen = true;
+        } else if (this.#home_prob > this.#away_prob && this.#local_goal_add > this.#visitor_goal_add) {
+            this.#pWinner = '1 | ' + this.#pWinner
+            this.#classe = 'table-info';
+            this.#isOpen = true;
+        } else if (this.#home_prob < this.#away_prob && this.#local_goal_add < this.#visitor_goal_add) {
+            this.#pWinner = '2 | ' + this.#pWinner
+            this.#classe = 'table-info';
+            this.#isOpen = true;
         }
+        
 
-        if (Math.abs(this.drop_1) > 10 && Math.abs(this.drop_2) > 10) {
-            //this.#isOpen = true;
-            if (this.drop_1 > this.drop_2) {
-                this.#pWinner = '1 | ' + this.#pWinner;
-            } else if (this.drop_1 < this.drop_2) {
-                this.#pWinner = '2 | ' + this.#pWinner;
+        /*
+        if (this.diff_goal_add > 0.10) {
+            if (this.#home_prob < this.#away_prob) {
+                this.#pWinner = '1 | ' + this.#pWinner
+                if (this.#away_prob > 0.4) {
+                    if (this.drop_N < 10) {
+                        this.#classe = 'table-success';
+                    } else {
+                        this.#classe = 'table-info';
+                    }
+                    this.#isOpen = true;
+                }
+            }
+        } else if (this.diff_goal_add < -0.10) {
+            if (this.#home_prob > this.#away_prob) {
+                this.#pWinner = '2 | ' + this.#pWinner
+                if (this.#home_prob > 0.4) {
+                    if (this.drop_N < 10) {
+                        this.#classe = 'table-success';
+                    } else {
+                        this.#classe = 'table-info';
+                    }
+                    this.#isOpen = true;
+                }
             }
         }
+        */
+
+
+        /*
+        if (this.diff_goal_add > 0) {
+            this.#pWinner = '1 | ' + this.#pWinner
+            if (this.diff_goal_add > 0.10) {
+                    if ((this.percent_diff_sum < 99.9 && this.percent_diff_total < 15 && this.local_part < 80 && this.visitor_part < 80)) {
+                        this.#classe = 'table-success';
+                        this.#isOpen = true;
+                    } else if ((this.percent_diff_sum > 99.9 && this.percent_diff_total < 15 && this.local_part < 80 && this.visitor_part < 80)) {
+                        this.#classe = 'table-info';
+                        this.#isOpen = true;
+                    }
+            }
+        } else if (this.diff_goal_add < -0) {
+            this.#pWinner = '2 | ' + this.#pWinner
+            if (this.diff_goal_add < -0.10) {
+                    if ((this.percent_diff_sum < 99.9 && this.percent_diff_total < 15 && this.local_part < 80 && this.visitor_part < 80)) {
+                        this.#classe = 'table-success';
+                        this.#isOpen = true;
+                    } else if ((this.percent_diff_sum > 99.9 && this.percent_diff_total < 15 && this.local_part < 80 && this.visitor_part < 80)) {
+                        this.#classe = 'table-info';
+                        this.#isOpen = true;
+                    }
+
+            }
+        }
+        */
 
     }
 
@@ -230,7 +331,7 @@ class ValideMatch {
         
        //this.res = (this.#local_goal_add - this.#visitor_goal_add).toFixed(2);
 
-       this.res = '' + (this.#home_prob * 100).toFixed(2) + ' | ' + (this.#draw_prob * 100).toFixed(2) + ' | ' + (this.#away_prob * 100).toFixed(2)
+       this.res = '' + (this.#home_prob * 5).toFixed(2) + ' | ' + (this.#draw_prob * 5).toFixed(2) + ' | ' + (this.#away_prob * 5).toFixed(2)
 
         this.res = this.#pWinner + this.res;
         
@@ -288,6 +389,11 @@ class ValideMatch {
     getTilt(){
         return [this.#local_tilt, this.#visitor_tilt];
     }
+
+    getForm(){
+        //console.log(this.#form);
+        return this.#form;
+    }
 }
 
 %> 
@@ -337,8 +443,9 @@ class ValideMatch {
                     <th data-sortable="true" scope="col">LEAGUE</th>
                     <th scope="col">TEAMS</th>
                     <th scope="col">OUVERTURE</th>
+                    <!--<th scope="col">FORM</th>
                     <th scope="col">TILT</th>
-                    <!--<th scope="col">ELO</th>
+                    <th scope="col">ELO</th>
                     <th scope="col">XG</th>
                     <th scope="col">XG ADD</th>-->
                     <th scope="col">NORMAL | NO TILT</th>
@@ -348,7 +455,8 @@ class ValideMatch {
                 <% data.forEach(el=> {  
                     dateTime = el.date + ' ' + el.time
                     id = el.id
-                    const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition);
+                    //const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition);
+                    const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition, el.local_string_form, el.visitor_string_form);
                     // Valide à partir du : sam. 12 févr. 2022
                     if ((p1.getOuverture() || showAll) && p1.getIsAvailable()) {
                 %>
@@ -356,7 +464,7 @@ class ValideMatch {
                         <td>
                             <%= moment(dateTime).subtract(0,'h').format("HH:mm") %>
                         </td>
-                        <td title="<%= el.name_compet %>">
+                        <td>
                             <%= (el.name_compet).substring(0, 15) %> <% if(el.id_compet) { %><%= el.id_compet %><% } %>
                         </td>
                         <td>
@@ -366,9 +474,16 @@ class ValideMatch {
                         <td class="<%= p1.getClass() %>">
                             <%= p1.getInfos() %>
                         </td>
+
+                        <!--<td class="<%= p1.getClass() %>">
+                            <%= p1.getForm()[0] %> | <%= p1.getForm()[1] %> |  <%= p1.getForm()[2] %>
+                        </td>
                         <td>
                             <%= p1.getTilt()[0] %> | <%= p1.getTilt()[1] %>
                         </td>
+                        <td>
+                            <%= p1.getElo()[0] %> | <%= p1.getElo()[1] %>
+                        </td>-->
 
                         <td class="user-select-all" style="font-weight: bold;">
                             <%= p1.getGoalPredict(1)[0] %>|<%= p1.getGoalPredict(1)[1] %>|<%= p1.getGoalPredict(2)[0].toFixed(2) %>|<%= p1.getGoalPredict(2)[1].toFixed(2) %>

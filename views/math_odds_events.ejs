@@ -29,7 +29,8 @@
                         <th scope="col">Away</th>
                         <th scope="col">Status</th>
                         <th data-sortable="true" scope="col">Date</th>
-                        <th scope="col">Detail 1N2</th>
+                        <th scope="col">Action</th>
+                        <th scope="col">Detail_2 1N2</th>
                     </tr>
                 </thead>
 
@@ -49,7 +50,10 @@
                                 <%= moment(events[Event].time).add(2,'h').format('lll') %>
                             </td>
                             <td>
-                                <a target="_blank" href="/event_detail/<%- events[Event].id -%>"><i>Détail 1N2</i></a>
+                                <a target="_blank" href="/event_detail/<%- events[Event].id -%>" style="font-weight: bold; text-decoration: none; color: black;" >Détail</a>
+                            </td>
+                            <td>
+                                <a class="aLien" target="_blank" href="/event_detail_2/<%- events[Event].id -%>" style="font-weight: bold; text-decoration: none; color: black;" >Détail 2</a>
                             </td>
                         </tr>
                         <% }) %>

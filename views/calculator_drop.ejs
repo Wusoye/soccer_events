@@ -90,21 +90,39 @@ if(cote_arr.length == 3 && cote_dep.length == 3){
         </thead>
     
         <tbody>
-            <td>
-                Drop is.
-            </td>
-            <td>
-                <%= dropping_me(my_odd_arr_1, my_odd_dep_1) %>%
-            </td>
-            <td>
-                <%= dropping_me(my_odd_arr_X, my_odd_dep_X) %>%
-            </td>
-            <td>
-                <%= dropping_me(my_odd_arr_2, my_odd_dep_2) %>%
-            </td>
-            <td>
-                <%= (Math.abs(dropping_me(my_odd_arr_1, my_odd_dep_1)) + Math.abs(dropping_me(my_odd_arr_X, my_odd_dep_X)) + Math.abs(dropping_me(my_odd_arr_2, my_odd_dep_2))).toFixed(2) %>%
-            </td>
+            <tr>
+                <td>
+                    Drop is.
+                </td>
+                <td>
+                    <%= dropping_me(my_odd_arr_1, my_odd_dep_1) %>%
+                </td>
+                <td>
+                    <%= dropping_me(my_odd_arr_X, my_odd_dep_X) %>%
+                </td>
+                <td>
+                    <%= dropping_me(my_odd_arr_2, my_odd_dep_2) %>%
+                </td>
+                <td>
+                    <%= (Math.abs(dropping_me(my_odd_arr_1, my_odd_dep_1)) + Math.abs(dropping_me(my_odd_arr_X, my_odd_dep_X)) + Math.abs(dropping_me(my_odd_arr_2, my_odd_dep_2))).toFixed(2) %>%
+                </td>
+            </tr>
+            <tr>
+                <td>
+                   percent 5
+                </td>
+                <td>
+                    <%= (5 * cote_arr[0] / 100).toFixed(2) %>
+                </td>
+                <td>
+                    <%= (5 * cote_arr[1] / 100).toFixed(2) %>
+                </td>
+                <td>
+                    <%= (5 * cote_arr[2] / 100).toFixed(2) %>
+                </td>
+                <td>
+                    
+                </td>
             </tr>
         </tbody>
     </table>

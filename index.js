@@ -89,6 +89,7 @@ app.get('/event_detail/:id', function (req, res) {
   elo_inc = [];
   model_prob = null;
   allXgs = null;
+  allFormes = null;
   var options = {
     method: 'GET',
     url: 'https://www.oddsmath.com/api/v1/live-odds.json/?event_id=' + id + '&cat_id=0&include_exchanges=1&language=en&country_code=FR'
@@ -96,7 +97,7 @@ app.get('/event_detail/:id', function (req, res) {
 
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, coteBasic: coteBasic, goals_predictions: goals_predictions, elo_inc: elo_inc,allXgs: allXgs, header: 'Event Detail' });
+    res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, coteBasic: coteBasic, goals_predictions: goals_predictions, elo_inc: elo_inc,allXgs: allXgs, allFormes: allFormes, header: 'Event Detail' });
   }).catch(function (error) {
     console.error(error);
   });
@@ -106,7 +107,11 @@ app.post('/event_detail/:id', function (req, res) {
   id = req.params.id;
   whoWin = parseInt(req.body.whoWin);
 
-  coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
+  //coteBe = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
+  allFormes = req.body.all_formes
+  coteBe = [allFormes.split('|')[0],allFormes.split('|')[1],allFormes.split('|')[2]]
+
+
   //coteFte = [req.body.coteBe1, req.body.coteBeX, req.body.coteBe2];
 
   /*
@@ -144,7 +149,7 @@ app.post('/event_detail/:id', function (req, res) {
 
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, coteBasic: coteBasic, goals_predictions: goals_predictions, elo_inc: elo_inc,allXgs: allXgs, header: 'Event Detail' });
+    res.render('event_detail', { idMatch: id, items: response.data.data, infos: response.data.event, coteFte: coteFte, coteBe: coteBe, coteBasic: coteBasic, goals_predictions: goals_predictions, elo_inc: elo_inc, allXgs: allXgs, allFormes: allFormes, header: 'Event Detail' });
   }).catch(function (error) {
     console.error(error);
   });

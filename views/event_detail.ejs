@@ -33,6 +33,9 @@
                 function dropping_me(odd_arrive, odd_depart){
                     return parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
                 }
+                function diff(odd_arrive, odd_depart){
+                    return parseFloat((odd_depart - odd_arrive).toFixed(2))
+                }
                 function dropping_me_modif(odd_arrive, odd_depart){
                     var res = parseFloat(((odd_arrive - odd_depart)/(odd_depart - 1)*100).toFixed(2))
 
@@ -114,13 +117,15 @@
                 }
 
                 function good_form(form){
-                    if (parseFloat(form) > 50 && parseFloat(form) < 60) {
+                    
+                    if (parseFloat(form) > 50) {
                         return "table-success";
-                    } else if (parseFloat(form) > 44) {
-                        return "table-info";
-                    } else if (parseFloat(form) < 25) {
+                    } else if (parseFloat(form) < 50) {
                         return "table-danger";
+                    } else {
+                        return "table-warning";
                     }
+                    
                 }
 
                 %> 
@@ -359,7 +364,16 @@
 
         <form action="" method="POST">
             <h5 style="text-align: center">PREDICTION PERCENT</h5>
+
             <br>
+            <h6>Forme</h6>
+            <div class="row justify-content-md-center" style="text-align: center">
+                <div class="col">
+                    <input class="form-control" type="text" placeholder="All formes percents with ' | '" name="all_formes" value="<% if(allFormes) { %><%= allFormes %><% } %>">
+                </div>
+            </div>
+
+            <!--<br>
             <h6>Forme</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
@@ -374,7 +388,7 @@
                     <input placeholder="Percent 2" type="text" class="form-control" id="coteBe2" name="coteBe2" value=<% if(coteBe[2]){ %>"<%=
                     coteBe[2] %>"<%}%>>
                 </div>
-            </div>
+            </div>-->
 
             <br>
             <h6>Goals prédictions</h6>
@@ -605,30 +619,45 @@
                             <td>Prediction / forme</td>
                             <td
                                 class="<%= im_positive((dropping_me(my_odd_1, my_oddBe_1)).toFixed(2)) %>">
-                                <%= dropping_me(my_odd_1, my_oddBe_1).toFixed(2) %> %
+                                <%= dropping_me(my_odd_1, my_oddBe_1).toFixed(2) %> % | <%= diff(coteFte[0], coteBe[0]).toFixed(2) %>
                             </td>
                             <td
                                 class="<%= im_positive((dropping_me(my_odd_X, my_oddBe_X)).toFixed(2)) %>">
-                                <%= dropping_me(my_odd_X, my_oddBe_X).toFixed(2) %> %
+                                <%= dropping_me(my_odd_X, my_oddBe_X).toFixed(2) %> % | <%= diff(coteFte[1], coteBe[1]).toFixed(2) %>
                             </td>
                             <td
                                 class="<%= im_positive((dropping_me(my_odd_2, my_oddBe_2)).toFixed(2)) %>">
-                                <%= dropping_me(my_odd_2, my_oddBe_2).toFixed(2) %> %
+                                <%= dropping_me(my_odd_2, my_oddBe_2).toFixed(2) %> % | <%= diff(coteFte[2], coteBe[2]).toFixed(2) %>
                             </td>
                         </tr>
                         <tr>
                             <td>Basic / forme</td>
                             <td
                                 class="<%= im_positive((dropping_me(my_oddBas_1, my_oddBe_1)).toFixed(2)) %>">
-                                <%= dropping_me(my_oddBas_1, my_oddBe_1).toFixed(2) %> %
+                                <%= dropping_me(my_oddBas_1, my_oddBe_1).toFixed(2) %> % | <%= diff(coteBasic[0], coteBe[0]).toFixed(2) %>
                             </td>
                             <td
                                 class="<%= im_positive((dropping_me(my_oddBas_X, my_oddBe_X)).toFixed(2)) %>">
-                                <%= dropping_me(my_oddBas_X, my_oddBe_X).toFixed(2) %> %
+                                <%= dropping_me(my_oddBas_X, my_oddBe_X).toFixed(2) %> % | <%= diff(coteBasic[1], coteBe[1]).toFixed(2) %>
                             </td>
                             <td
                                 class="<%= im_positive((dropping_me(my_oddBas_2, my_oddBe_2)).toFixed(2)) %>">
-                                <%= dropping_me(my_oddBas_2, my_oddBe_2).toFixed(2) %> %
+                                <%= dropping_me(my_oddBas_2, my_oddBe_2).toFixed(2) %> % | <%= diff(coteBasic[2], coteBe[2]).toFixed(2) %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Basic / Prediction</td>
+                            <td
+                                class="<%= im_positive((dropping_me(my_oddBas_1, my_odd_1)).toFixed(2)) %>">
+                                <%= dropping_me(my_oddBas_1, my_odd_1).toFixed(2) %> % | <%= diff(coteBasic[0], coteFte[0]).toFixed(2) %>
+                            </td>
+                            <td
+                                class="<%= im_positive((dropping_me(my_oddBas_X, my_odd_X)).toFixed(2)) %>">
+                                <%= dropping_me(my_oddBas_X, my_odd_X).toFixed(2) %> % | <%= diff(coteBasic[1], coteFte[1]).toFixed(2) %>
+                            </td>
+                            <td
+                                class="<%= im_positive((dropping_me(my_oddBas_2, my_odd_2)).toFixed(2)) %>">
+                                <%= dropping_me(my_oddBas_2, my_odd_2).toFixed(2) %> % | <%= diff(coteBasic[2], coteFte[2]).toFixed(2) %>
                             </td>
                         </tr>
                         <tr>
@@ -653,6 +682,18 @@
                             </td>
                             <td class="<%= good_form(coteBe[2]) %>">
                                 <%= parseFloat(coteBasic[2]).toFixed(2) %> %
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Form</td>
+                            <td class="<%= good_form(coteBe[0]) %>">
+                                <%= parseFloat(coteBe[0]).toFixed(2) %> %
+                            </td>
+                            <td class="<%= good_form(coteBe[1]) %>">
+                                <%= parseFloat(coteBe[1]).toFixed(2) %> %
+                            </td>
+                            <td class="<%= good_form(coteBe[2]) %>">
+                                <%= parseFloat(coteBe[2]).toFixed(2) %> %
                             </td>
                         </tr>
                     </tbody>

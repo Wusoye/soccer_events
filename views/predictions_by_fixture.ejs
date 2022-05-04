@@ -219,6 +219,10 @@ away_percent = percent_predictions['away']
                         <td><%= home_total %></td>
                         <td><%= away_total %></td>
                     </tr>
+                    <tr>
+                        <th scope="row">Total</th>
+                        <td colspan="2" class="user-select-all" style="font-weight: bold;"><%= home_total.split('%')[0] %>||<%= away_total.split('%')[0] %></td>
+                    </tr>
                   </tbody>
             </table>
         </div>
