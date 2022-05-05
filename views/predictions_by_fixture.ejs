@@ -180,6 +180,10 @@ away_percent = percent_predictions['away']
                   </thead>
                   <tbody>
                     <tr>
+                        <th scope="row">Total input</th>
+                        <td colspan="2" class="user-select-all text-center" style="font-weight: bold;"><%= home_total.split('%')[0] %>||<%= away_total.split('%')[0] %></td>
+                    </tr>
+                    <tr>
                         <th scope="row">Form</th>
                         <td><%= home_form %></td>
                         <td><%= away_form %></td>
@@ -219,10 +223,7 @@ away_percent = percent_predictions['away']
                         <td><%= home_total %></td>
                         <td><%= away_total %></td>
                     </tr>
-                    <tr>
-                        <th scope="row">Total</th>
-                        <td colspan="2" class="user-select-all" style="font-weight: bold;"><%= home_total.split('%')[0] %>||<%= away_total.split('%')[0] %></td>
-                    </tr>
+                    
                   </tbody>
             </table>
         </div>

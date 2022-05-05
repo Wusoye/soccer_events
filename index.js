@@ -1347,18 +1347,24 @@ app.post('/besoccer', (req, res) => {
   showAll = req.body.showAll == 'true';
 
   const csvFilePath = './models/BeSoccer/'+file
+  const extPaysFile = './models/extPays.csv'
   const Folder = './models/BeSoccer';
   const fs = require('fs');
 
   files = fs.readdirSync(Folder)
 
-  header = 'BeSoccer ' + moment(file.split('_BeSoccer.csv')[0]).format('lll')
+  header = 'BeSoccer ' + moment(file.split('_BeSoccer')[0]).format('lll')
 
   csv()
     .fromFile(csvFilePath)
     .then((jsonObj) => {
-      //console.log(jsonObj);
-      res.render('besoccer copy 2', { data: jsonObj, files: files, file: file, showAll: showAll, header: header });
+
+      csv()
+        .fromFile(extPaysFile)
+        .then((jsonExtPays) => {
+          res.render('besoccer copy 2', { data: jsonObj, jsonExtPays: jsonExtPays, files: files, file: file, showAll: showAll, header: header });
+        })
+
     })
 });
 
