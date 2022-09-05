@@ -717,7 +717,7 @@
             </div>-->
 
             <br>
-            <h6>Goals prédiction</h6>
+            <h6>Goals form</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
                     <input placeholder="Local goals" type="text" class="form-control" id="local_goal" name="local_goal" value=<% if(goals_predictions[0]){ %>"<%=
@@ -742,8 +742,8 @@
                 </div>
             </div>
 
-            <!--<br>
-            <h6>Elo inclinaison</h6> Augmentation du xG par l'inclinaison
+            <br>
+            <h6>Goals possible</h6>
             <div class="row justify-content-md-center" style="text-align: center">
                 <div class="col">
                     <input placeholder="Local inclinaison" type="text" class="form-control" id="local_inc" name="local_inc" value=<% if(elo_inc[0]){ %>"<%=
@@ -753,7 +753,7 @@
                     <input placeholder="Visitor inclinaison" type="text" class="form-control" id="visitor_inc" name="visitor_inc" value=<% if(elo_inc[1]){ %>"<%=
                     elo_inc[1] %>"<%}%>>
                 </div>
-            </div>-->
+            </div>
 
             <br>
             <div class="row justify-content-center">
@@ -1000,7 +1000,7 @@
             </div>
         </div>
         <br>
-        <% if (tilt[0] && tilt[1]) { %>
+        <% if (c_normal[0] && c_normal[1] && c_normal[2]) { %>
             <br>
             <div class="row">
                 <div class="col-12">
@@ -1019,33 +1019,54 @@
             
                         <tbody>
                             <tr>
-                                <td>Goals prédiction</td>
+                                <td>Goals form</td>
                                 <td>
-                                    <%= c_normal[0].toFixed(2) %> %
+                                    <%= c_normal[0].toFixed(0) %> %
                                 </td>
                                 <td>
-                                    <%= c_normal[1].toFixed(2) %> %
+                                    <%= c_normal[1].toFixed(0) %> %
                                 </td>
                                 <td>
-                                    <%= c_normal[2].toFixed(2) %> %
+                                    <%= c_normal[2].toFixed(0) %> %
                                 </td>
                             </tr>
                             <tr>
                                 <td>No tilt</td>
                                 <td>
-                                    <%= c_no_tilt[0].toFixed(2) %> %
+                                    <%= c_no_tilt[0].toFixed(0) %> %
                                 </td>
                                 <td>
-                                    <%= c_no_tilt[1].toFixed(2) %> %
+                                    <%= c_no_tilt[1].toFixed(0) %> %
                                 </td>
                                 <td>
-                                    <%= c_no_tilt[2].toFixed(2) %> %
+                                    <%= c_no_tilt[2].toFixed(0) %> %
                                 </td>
                             </tr>
-                            
-                            
-                        
-                            
+                            <tr>
+                                <td>Goals possible</td>
+                                <td>
+                                    <%= c_inc[0].toFixed(0) %> %
+                                </td>
+                                <td>
+                                    <%= c_inc[1].toFixed(0) %> %
+                                </td>
+                                <td>
+                                    <%= c_inc[2].toFixed(0) %> %
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Goals possible / No tilt</td>
+                                <td>
+                                    <%= dropping_me(percent_to_odd(c_no_tilt[0]), percent_to_odd(c_inc[0])).toFixed(0) %> %
+                                </td>
+                                <td>
+                                    <%= dropping_me(percent_to_odd(c_no_tilt[1]), percent_to_odd(c_inc[1])).toFixed(0) %> %
+                                </td>
+                                <td>
+                                    <%= dropping_me(percent_to_odd(c_no_tilt[2]), percent_to_odd(c_inc[2])).toFixed(0) %> %
+                                </td>
+                            </tr>           
+
                         </tbody>
                     </table>
                 </div>

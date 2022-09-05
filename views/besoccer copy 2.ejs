@@ -56,9 +56,30 @@ class ValideMatch {
     #old_away_prob = 0;
     #limitPercent = 0.405;
     #pWinner = '';
+    #pos_att_local;
+    #pos_def_local;
+    #pos_att_visitor;
+    #pos_def_visitor;   
+
+    #avg_fpg_local;
+    #avg_apg_local;
+    #avg_fpg_visitor;
+    #avg_apg_visitor;
+
+    #nb_matche_local;
+    #nb_matche_visitor;
    
-   
-    constructor(local_note, visitor_note, local_tilt, visitor_tilt, local_xg, visitor_xg, local_elo, visitor_elo, coefLeague){
+    constructor(local_note, visitor_note, local_tilt, visitor_tilt, local_xg, visitor_xg, local_elo, visitor_elo, coefLeague, pos_att_local, pos_def_local, pos_att_visitor, pos_def_visitor, avg_fpg_local, avg_apg_local, avg_fpg_visitor, avg_apg_visitor, nb_matche_local, nb_matche_visitor){
+        this.#nb_matche_local = parseInt(nb_matche_local);
+        this.#nb_matche_visitor = parseInt(nb_matche_visitor);
+        this.#avg_fpg_local = parseFloat(avg_fpg_local);
+        this.#avg_apg_local = parseFloat(avg_apg_local);
+        this.#avg_fpg_visitor = parseFloat(avg_fpg_visitor);
+        this.#avg_apg_visitor = parseFloat(avg_apg_visitor);
+        this.#pos_att_local = parseInt(pos_att_local);
+        this.#pos_def_local = parseInt(pos_def_local);
+        this.#pos_att_visitor = parseInt(pos_att_visitor);
+        this.#pos_def_visitor = parseInt(pos_def_visitor);
         this.#coefLeague = parseFloat(coefLeague);
         this.#IsPricipalLeague = this.#coefLeague > 40;
         this.#local_note = parseInt(local_note);
@@ -214,15 +235,73 @@ class ValideMatch {
         }
         */
 
-        this.#isOpen = true;
+        this.diff_note = this.#local_note > this.#visitor_note
+
+        //this.#isOpen = true;
+        /*
         if (Math.abs(this.drop_1) > 10 && Math.abs(this.drop_2) > 10) {
             //this.#isOpen = true;
-            if (this.drop_1 > this.drop_2) {
+            if (this.drop_1 > this.drop_2 && !this.diff_note) {
+                this.#isOpen = true;
                 this.#pWinner = '1 | ' + this.#pWinner;
-            } else if (this.drop_1 < this.drop_2) {
+                this.#classe = 'table-success';
+            } else if (this.drop_1 < this.drop_2 && this.diff_note) {
+                this.#isOpen = true;
                 this.#pWinner = '2 | ' + this.#pWinner;
+                this.#classe = 'table-success';
+            }
+        } else {
+            if (this.drop_1 > this.drop_2 + 10 && !this.diff_note) {
+                this.#isOpen = true;
+                this.#pWinner = '1 | ' + this.#pWinner;
+                this.#classe = 'table-warning';
+            } else if (this.drop_1 + 10 < this.drop_2 && this.diff_note) {
+                this.#isOpen = true;
+                this.#pWinner = '2 | ' + this.#pWinner;
+                this.#classe = 'table-warning';
+            }
+        }*/
+
+        
+        if ((this.#home_prob < 0.15 || this.#away_prob < 0.15) && (this.home_prob < this.#draw_prob || this.#away_prob < this.#draw_prob)) {
+            
+            this.#classe = 'table-warning';
+
+            if ((this.#home_prob < 0.11 || this.#away_prob < 0.11)) {
+                this.#isOpen = true;
+                this.#classe = 'table-success';
             }
         }
+        
+/*
+        if (this.#avg_fpg_local < this.#avg_fpg_visitor &&  this.#avg_apg_local > this.#avg_apg_visitor) {
+            this.#isOpen = true;
+                this.#classe = 'table-success';
+        }
+
+        if (this.#avg_fpg_local > this.#avg_fpg_visitor &&  this.#avg_apg_local < this.#avg_apg_visitor) {
+            this.#isOpen = true;
+                this.#classe = 'table-success';
+        }
+*/  
+        const min = .96;
+        const max = 2.04
+        /*if (this.#avg_fpg_local > max && this.#avg_apg_local < min || this.#avg_fpg_visitor > max && this.#avg_apg_visitor < min) {
+            this.#isOpen = true;
+                this.#classe = 'table-success';
+        }*/
+
+
+        /*if (this.#avg_fpg_local < this.#avg_apg_local || this.#avg_fpg_visitor < this.#avg_apg_visitor ) {
+            this.#isOpen = true;
+                this.#classe = 'table-success';
+        }*/
+
+        /*if ((this.#avg_fpg_local / this.#avg_apg_local) > 4 || (this.#avg_fpg_visitor / this.#avg_apg_visitor) > 4) {
+            this.#isOpen = true;
+                this.#classe = 'table-success';
+        }*/
+        
 
     }
 
@@ -244,7 +323,9 @@ class ValideMatch {
         
        //this.res = (this.#local_goal_add - this.#visitor_goal_add).toFixed(2);
 
-       this.res = '' + (this.#home_prob * 100).toFixed(2) + ' | ' + (this.#draw_prob * 100).toFixed(2) + ' | ' + (this.#away_prob * 100).toFixed(2)
+       this.res = '' + (this.#home_prob * 100).toFixed(0) + '% ' + (this.#draw_prob * 100).toFixed(0) + '% ' + (this.#away_prob * 100).toFixed(0) + '% '
+
+        //this.res = '' + (this.#home_prob * 100).toFixed(2) + ' | ' + (this.#old_home_prob * 100).toFixed(2) + ' |-| ' + (this.#away_prob * 100).toFixed(2) + ' | ' + (this.#old_away_prob * 100).toFixed(2)
 
         this.res = this.#pWinner + this.res;
         
@@ -302,6 +383,42 @@ class ValideMatch {
     getTilt(){
         return [this.#local_tilt, this.#visitor_tilt];
     }
+
+    getPos(){ 
+        if (this.#pos_att_local, this.#pos_att_visitor) {
+            return "" + this.#pos_att_local + "/" + this.#pos_def_local + " | " + this.#pos_att_visitor + "/" + this.#pos_def_visitor;
+        } else {
+            return "";
+        }
+    }
+
+    getAttDef(a) {
+        if (this.#avg_fpg_local &&
+        this.#avg_apg_local &&
+        this.#avg_fpg_visitor &&
+        this.#avg_apg_visitor) {
+            
+            //return "" + ((this.#avg_fpg_local + this.#avg_apg_visitor) / 2).toFixed(2)  + " | " +  ((this.#avg_apg_local + this.#avg_fpg_visitor) / 2).toFixed(2)
+            //
+
+            if (a == 1){
+                return "" + this.#avg_fpg_local.toFixed(2) + "/" + this.#avg_apg_local.toFixed(2) + " | " + this.#avg_fpg_visitor.toFixed(2) + "/" + this.#avg_apg_visitor.toFixed(2);
+            } else if (a == 2) {
+                return "" + ((this.#avg_fpg_local / this.#avg_apg_local)).toFixed(2)  + " | " +  ((this.#avg_fpg_visitor / this.#avg_apg_visitor)).toFixed(2);
+            }
+        } else {
+            return "";
+        }
+    }
+
+    getNbMatche() {
+        if (this.#nb_matche_local && this.#nb_matche_visitor) {
+            return this.#nb_matche_local + " | " + this.#nb_matche_visitor;
+        } else {
+            return "";
+        }
+        
+    }
 }
 
 %> 
@@ -348,11 +465,13 @@ class ValideMatch {
             <thead>
                 <tr>
                     <th data-sortable="true" scope="col">TIME</th>
-                    <th data-sortable="true" scope="col">LEAGUE</th>
+                    <th scope="col">LOCATION</th>
                     <th scope="col">TEAMS</th>
                     <th scope="col">OUVERTURE</th>
-                    <th scope="col">TILT</th>
-                    <!--<th scope="col">ELO</th>
+                    <th scope="col">ATT / DEF</th>
+                    <th scope="col">LOCAL / VISIT</th>
+                    <!-- <th scope="col">TILT</th>
+                    <th scope="col">ELO</th>
                     <th scope="col">XG</th>
                     <th scope="col">XG ADD</th>-->
                     <th scope="col">NORMAL | NO TILT</th>
@@ -363,7 +482,17 @@ class ValideMatch {
                     dateTime = el.date + ' ' + el.time
                     id = el.id
                     country_compet = ""
-                    const p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition);
+                    let p1 = null
+                    /*
+                    if (el.pos_att_local, el.pos_def_local, el.pos_att_visitor, el.pos_def_visitor) {
+                        p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition, el.pos_att_local, el.pos_def_local, el.pos_att_visitor, el.pos_def_visitor);
+                    } else if (el.avg_fpg_local, el.avg_apg_local, el.avg_fpg_visitor, el.avg_apg_visitor) {
+                        p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition, el.pos_att_local, el.pos_def_local, el.pos_att_visitor, el.pos_def_visitor, el.avg_fpg_local, el.avg_apg_local, el.avg_fpg_visitor, el.avg_apg_visitor);
+                    } else {
+                        p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition);
+                    }*/
+                    p1 = new ValideMatch(el.local_note, el.visitor_note, el.local_tilt, el.visitor_tilt, el.local_goal_predict, el.visitor_goal_predict, el.local_elo, el.visitor_elo, el.coef_competition, el.pos_att_local, el.pos_def_local, el.pos_att_visitor, el.pos_def_visitor, el.avg_fpg_local, el.avg_apg_local, el.avg_fpg_visitor, el.avg_apg_visitor, el.nb_matche_local, el.nb_matche_visitor);
+                    
                     // Valide à partir du : sam. 12 févr. 2022
                     if ((p1.getOuverture() || showAll) && p1.getIsAvailable()) {
 
@@ -382,7 +511,7 @@ class ValideMatch {
                             <%= moment(dateTime).subtract(0,'h').format("HH:mm") %>
                         </td>
                         <td title="<%= el.name_compet %>">
-                            <%= (country_compet).substring(0, 15) %> <% if(el.id_compet) { %><% } %>
+                            <%= (country_compet).substring(0, 15) %> <% if(el.country) { %><% } %>
                         </td>
                         <td>
                             <%= (el.local_team).substring(0, 15) %> - <%= (el.visitor_team).substring(0, 15) %>
@@ -392,12 +521,21 @@ class ValideMatch {
                             <%= p1.getInfos() %>
                         </td>
                         <td>
-                            <%= p1.getTilt()[0] %> | <%= p1.getTilt()[1] %>
+                            <!--<%= p1.getTilt()[0] %> | <%= p1.getTilt()[1] %>-->
+                            <%= p1.getAttDef(1) %>
                         </td>
 
-                        <td class="user-select-all" style="font-weight: bold;">
+                        <td>
+                            <%= p1.getAttDef(2) %>
+                        </td>
+                        
+                        <!--<td class="user-select-all" style="font-weight: bold;">
                             <%= p1.getGoalPredict(1)[0] %>|<%= p1.getGoalPredict(1)[1] %>|<%= p1.getGoalPredict(2)[0].toFixed(2) %>|<%= p1.getGoalPredict(2)[1].toFixed(2) %>
-                        </td>                        
+                        </td>-->  
+                        
+                        <td class="" style="font-weight: bold;">
+                            <%= p1.getGoalPredict(1)[0] %>|<%= p1.getGoalPredict(1)[1] %> %>
+                        </td>
                     </tr>
                 <% }; }); %>
             </tbody>

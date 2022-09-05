@@ -9,6 +9,8 @@ var csv = require("csvtojson");
 const request = require('request')
 var moment = require('./config/moment');
 
+let {PythonShell} = require('python-shell')
+
 distrib_poisson = require('./config/distrib_poisson')
 inde_tilt = require('./config/inde_tilt')
 
@@ -189,32 +191,17 @@ app.post('/event_detail_2/:id', function (req, res) {
   local_goals = goals_predictions[0]
   visitor_goals = goals_predictions[1]
 
-  local_tilt = tilt[0]
-  visitor_tilt = tilt[1]
+  local_goals_inc = elo_inc[0]
+  visitor_goals_inc = elo_inc[1]
 
-  new_local_goals = local_goals * (1 + local_tilt / 100)
-  new_visitor_goals = visitor_goals * (1 + visitor_tilt / 100)
+  //local_goals_inc = goals_predictions[0] * (1 + tilt[0] / 100)
+  //visitor_goals_inc = goals_predictions[1] * (1 + tilt[1] / 100)
 
-  local_pov_distrib = new distrib_poisson(new_local_goals, visitor_goals, 25)
-  matrice_local_pov = local_pov_distrib.predict_proba();
-  local_pov_proba = matrice_local_pov['percent']
+  //local_goals_nT = goals_predictions[0] / (1 + tilt[0] / 100)
+  //visitor_goals_nT = goals_predictions[1] / (1 + tilt[1] / 100)
 
-  visitor_pov_distrib = new distrib_poisson(local_goals, new_visitor_goals, 25)
-  matrice_visitor_pov = visitor_pov_distrib.predict_proba();
-  visitor_pov_proba = matrice_visitor_pov['percent']
-
-  local_goals_nT = goals_predictions[0] / (1 + tilt[0] / 100)
-  visitor_goals_nT = goals_predictions[1] / (1 + tilt[1] / 100)
-
-  console.log(local_goals_nT);
-
-  //local_goals_nT = tilt[0]
-  //visitor_goals_nT = tilt[1]
-
-  local_goals_inc = goals_predictions[0] * (1 + tilt[0] / 100)
-  visitor_goals_inc = goals_predictions[1] * (1 + tilt[1] / 100)
-
-  console.log('----------')
+  local_goals_nT = tilt[0]
+  visitor_goals_nT = tilt[1]
 
   normal_distrib = new distrib_poisson(local_goals, visitor_goals, 25)
   matrice_normal = normal_distrib.predict_proba();
@@ -223,7 +210,6 @@ app.post('/event_detail_2/:id', function (req, res) {
   no_tilt_distrib = new distrib_poisson(local_goals_nT, visitor_goals_nT, 25)
   matrice_no_tilt = no_tilt_distrib.predict_proba();
   no_tilt_proba = matrice_no_tilt['percent']
-  //console.log(matrice_no_tilt); 
 
   inc_distrib = new distrib_poisson(local_goals_inc, visitor_goals_inc, 25)
   matrice_inc = inc_distrib.predict_proba();
@@ -231,10 +217,9 @@ app.post('/event_detail_2/:id', function (req, res) {
   
   
   c_normal = [normal_proba[0], normal_proba[1], normal_proba[2]];
-  c_no_tilt = [no_tilt_proba[0], no_tilt_proba[1], no_tilt_proba[2]];
+  //c_no_tilt = [no_tilt_proba[0], no_tilt_proba[1], no_tilt_proba[2]];
+  c_no_tilt = [inc_proba[0], inc_proba[1], inc_proba[2]];
   c_inc = [inc_proba[0], inc_proba[1], inc_proba[2]];
-  local_pov = [local_pov_proba[0], local_pov_proba[1], local_pov_proba[2]];
-  visitor_pov = [visitor_pov_proba[0], visitor_pov_proba[1], visitor_pov_proba[2]];
   //c_normal = [percent_winning[0], percent_winning[1], percent_winning[2]];
   
   model_prob = null;
@@ -246,7 +231,7 @@ app.post('/event_detail_2/:id', function (req, res) {
 
   axios.request(options).then(function (response) {
     //console.log(response.data),
-    res.render('event_detail_2', { idMatch: id, items: response.data.data, infos: response.data.event, local_pov: local_pov, visitor_pov: visitor_pov, c_normal: c_normal, c_no_tilt: c_no_tilt, c_inc: c_inc, goals_predictions: goals_predictions, tilt: tilt, elo_inc: elo_inc, header: 'Event Detail' });
+    res.render('event_detail_2', { idMatch: id, items: response.data.data, infos: response.data.event, c_normal: c_normal, c_no_tilt: c_no_tilt, c_inc: c_inc, goals_predictions: goals_predictions, tilt: tilt, elo_inc: elo_inc, header: 'Event Detail' });
   }).catch(function (error) {
     console.error(error);
   });
@@ -835,15 +820,133 @@ app.post('/fixtures', function (req, res) {
   });
 });
 
-app.get('/predictions_by_fixture/:id/:dateISO/:idHome/:idAway/:season', function (req, res) {
+app.get('/predictions_by_fixture/:id/:dateISO/:idHome/:idAway/:season', async function (req, res) {
   my_id = req.params.id;
   dateISO = req.params.dateISO;
   idHome = req.params.idHome;
   idAway = req.params.idAway;
   season = req.params.season;
-  console.log(idAway, season);
-  api.getPrdictionsByFixture(my_id, (response_1) => {
-    res.render('predictions_by_fixture', { id_fixture: my_id, dateISO: dateISO, data_pred: response_1.response[0], header: 'Prédiction' });
+  //console.log(idAway, season);
+  api.getPrdictionsByFixture(my_id, async (response_1) => {
+    //---- catégories
+    predictions = response_1.response[0]['predictions']
+    league = response_1.response[0]['league']
+    teams = response_1.response[0]['teams']
+    comparison = response_1.response[0]['comparison']
+    h2h = response_1.response[0]['h2h']
+
+    //----  league
+
+    id_league = league['id']
+    name_league = league['name']
+    country_league = league['country']
+    logo_league = league['logo']
+    flag_league = league['flag']
+    season_league = league['season']
+
+    //----  teams
+
+    home_info = teams['home']
+    away_info = teams['away']
+
+    id_home = home_info['id']
+    name_home = home_info['name']
+    logo_home = home_info['logo']
+    home_last_5 = home_info['last_5']
+    home_for = home_last_5['for']
+
+    home_xG = (home_last_5['goals']['for']['average'] / home_last_5['goals']['against']['average'])
+
+
+    id_away = away_info['id']
+    name_away = away_info['name']
+    logo_away = away_info['logo']
+    away_last_5 = away_info['last_5']
+    away_xG = (away_last_5['goals']['for']['average'] / away_last_5['goals']['against']['average'])
+
+    normal_distrib = new distrib_poisson(home_xG, away_xG, 25)
+    matrice_normal = normal_distrib.predict_proba();
+    proba_poisson = matrice_normal['percent'];
+
+    let options = {
+      mode: 'text',
+      pythonOptions: ['-u'], // get print results in real-time
+      args: [id_home, id_away]
+    };
+    
+    /*
+    PythonShell.run('./models/modelFixtureFormXg.py', options, function (err, results) {
+      if (err) throw err;
+      // results is an array consisting of messages collected during execution
+      
+      pyEcart = [parseInt(results[0]) + ' | ' + parseInt(results[10]), parseInt(results[2]) + ' | ' + parseInt(results[12]), parseInt(results[4]) + ' | ' + parseInt(results[14]), parseInt(results[6]) + ' | ' + parseInt(results[16]), parseInt(results[8]) + ' | ' + parseInt(results[18])]
+      pyHome = [parseFloat(results[1]), parseFloat(results[3]), parseFloat(results[5]), parseFloat(results[7]), parseFloat(results[9])]
+      pyAway = [parseFloat(results[11]), parseFloat(results[13]), parseFloat(results[15]), parseFloat(results[17]), parseFloat(results[19])]
+      resPy = [pyHome, pyAway, pyEcart]
+      
+      res.render('predictions_by_fixture', { id_fixture: my_id, dateISO: dateISO, data_pred: response_1.response[0], proba_poisson: proba_poisson, resPy: resPy, header: 'Prédiction' });
+    });
+        */
+
+    api.getLastFixturesByTeam(idHome, 50, (response_local) => {
+      api.getLastFixturesByTeam(idAway, 50, (response_visitor) => {
+
+        dateISO
+
+        console.log(response_local['api']['fixtures']);
+        fixtures = response_local['api']['fixtures']
+
+        lfib = []
+        fixtures.forEach(fixture => {
+          if (moment(fixture['event_date']).format() < moment(dateISO).format()) {
+            lfib.push(fixture)
+          }
+        })
+
+        nbmatch = 10
+
+        lfib = lfib.slice(0, nbmatch).reverse()
+
+        periode = 2
+        const_mme = 2 / (periode + 1)
+
+        vi_ema_for_local = 0
+        vi_ema_aga_local = 0
+        
+        vi_ema_for_visitor = 0
+        vi_ema_aga_visitor = 0
+
+        for (let index_2 = periode+1; index_2 < nbmatch+1; index_2++) {
+          
+          if (index_2 - 1 == periode) {
+            for (let index = 0; index < periode; index++) {
+              if (lfib[index]['homeTeam']['team_id'] == idHome) {
+                vi_ema_for_local = vi_ema_for_local + lfib[index]['goalsHomeTeam']
+              } else {
+                vi_ema_for_local = vi_ema_for_local + lfib[index]['goalsAwayTeam']
+              }
+            }
+            vi_ema_for_local = vi_ema_for_local / 2
+          }
+          
+          if (lfib.slice(index_2-1, index_2)[0]['homeTeam']['team_id'] == idHome) {
+            vi_ema_for_local = (lfib.slice(index_2-1, index_2)[0]['goalsHomeTeam'] - vi_ema_for_local) * const_mme + vi_ema_for_local
+          } else {
+            vi_ema_for_local = (lfib.slice(index_2-1, index_2)[0]['goalsAwayTeam'] - vi_ema_for_local) * const_mme + vi_ema_for_local
+          }
+          
+        }
+
+       
+        console.log(vi_ema_for_local);
+        
+
+        res.render('predictions_by_fixture', { id_fixture: my_id, dateISO: dateISO, data_pred: response_1.response[0], proba_poisson: proba_poisson, header: 'Prédiction' });
+      })
+    })
+      
+
+      
   });
 });
 
@@ -1460,5 +1563,14 @@ app.get('/TEST', (req, res) => {
 })
 
 
+function double30(){
+
+  let res = 0.4
+  for (let i = 0; i < 30; i++) {
+    res*=2
+  }
+  console.log(res);
+}
+double30()
 
 app.listen(40);

@@ -183,42 +183,64 @@ away_percent = percent_predictions['away']
                         <th scope="row">Total input</th>
                         <td colspan="2" class="user-select-all text-center" style="font-weight: bold;"><%= home_total.split('%')[0] %>||<%= away_total.split('%')[0] %></td>
                     </tr>
-                    <tr>
+                    <tr id="compareForm">
                         <th scope="row">Form</th>
                         <td><%= home_form %></td>
                         <td><%= away_form %></td>
                     </tr>
-                    <tr>
+                    <tr id="compareAtt">
                         <th scope="row">Attack</th>
                         <td><%= home_att %></td>
                         <td><%= away_att %></td>
                     </tr>
-                    <tr>
+                    <tr id="compareDef">
                         <th scope="row">Defense</th>
                         <td><%= home_def %></td>
                         <td><%= away_def %></td>
                     </tr>
-                    <tr>
+                    <tr id="comparePd">
                         <th scope="row">Poisson distribution</th>
                         <td><%= home_poissond %></td>
                         <td><%= away_poissond %></td>
                     </tr>
-                    <tr>
+                    <tr id="compareH2h">
                         <th scope="row">Head 2 head</th>
                         <td><%= home_h2h %></td>
                         <td><%= away_h2h %></td>
                     </tr>
-                    <tr>
+                    <tr id="compareGoal">
                         <th scope="row">Goal</th>
                         <td><%= home_goals %></td>
                         <td><%= away_goals %></td>
                     </tr>
-                    <tr>
+                    <!--<tr id="compareXg">
                         <th scope="row">xG</th>
                         <td><%= home_xG %></td>
                         <td><%= away_xG %></td>
                     </tr>
+                    <tr id="compareXg">
+                        <th scope="row">xG poisson</th>
+                        <td><%= (proba_poisson[0]).toFixed(0) %>%</td>
+                        <td><%= (proba_poisson[2]).toFixed(0) %>%</td>
+                    </tr>-->
+
+                    <!--<%# for (let i = 0; i < resPy[2].length; i++) { %>
+                        
+                        <tr id="compareByEcart">
+                            <th scope="row"><%#= resPy[2][i] %></th>
+                            <td><%#= (resPy[0][i]).toFixed(3) %></td>
+                            <td><%#= (resPy[1][i]).toFixed(3) %></td>
+                        </tr>
+                        
+                    <%# } %>-->
+
                     <tr>
+                        <th></th>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    
+                    <tr id="compareTotal">
                         <th scope="row">Total</th>
                         <td><%= home_total %></td>
                         <td><%= away_total %></td>
@@ -270,3 +292,16 @@ away_percent = percent_predictions['away']
 
 
 <%- include('include/footer') %>
+
+<script defer="defer">
+    var compareForm = document.getElementById('compareForm');
+    var homeForm = parseInt(compareForm.childNodes[3].textContent.split('%')[0]);
+    var awayForm = parseInt(compareForm.childNodes[5].textContent.split('%')[0]);
+
+    if (homeForm > awayForm) {
+        compareForm.childNodes[3].classList.add("table-success");
+    } else if (homeForm < awayForm) {
+        compareForm.childNodes[5].classList.add("table-info");
+    }
+
+</script>
