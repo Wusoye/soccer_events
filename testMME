@@ -24,3 +24,40 @@ for (let index_2 = periode+1; index_2 < nbmatch; index_2++) {
 
     console.log(index_2 + ": " +vi_ema_for_local);
 }
+
+
+
+-------------------------------------------------------------------------------------------------------
+
+//local_for = [2, 1, 0, 0, 3, 1, 2, 0, 1, 0]
+local_for = [5, 2, 6, 5, 2, 4, 2, 2, 4, 1]
+
+MME(local_for, 3)
+MME(local_for, 4)
+
+
+function MME(tab, periode) {
+    nbmatch = tab.length
+    const_mme = 2 / (periode + 1)
+
+    vi_ema_for_local = 0
+    vi_ema_aga_local = 0
+
+    vi_ema_for_visitor = 0
+    vi_ema_aga_visitor = 0
+
+    for (let index_2 = periode+1; index_2 < nbmatch; index_2++) {
+        
+        if (index_2 - 1 == periode) {
+            for (let index = 0; index < periode; index++) {
+                vi_ema_for_local = tab[index]
+            }
+            vi_ema_for_local = vi_ema_for_local / 2
+        }
+        
+        vi_ema_for_local = (tab[index_2] - vi_ema_for_local) * const_mme + vi_ema_for_local
+        
+
+        console.log(index_2 + ": " +vi_ema_for_local);
+    }
+}
