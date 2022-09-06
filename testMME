@@ -61,3 +61,35 @@ function MME(tab, periode) {
         console.log(index_2 + ": " +vi_ema_for_local);
     }
 }
+
+-------------------------------------------------------------------------------------------------------
+
+function MME(tab, periode) {
+    history_MME = []
+    nbmatch = tab.length
+    const_mme = 2 / (periode + 1)
+
+    vi_ema_for_local = 0
+    vi_ema_aga_local = 0
+
+    vi_ema_for_visitor = 0
+    vi_ema_aga_visitor = 0
+
+    for (let index_2 = periode+1; index_2 < nbmatch; index_2++) {
+        
+        if (index_2 - 1 == periode) {
+            for (let index = 0; index < periode; index++) {
+                vi_ema_for_local = tab[index]
+            }
+            vi_ema_for_local = vi_ema_for_local / 2
+        }
+        
+        vi_ema_for_local = (tab[index_2] - vi_ema_for_local) * const_mme + vi_ema_for_local
+        
+        history_MME.push(vi_ema_for_local)
+        console.log(index_2 + ": " +vi_ema_for_local);
+    }
+
+
+    return history_MME
+}
