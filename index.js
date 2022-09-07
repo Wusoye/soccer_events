@@ -868,80 +868,153 @@ app.get('/predictions_by_fixture/:id/:dateISO/:idHome/:idAway/:season', async fu
     matrice_normal = normal_distrib.predict_proba();
     proba_poisson = matrice_normal['percent'];
 
-    let options = {
-      mode: 'text',
-      pythonOptions: ['-u'], // get print results in real-time
-      args: [id_home, id_away]
-    };
-    
-    /*
-    PythonShell.run('./models/modelFixtureFormXg.py', options, function (err, results) {
-      if (err) throw err;
-      // results is an array consisting of messages collected during execution
-      
-      pyEcart = [parseInt(results[0]) + ' | ' + parseInt(results[10]), parseInt(results[2]) + ' | ' + parseInt(results[12]), parseInt(results[4]) + ' | ' + parseInt(results[14]), parseInt(results[6]) + ' | ' + parseInt(results[16]), parseInt(results[8]) + ' | ' + parseInt(results[18])]
-      pyHome = [parseFloat(results[1]), parseFloat(results[3]), parseFloat(results[5]), parseFloat(results[7]), parseFloat(results[9])]
-      pyAway = [parseFloat(results[11]), parseFloat(results[13]), parseFloat(results[15]), parseFloat(results[17]), parseFloat(results[19])]
-      resPy = [pyHome, pyAway, pyEcart]
-      
-      res.render('predictions_by_fixture', { id_fixture: my_id, dateISO: dateISO, data_pred: response_1.response[0], proba_poisson: proba_poisson, resPy: resPy, header: 'Prédiction' });
-    });
-        */
 
-    api.getLastFixturesByTeam(idHome, 50, (response_local) => {
-      api.getLastFixturesByTeam(idAway, 50, (response_visitor) => {
 
-        dateISO
+    api.getLastFixturesByTeam(idHome, 100, (response_local) => {
+      api.getLastFixturesByTeam(idAway, 100, (response_visitor) => {
 
-        console.log(response_local['api']['fixtures']);
-        fixtures = response_local['api']['fixtures']
-
-        lfib = []
-        fixtures.forEach(fixture => {
-          if (moment(fixture['event_date']).format() < moment(dateISO).format()) {
-            lfib.push(fixture)
-          }
-        })
-
-        nbmatch = 10
-
-        lfib = lfib.slice(0, nbmatch).reverse()
-
-        periode = 2
-        const_mme = 2 / (periode + 1)
-
-        vi_ema_for_local = 0
-        vi_ema_aga_local = 0
         
-        vi_ema_for_visitor = 0
-        vi_ema_aga_visitor = 0
 
-        for (let index_2 = periode+1; index_2 < nbmatch+1; index_2++) {
-          
-          if (index_2 - 1 == periode) {
-            for (let index = 0; index < periode; index++) {
-              if (lfib[index]['homeTeam']['team_id'] == idHome) {
-                vi_ema_for_local = vi_ema_for_local + lfib[index]['goalsHomeTeam']
-              } else {
-                vi_ema_for_local = vi_ema_for_local + lfib[index]['goalsAwayTeam']
+        function MME(tab, periode, nbmatch) {
+          if (nbmatch < tab.length) {
+            a = tab.length - nbmatch -1
+            b = tab.length
+            tab = tab.slice(a, b)
+          }
+          history_MME = []
+          nbmatch = tab.length
+          const_mme = 2 / (periode + 1)
+      
+          vi_ema_for_local = 0
+
+          for (let index_2 = periode; index_2 < nbmatch; index_2++) {
+              
+              if (index_2 - 1 == periode) {
+                  for (let index = 0; index < periode; index++) {
+                      vi_ema_for_local = tab[index]['goal']
+                  }
+                  vi_ema_for_local = vi_ema_for_local / 2
               }
+              
+              vi_ema_for_local = (tab[index_2]['goal'] - vi_ema_for_local) * const_mme + vi_ema_for_local
+              
+              history_MME.push(vi_ema_for_local)
+              mme = vi_ema_for_local
+
+              tab[index_2] = {...tab[index_2], mme}
+          }
+    
+          return tab
+        }
+
+
+        function orderData(tab, idTeam, forOrAgainst) {
+          tab = tab.reverse()
+          tab_2 = []
+          tab.forEach(game => {
+            if (game['goalsHomeTeam'] != null && game['goalsAwayTeam'] != null) {
+              if (forOrAgainst) {
+                if (game['homeTeam']['team_id'] == idTeam) {
+                  tab_2.push({
+                    'event_date': game['event_date'],
+                    'goal': game['goalsHomeTeam']
+                  })
+                } else {
+                  tab_2.push({
+                    'event_date': game['event_date'],
+                    'goal': game['goalsAwayTeam']
+                  })
+                }
+              } else {
+                if (game['homeTeam']['team_id'] == idTeam) {
+                  tab_2.push({
+                    'event_date': game['event_date'],
+                    'goal': game['goalsAwayTeam']
+                  })
+                } else {
+                  tab_2.push({
+                    'event_date': game['event_date'],
+                    'goal': game['goalsHomeTeam']
+                  })
+                }
+              }           
             }
-            vi_ema_for_local = vi_ema_for_local / 2
-          }
+            
+          })
+          return tab_2
+        }
+
+        require('events').EventEmitter.prototype._maxListeners = 0;
+       
+        try {
+          console.log(response_local['api']['results']);
+          local_fixtures = response_local['api']['fixtures'];
+        } catch (error) {
           
-          if (lfib.slice(index_2-1, index_2)[0]['homeTeam']['team_id'] == idHome) {
-            vi_ema_for_local = (lfib.slice(index_2-1, index_2)[0]['goalsHomeTeam'] - vi_ema_for_local) * const_mme + vi_ema_for_local
-          } else {
-            vi_ema_for_local = (lfib.slice(index_2-1, index_2)[0]['goalsAwayTeam'] - vi_ema_for_local) * const_mme + vi_ema_for_local
-          }
+        }
+        
+        
+        try {
+          visitor_fixtures = response_visitor['api']['fixtures'];
+        } catch (error) {
           
         }
 
-       
-        console.log(vi_ema_for_local);
         
 
-        res.render('predictions_by_fixture', { id_fixture: my_id, dateISO: dateISO, data_pred: response_1.response[0], proba_poisson: proba_poisson, header: 'Prédiction' });
+        lfib = []
+        laib = []
+        vfib = []
+        vaib = []
+
+        local_fixtures.forEach(fixture => {
+          if (moment(fixture['event_date']).format() < moment(dateISO).format()) {
+            lfib.push(fixture)
+            laib.push(fixture)
+          }
+        })
+
+        visitor_fixtures.forEach(fixture => {
+          if (moment(fixture['event_date']).format() < moment(dateISO).format()) {
+            vfib.push(fixture)
+            vaib.push(fixture)
+          }
+        })
+
+        lfib = orderData(lfib, idHome, true)
+        laib = orderData(laib, idHome, false)
+
+        vfib = orderData(vfib, idAway, true)
+        vaib = orderData(vaib, idAway, false)
+
+        
+        lfib_3 = MME(lfib, 3, 10)
+        lfib_5 = MME(lfib, 5, 16)
+        lfib_10 = MME(lfib, 10, 33)
+        lfib_30 = MME(lfib, 30, 100)
+
+        laib_3 = MME(laib, 3, 10)
+        laib_5 = MME(laib, 5, 16)
+        laib_10 = MME(laib, 10, 33)
+        laib_30 = MME(laib, 30, 100)
+
+        vfib_3 = MME(vfib, 3, 10)
+        vfib_5 = MME(vfib, 5, 16)
+        vfib_10 = MME(vfib, 10, 33)
+        vfib_30 = MME(vfib, 30, 100)
+
+        vaib_3 = MME(vaib, 3, 10)
+        vaib_5 = MME(vaib, 5, 16)
+        vaib_10 = MME(vaib, 10, 33)
+        vaib_30 = MME(vaib, 30, 100)
+        
+        mmes = []
+
+        mmes.push({lfib_3, lfib_5, lfib_10, lfib_30, laib_3, laib_5, laib_10, laib_30, vfib_3, vfib_5, vfib_10, vfib_30, vaib_3, vaib_5, vaib_10, vaib_30})
+
+        //console.log(mmes);
+
+        res.render('predictions_by_fixture', { id_fixture: my_id, dateISO: dateISO, data_pred: response_1.response[0], proba_poisson: proba_poisson, mmes: mmes, header: 'Prédiction' });
       })
     })
       

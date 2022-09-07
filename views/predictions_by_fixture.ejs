@@ -236,6 +236,36 @@ away_percent = percent_predictions['away']
 
                     <tr>
                         <th></th>
+                        <td><%= mmes[0]['lfib_3'][mmes[0]['lfib_3'].length-1]['goal'].toFixed(2) %> / <%= mmes[0]['laib_3'][mmes[0]['laib_3'].length-1]['goal'].toFixed(2) %></td>
+                        <td><%= mmes[0]['vfib_3'][mmes[0]['vfib_3'].length-1]['goal'].toFixed(2) %> / <%= mmes[0]['vaib_3'][mmes[0]['vaib_3'].length-1]['goal'].toFixed(2) %></td>
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <td><%= (mmes[0]['lfib_3'][mmes[0]['lfib_3'].length-1]['mme']  /  mmes[0]['laib_3'][mmes[0]['laib_3'].length-1]['mme']).toFixed(2) %></td>
+                        <td><%= (mmes[0]['vfib_3'][mmes[0]['vfib_3'].length-1]['mme'].toFixed(2)  /  mmes[0]['vaib_3'][mmes[0]['vaib_3'].length-1]['mme'].toFixed(2)).toFixed(2) %></td>
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <td><%= (mmes[0]['lfib_5'][mmes[0]['lfib_5'].length-1]['mme'].toFixed(2)  /  mmes[0]['laib_5'][mmes[0]['laib_5'].length-1]['mme'].toFixed(2)).toFixed(2) %></td>
+                        <td><%= (mmes[0]['vfib_5'][mmes[0]['vfib_5'].length-1]['mme'].toFixed(2)  /  mmes[0]['vaib_5'][mmes[0]['vaib_5'].length-1]['mme'].toFixed(2)).toFixed(2) %></td>
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <td><%= (mmes[0]['lfib_10'][mmes[0]['lfib_10'].length-1]['mme'].toFixed(2)  /  mmes[0]['laib_10'][mmes[0]['laib_10'].length-1]['mme'].toFixed(2)).toFixed(2) %></td>
+                        <td><%= (mmes[0]['vfib_10'][mmes[0]['vfib_10'].length-1]['mme'].toFixed(2)  /  mmes[0]['vaib_10'][mmes[0]['vaib_10'].length-1]['mme'].toFixed(2)).toFixed(2) %></td>
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <td><%=( mmes[0]['lfib_30'][mmes[0]['lfib_30'].length-1]['mme'].toFixed(2)  /  mmes[0]['laib_30'][mmes[0]['laib_30'].length-1]['mme'].toFixed(2)).toFixed(2) %></td>
+                        <td><%= (mmes[0]['vfib_30'][mmes[0]['vfib_30'].length-1]['mme'].toFixed(2)  /  mmes[0]['vaib_30'][mmes[0]['vaib_30'].length-1]['mme'].toFixed(2)).toFixed(2) %></td>
+                    </tr>
+
+                    <tr>
+                        <th></th>
                         <td></td>
                         <td></td>
                     </tr>

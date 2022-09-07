@@ -93,3 +93,40 @@ function MME(tab, periode) {
 
     return history_MME
 }
+
+
+------------------------------------------------------------------------------------------------------------
+
+nbmatch = 10
+
+lfib = lfib.slice(0, nbmatch).reverse()
+
+periode = 2
+const_mme = 2 / (periode + 1)
+
+vi_ema_for_local = 0
+vi_ema_aga_local = 0
+
+vi_ema_for_visitor = 0
+vi_ema_aga_visitor = 0
+
+for (let index_2 = periode+1; index_2 < nbmatch+1; index_2++) {
+  
+  if (index_2 - 1 == periode) {
+    for (let index = 0; index < periode; index++) {
+      if (lfib[index]['homeTeam']['team_id'] == idHome) {
+        vi_ema_for_local = vi_ema_for_local + lfib[index]['goalsHomeTeam']
+      } else {
+        vi_ema_for_local = vi_ema_for_local + lfib[index]['goalsAwayTeam']
+      }
+    }
+    vi_ema_for_local = vi_ema_for_local / 2
+  }
+  
+  if (lfib.slice(index_2-1, index_2)[0]['homeTeam']['team_id'] == idHome) {
+    vi_ema_for_local = (lfib.slice(index_2-1, index_2)[0]['goalsHomeTeam'] - vi_ema_for_local) * const_mme + vi_ema_for_local
+  } else {
+    vi_ema_for_local = (lfib.slice(index_2-1, index_2)[0]['goalsAwayTeam'] - vi_ema_for_local) * const_mme + vi_ema_for_local
+  }
+  
+}
