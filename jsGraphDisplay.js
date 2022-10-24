@@ -446,10 +446,10 @@ function jsGraphDisplay(aData) {
 
 var graph = new jsGraphDisplay({
     margin: {
-        top: 25,
+        top: 10,
         right: 30,
-        bottom: 25,
-        left: 25
+        bottom: 10,
+        left: 10
     }
 });
 
