@@ -162,7 +162,7 @@ function jsGraphDisplay(aData) {
         }
 
         // texte
-        me.Text = function (txt, pt, opt) {
+        me.Text = function (txt, pt, opt) { 
             if (opt.fontSize) me.context.font = opt.fontSize + "px Arial";
             if (opt.textBaseline) me.context.textBaseline = opt.textBaseline;
             if (opt.width) me.context.lineWidth = opt.width;
@@ -241,7 +241,8 @@ function jsGraphDisplay(aData) {
             if (i % me.axe.x.textDisplayEvery == 0) {
                 tmp = me.axe.x.min + i * me.axe.x.step;
                 if (me.axe.x.list) tmp = me.axe.x.list[(tmp / me.axe.x.max * me.axe.x.list.length) - 1];
-                else tmp = Math.floor(tmp);
+                //else tmp = Math.floor(tmp);
+                else tmp = moment(tmp).format('DD MMM YY');
                 objDraw.Text(tmp, [x, limitB + lineH * 2], { fontSize: me.axe.x.textSize, color: me.axe.x.textColor, textBaseline: "top", textAlign: "center" });
             }
         }
@@ -437,15 +438,26 @@ function jsGraphDisplay(aData) {
     return me;
 }
 
-/**  TEST  */
 
-var graph = new jsGraphDisplay();
+
+/** TEST */
+
+
+
+var graph = new jsGraphDisplay({
+    margin: {
+        top: 25,
+        right: 30,
+        bottom: 25,
+        left: 25
+    }
+});
 
 var display = {
     linkType: "bezier",
     linkWidth: "1",
     linkColor: "#FF0000",
-    linkFromZero: "true",
+    linkFromZero: "false",
     linkDash: [],
     dataType: "rectangle",
     dataWidth: "4",
@@ -461,7 +473,7 @@ graph.DataAdd({
         [moment().subtract(64, 'days'), 20],
         [moment().subtract(54, 'days'), 22],
         [moment().subtract(30, 'days'), 27],
-        [moment().subtract(10, 'days'), 35]
+        [moment(), 35]
     ],
     display
 });
@@ -477,7 +489,7 @@ graph.DataAdd({
         [moment().subtract(64, 'days'), 21],
         [moment().subtract(54, 'days'), 15],
         [moment().subtract(30, 'days'), 12],
-        [moment().subtract(10, 'days'), 27]
+        [moment(), 27]
     ],
     display
 });
@@ -485,3 +497,4 @@ graph.DataAdd({
 
 
 graph.Draw('canvas');
+
