@@ -8,7 +8,6 @@ Array.prototype.sum = function () {
 
 Array.prototype.average = function (periode) {
     let tab = [...this].slice(-periode)
-    console.log(tab);
     const sum = tab.reduce((accumulator, value) => {
         return accumulator + value;
     }, 0);
@@ -77,15 +76,11 @@ let tab_DP2 = [105 / 99, 87 / 101, 79 / 82, 102 / 86, 96 / 117, 101 / 107, 99 / 
 
 
 
-let tab = tab_DP2
-const periode = 3
-console.log(tab.average(periode))
-console.log();
-console.log(EMA(tab, periode));
-
+let tab = tab_NOP
+const periode = 4
 
 for (let index = 1; index <= tab.length; index++) {
     if (index > periode) {
-        console.log(EMA(tab.slice(0, index), periode));
+        console.log([index, EMA(tab.slice(0, index), periode)]);
     }    
 }
