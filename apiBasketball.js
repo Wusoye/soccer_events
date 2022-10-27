@@ -93,6 +93,14 @@ for (let index = 1; index <= tab.length; index++) {
     }    
 }
 
+const periode6 = 6
+console.log('P 6:');
+for (let index = 1; index <= tab.length; index++) {
+    if (index > periode6) {
+        console.log([index, EMA(tab.slice(0, index), periode6)]);
+    }
+}
+
 console.log('P N:');
 for (let index = 1; index <= tab.length; index++) {
     console.log([index, tab[index-1]]);
