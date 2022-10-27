@@ -62,7 +62,7 @@ function EMA(tab, periode) {
     }
 }
 
-let tab_NOP = [94 / 102, 107 / 71, 129 / 125, 107 / 101, 111 / 97, 103 / 120, 120 / 111, 130 / 108, 124 / 112, 121 / 122, 113 / 111]
+let tab_NOP = [94 / 102, 107 / 71, 129 / 125, 107 / 101, 111 / 97, 103 / 120, 120 / 111, 130 / 108, 124 / 112, 121 / 122]
 let tab_DM = [99 / 100, 82 / 83, 78 / 105, 89 / 100, 84 / 95, 98 / 96, 105 / 110, 115 / 101, 105 / 107, 137 / 96]
 
 let tab_DM2 = [110 / 120, 99 / 100, 82 / 83, 78 / 105, 89 / 100, 84 / 95, 98 / 96, 105 / 110, 115 / 101, 105 / 107]
@@ -76,11 +76,24 @@ let tab_DP2 = [105 / 99, 87 / 101, 79 / 82, 102 / 86, 96 / 117, 101 / 107, 99 / 
 
 
 
-let tab = tab_NOP
-const periode = 4
-
+let tab = tab_WW
+const periode2 = 2
+console.log('P 2:');
 for (let index = 1; index <= tab.length; index++) {
-    if (index > periode) {
-        console.log([index, EMA(tab.slice(0, index), periode)]);
+    if (index > periode2) {
+        console.log([index, EMA(tab.slice(0, index), periode2)]);
     }    
+}
+
+const periode4 = 4
+console.log('P 4:');
+for (let index = 1; index <= tab.length; index++) {
+    if (index > periode4) {
+        console.log([index, EMA(tab.slice(0, index), periode4)]);
+    }    
+}
+
+console.log('P N:');
+for (let index = 1; index <= tab.length; index++) {
+    console.log([index, tab[index-1]]);
 }
