@@ -62,6 +62,38 @@ function EMA(tab, periode) {
     }
 }
 
+function EMA(tab, periode) {
+    try {
+        if (tab.length <= periode) throw new Error('Periode trop grande par rapport aux données disponobles')
+        let tabEma = [...tab]
+        if (typeof tabEma[0] === "number") {
+            let valueForEMA = tabEma.pop()
+            let tabForSM = tabEma.slice(-periode)
+            let average = tabForSM.average()
+            let lambda =  2 / (periode + 1)
+            return (valueForEMA - average) * lambda + average
+        } else if (typeof tabEma[0] === "object") {
+            let keys = Object.keys(tabEma[0])
+            let goodKey = null
+            keys.forEach(key => {
+                if (typeof tabEma[0][key] === "number") goodKey = key
+            })
+            let valueForEMA = tabEma.pop()
+            let tabForSM = tabEma.slice(-periode)
+            const sum = tabForSM.reduce((accumulator, value) => {
+                return accumulator + value[goodKey];
+            }, 0);
+            let average = sum / tabForSM.length
+            let lambda =  2 / (periode + 1)
+            return (valueForEMA[goodKey] - average) * lambda + average
+        }
+        
+    } catch (e) {
+        console.log(e);
+        return e
+    }
+}
+
 let tab_NOP = [94 / 102, 107 / 71, 129 / 125, 107 / 101, 111 / 97, 103 / 120, 120 / 111, 130 / 108, 124 / 112, 121 / 122]
 let tab_DM = [99 / 100, 82 / 83, 78 / 105, 89 / 100, 84 / 95, 98 / 96, 105 / 110, 115 / 101, 105 / 107, 137 / 96]
 
